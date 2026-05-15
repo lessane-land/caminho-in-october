@@ -28,8 +28,8 @@ document.write('<link rel="manifest" href="'+URL.createObjectURL(b)+'">');
   --gold:#d4900a;--goldl:#fffbea;--goldm:#f0c040;
   --teal:#0898b0;--teall:#e8f9fc;--tealm:#50c8d8;
 }
-html,body{height:calc(var(--vh,1vh)*100);overflow:hidden;font-family:'Raleway',-apple-system,sans-serif;background:var(--bg);color:var(--text-inv);-webkit-font-smoothing:antialiased;letter-spacing:.01em}
-#app{display:flex;flex-direction:column;height:calc(var(--vh,1vh)*100);min-height:0;overflow:hidden}
+html,body{height:100%;overflow:hidden;font-family:'Raleway',-apple-system,sans-serif;background:var(--bg);color:var(--text-inv);-webkit-font-smoothing:antialiased;letter-spacing:.01em}
+#app{display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
 
 /* ── HEADER ── */
 .hdr{
@@ -746,7 +746,7 @@ function updateProgress(){
       if(dot) dot.style.background = colors[n-1];
     });
     // If all done, show 100%
-    if(done.length === 3 && pct_el) pct_el.textContent = '100% 🎉';
+    if(done.length === 3 && pct_el) pct_el.textContent = '100%';
   }catch(e){}
 }
 function switchStage(n){
@@ -964,24 +964,7 @@ buildCL();
 updatePicker(1);
 
 // iOS viewport height fix
-function setVH(){
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', vh + 'px');
-}
-// Fire multiple times to catch iOS Safari delayed rendering
-setVH();
-setTimeout(setVH, 100);
-setTimeout(setVH, 300);
-setTimeout(setVH, 600);
-window.addEventListener('resize', setVH);
-window.addEventListener('orientationchange', () => {
-  setTimeout(setVH, 100);
-  setTimeout(setVH, 300);
-});
-// Also fire when page becomes visible (returning from background)
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) setTimeout(setVH, 100);
-});
+// iOS height handled by position:fixed on #app
 
 // Load persisted progress on startup
 updateProgress();
