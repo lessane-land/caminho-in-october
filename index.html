@@ -74,7 +74,12 @@ body{margin:0;padding:0;background:#0f0c18;overflow:hidden;position:fixed;top:0;
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── TABS ── */
-.tabs{position:fixed;left:0;right:0;bottom:-100px;z-index:20;display:flex;align-items:flex-start;width:100%;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-top:6px;padding-bottom:calc(100px + max(env(safe-area-inset-bottom,0px),6px))}
+/* Tab bar with iOS 26 bug workaround:
+   bottom:-50px extends bar past viewport edge to cover iOS 26 phantom gap.
+   The 50px is added back as padding-bottom + safe-area so icons sit
+   correctly inside the visible portion. align-items:center keeps icons
+   visually balanced. */
+.tabs{position:fixed;left:0;right:0;bottom:-50px;z-index:20;display:flex;align-items:center;width:100%;height:60px;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-bottom:calc(50px + max(env(safe-area-inset-bottom,0px),0px));box-sizing:content-box}
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:8px 4px;transition:all .15s}
 .tb:active{opacity:.5;transform:scale(.92)}
 .tb-iw{width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:transform .2s;border-radius:10px}
