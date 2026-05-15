@@ -931,9 +931,20 @@ function setVH(){
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', vh + 'px');
 }
+// Fire multiple times to catch iOS Safari delayed rendering
 setVH();
+setTimeout(setVH, 100);
+setTimeout(setVH, 300);
+setTimeout(setVH, 600);
 window.addEventListener('resize', setVH);
-window.addEventListener('orientationchange', () => setTimeout(setVH, 150));
+window.addEventListener('orientationchange', () => {
+  setTimeout(setVH, 100);
+  setTimeout(setVH, 300);
+});
+// Also fire when page becomes visible (returning from background)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) setTimeout(setVH, 100);
+});
 
 // Service Worker for offline
 if('serviceWorker' in navigator){
