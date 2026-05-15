@@ -31,10 +31,10 @@ document.write('<link rel="manifest" href="'+URL.createObjectURL(b)+'">');
   --gold:#d4900a;--goldl:#fffbea;--goldm:#f0c040;
   --teal:#0898b0;--teall:#e8f9fc;--tealm:#50c8d8;
 }
-html{height:100%;background:#0f0c18}
+html{height:100%;background:#ff0000} /* RED — html background */
 html,body{height:100vh;height:-webkit-fill-available}
-body{margin:0;padding:0;background:#0f0c18;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;width:100%}
-#app{position:absolute;top:0;right:0;left:0;bottom:0;display:flex;flex-direction:column;background:#0f0c18;overflow:hidden}
+body{margin:0;padding:0;background:#00ff00;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;width:100%} /* GREEN — body */
+#app{position:absolute;top:0;right:0;left:0;bottom:0;display:flex;flex-direction:column;background:#0000ff;overflow:hidden} /* BLUE — #app */
 
 /* ── HEADER ── */
 .hdr{
@@ -74,7 +74,7 @@ body{margin:0;padding:0;background:#0f0c18;overflow:hidden;position:fixed;top:0;
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── TABS ── */
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;width:100%;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-top:6px;padding-bottom:max(env(safe-area-inset-bottom,0px),6px)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;width:100%;background:#ffff00;border-top:.5px solid rgba(255,255,255,0.08);padding-top:6px;padding-bottom:max(env(safe-area-inset-bottom,0px),6px)} /* YELLOW — .tabs */
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:8px 4px;transition:all .15s}
 .tb:active{opacity:.5;transform:scale(.92)}
 .tb-iw{width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:transform .2s;border-radius:10px}
