@@ -28,8 +28,8 @@ document.write('<link rel="manifest" href="'+URL.createObjectURL(b)+'">');
   --gold:#d4900a;--goldl:#fffbea;--goldm:#f0c040;
   --teal:#0898b0;--teall:#e8f9fc;--tealm:#50c8d8;
 }
-html,body{height:100%;overflow:hidden;font-family:'Raleway',-apple-system,sans-serif;background:var(--bg);color:var(--text-inv);-webkit-font-smoothing:antialiased;letter-spacing:.01em}
-#app{display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;height:100%}
+html,body{height:100svh;overflow:hidden;font-family:'Raleway',-apple-system,sans-serif;background:var(--bg);color:var(--text-inv);-webkit-font-smoothing:antialiased;letter-spacing:.01em}
+#app{display:flex;flex-direction:column;width:100%;height:100svh;overflow:hidden}
 
 /* ── HEADER ── */
 .hdr{
@@ -69,18 +69,7 @@ html,body{height:100%;overflow:hidden;font-family:'Raleway',-apple-system,sans-s
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── TABS ── */
-.tabs{position:fixed;bottom:0;left:0;right:0;
-  height:auto;
-  min-height:58px;
-  padding-top:8px;
-  padding-bottom:max(env(safe-area-inset-bottom,0px),34px);
-  padding-left:0;padding-right:0;
-  background:var(--bg);
-  border-top:.5px solid rgba(255,255,255,0.08);
-  display:flex;align-items:flex-start;
-  z-index:100;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)
-}
+.tabs{position:fixed;bottom:0;left:0;right:0;padding-top:8px;padding-bottom:env(safe-area-inset-bottom,34px);background:var(--bg);border-top:.5px solid rgba(255,255,255,0.08);display:flex;align-items:flex-start;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:8px 4px;transition:all .15s}
 .tb:active{opacity:.5;transform:scale(.92)}
 .tb-iw{width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:transform .2s;border-radius:10px}
@@ -977,6 +966,7 @@ updatePicker(1);
 // iOS viewport height fix
 // iOS height handled by position:fixed on #app
 
+
 // Load persisted progress on startup
 updateProgress();
 
@@ -986,28 +976,7 @@ if (isStandalone) {
   const ib = document.getElementById('ib');
   if (ib) ib.style.display = 'none';
   // In standalone PWA, measure exact dimensions and set them
-  function fixLayout() {
-    const totalH = window.innerHeight;
-    const app = document.getElementById('app');
-    const tabs = document.querySelector('.tabs');
-    const hdr = document.querySelector('.hdr');
-    if (!app || !tabs || !hdr) return;
-    // Set app to exact pixel height
-    app.style.height = totalH + 'px';
-    // Get actual computed heights
-    const tabsH = tabs.getBoundingClientRect().height;
-    const hdrH = hdr.getBoundingClientRect().height;
-    // Set scroll area to fill exactly
-    const sa = document.getElementById('sa');
-    if (sa) {
-      sa.style.height = (totalH - tabsH - hdrH) + 'px';
-      sa.style.flex = 'none';
-    }
-  }
-  fixLayout();
-  setTimeout(fixLayout, 100);
-  setTimeout(fixLayout, 500);
-  window.addEventListener('resize', fixLayout);
+  
 } else {
   const ib = document.getElementById('ib');
   if (ib) ib.style.display = 'flex';
