@@ -62,7 +62,7 @@ body{height:100%;margin:0;padding:0;overflow:hidden;background:#0f0c18}
 .hdr-badge{background:linear-gradient(135deg,rgba(240,112,32,0.9),rgba(192,64,32,0.95));color:#fff;font-size:13px;font-weight:700;padding:8px 16px;border-radius:20px;display:flex;align-items:center;gap:5px;box-shadow:0 4px 20px rgba(240,112,32,0.5),0 0 0 1px rgba(255,255,255,0.15) inset;letter-spacing:.04em;backdrop-filter:blur(10px);white-space:nowrap;flex-shrink:0}
 
 /* ── SCROLL ── */
-#sa{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0f0c18;padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+#sa{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0f0c18;padding-bottom:80px}
 
 /* ── PAGES ── */
 .page{display:none;padding-bottom:16px}
@@ -70,7 +70,7 @@ body{height:100%;margin:0;padding:0;overflow:hidden;background:#0f0c18}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── TABS ── */
-.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,0px);z-index:100}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-top:8px;padding-bottom:8px;z-index:100}
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:8px 4px;transition:all .15s}
 .tb:active{opacity:.5;transform:scale(.92)}
 .tb-iw{width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:transform .2s;border-radius:10px}
@@ -965,41 +965,8 @@ buildCL();
 updatePicker(1);
 
 
-// Measure and fix safe area bottom
-(function fixSafeArea() {
-  function apply() {
-    // Create test element to measure env(safe-area-inset-bottom)
-    const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;bottom:env(safe-area-inset-bottom,0px);left:0;width:1px;height:1px;opacity:0;pointer-events:none';
-    document.body.appendChild(el);
-    const rect = el.getBoundingClientRect();
-    const fromBottom = window.innerHeight - rect.top;
-    el.remove();
-    const safe = fromBottom > 2 ? fromBottom : 34;
-    // Apply to tabs
-    const tabs = document.querySelector('.tabs');
-    if (tabs) {
-      tabs.style.paddingBottom = safe + 'px';
-    }
-    // Fill the gap below tabs
-    let fill = document.getElementById('safe-fill');
-    if (!fill) {
-      fill = document.createElement('div');
-      fill.id = 'safe-fill';
-      fill.style.cssText = 'position:fixed;left:0;right:0;background:#0f0c18;z-index:98;pointer-events:none';
-      document.body.appendChild(fill);
-    }
-    const tabsRect = document.querySelector('.tabs').getBoundingClientRect();
-    fill.style.top = tabsRect.bottom + 'px';
-    fill.style.bottom = '0';
-    fill.style.height = (window.innerHeight - tabsRect.bottom) + 'px';
-  }
-  setTimeout(apply, 100);
-  setTimeout(apply, 500);
-  window.addEventListener('resize', apply);
-})();
 
-// iOS viewport height fix
+
 </script>
 </body>
 </html>
