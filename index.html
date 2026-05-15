@@ -28,8 +28,18 @@ document.write('<link rel="manifest" href="'+URL.createObjectURL(b)+'">');
   --gold:#d4900a;--goldl:#fffbea;--goldm:#f0c040;
   --teal:#0898b0;--teall:#e8f9fc;--tealm:#50c8d8;
 }
-html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#0f0c18}
-#app{display:flex;flex-direction:column;height:100%;background:#0f0c18}
+html{
+  min-height:calc(100% + env(safe-area-inset-top));
+  background:#0f0c18
+}
+body{
+  min-height:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  margin:0;
+  overflow:hidden;
+  background:#0f0c18
+}
+#app{display:flex;flex-direction:column;height:100%;background:#0f0c18;overflow:hidden}
 
 /* ── HEADER ── */
 .hdr{
@@ -69,7 +79,7 @@ html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#0f0c18}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── TABS ── */
-.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,34px);z-index:100}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;background:#0f0c18;border-top:.5px solid rgba(255,255,255,0.08);padding-top:8px;padding-bottom:env(safe-area-inset-bottom,0px);z-index:100}
 .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:8px 4px;transition:all .15s}
 .tb:active{opacity:.5;transform:scale(.92)}
 .tb-iw{width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:transform .2s;border-radius:10px}
