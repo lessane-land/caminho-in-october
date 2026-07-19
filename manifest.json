@@ -1,0 +1,14 @@
+{
+  "name": "Camino Porto - Vigo",
+  "short_name": "Camino",
+  "description": "Camino Portugues da Costa: stages, elevation, albergues, offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c1420",
+  "theme_color": "#0c1420",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
