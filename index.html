@@ -3,544 +3,921 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Porto &rarr; Vigo</title>
+<title>For us · Porto → Vigo, October 2026</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0c1420">
+<meta name="theme-color" content="#0a0e1a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Camino">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --abyss:#0a111c; --deep:#0f1a29; --card:#131f31; --card2:#16243a;
-    --line:#22334a; --line-soft:#1a293d;
-    --foam:#e8eef5; --mist:#91a3b9; --kelp:#5b6d85;
-    --tide:#3fa7a0; --tide-deep:#255e5a; --tide-glow:rgba(63,167,160,.35);
-    --waymark:#f2c230; --waymark-dim:#8a7326; --coral:#e0938a;
-    --radius:16px;
-    --font-display:"Fraunces",serif; --font-body:"Inter",system-ui,sans-serif; --font-mono:"JetBrains Mono",monospace;
+    --night-deep:#0a111c; --night:#0f1826; --night-soft:#131f31; --night-card:#182842;
+    --night-border:rgba(63,167,160,0.16);
+    --paper:#e8eef5; --ink:#e8eef5; --ink-soft:#9fb0c5; --mute:#5b6d85; --mute-dim:#44536a;
+    --terracotta:#3fa7a0; --terracotta-bright:#5fc2bb; --gold:#f2c230; --gold-bright:#f6d35f;
+    --sea-glow:#4a90b8; --sea-deep:#255e5a; --sea-shallow:#6fd0c9;
+    --success:#7ab87a; --warn:#d4a672; --danger:#e07856;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{scroll-behavior:smooth}
   body{
-    background:
-      radial-gradient(1200px 500px at 50% -10%, #12233a 0%, transparent 60%),
-      var(--abyss);
-    color:var(--foam);font-family:var(--font-body);line-height:1.65;font-size:15px;
-    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
-    position:relative;
+    font-family:'Inter Tight',system-ui,sans-serif;
+    background:var(--night-deep); color:var(--ink); line-height:1.6;
+    background-image:
+      radial-gradient(at 15% 5%, rgba(242,194,48,0.07) 0px, transparent 50%),
+      radial-gradient(at 85% 90%, rgba(74,144,184,0.08) 0px, transparent 50%);
+    min-height:100vh; overflow-x:hidden;
+    padding-bottom:env(safe-area-inset-bottom);
   }
-  /* film grain so the dark never reads flat */
-  body::before{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
-  }
-  .wrap{max-width:760px;margin:0 auto;padding:0 18px 120px;position:relative;z-index:2}
+  .container{max-width:1000px;margin:0 auto;padding:0 22px}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.85}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes shimmer{0%,100%{opacity:.3}50%{opacity:.9}}
+  @keyframes confetti-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01s !important}}
 
-  /* ---------- hero ---------- */
-  header{padding:34px 0 0}
-  .eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--tide);margin-bottom:14px;display:flex;align-items:center;gap:9px}
-  h1{font-family:var(--font-display);font-weight:300;font-size:clamp(38px,10vw,56px);line-height:1.02;letter-spacing:-.015em}
-  h1 em{font-style:italic;color:var(--waymark);font-weight:500}
-  .dedication{
-    margin-top:14px;display:flex;align-items:center;gap:14px;
-    font-family:var(--font-display);font-style:italic;font-size:15.5px;color:var(--mist);
-  }
-  .dedication::before,.dedication::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--line));}
-  .dedication::after{background:linear-gradient(90deg,var(--line),transparent)}
-  .dedication b{font-weight:500;color:var(--foam)}
+  /* header */
+  .header-wrap{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--night-border);padding-top:env(safe-area-inset-top)}
+  .header-top{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;max-width:1000px;margin:0 auto;border-bottom:1px solid var(--night-border)}
+  .logo{font-family:'Fraunces',serif;font-size:.98rem;color:var(--gold-bright);font-style:italic;font-weight:400;display:flex;align-items:center;gap:10px}
+  .logo-icon{width:18px;height:18px;color:var(--terracotta);flex:none}
+  .logo strong{color:var(--paper);font-style:normal;font-weight:500}
+  .countdown-pill{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--terracotta-bright);padding:6px 13px;border:1px solid var(--terracotta);border-radius:50px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .countdown-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--terracotta);animation:pulse 2s ease-in-out infinite}
+  .tabs{max-width:1000px;margin:0 auto;display:flex;padding:0 12px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{background:none;border:none;cursor:pointer;padding:14px 16px;position:relative;font-family:'Fraunces',serif;font-size:.95rem;font-weight:400;font-style:italic;color:var(--mute);white-space:nowrap;transition:color .2s}
+  .tab .tab-num{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute-dim);display:block;margin-bottom:3px;font-style:normal}
+  .tab:hover{color:var(--ink-soft)} .tab:hover .tab-num{color:var(--terracotta-bright)}
+  .tab.active{color:var(--paper)} .tab.active .tab-num{color:var(--terracotta-bright)}
+  .tab.active::after{content:"";position:absolute;bottom:0;left:16px;right:16px;height:2px;background:linear-gradient(90deg,var(--terracotta),var(--gold));border-radius:2px 2px 0 0}
 
-  /* signature: the tide */
-  .wave{margin:18px -18px 0;line-height:0;position:relative}
-  .wave svg{width:100%;height:52px;display:block}
-  .wave .w1,.wave .w2{animation:drift 26s linear infinite}
-  .wave .w2{animation-duration:38s;animation-direction:reverse;opacity:.5}
-  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-360px)}}
-  @media (prefers-reduced-motion: reduce){.wave .w1,.wave .w2{animation:none}}
+  .panel{display:none;min-height:70vh;padding:44px 0 90px}
+  .panel.active{display:block;animation:fadeIn .5s ease}
+  .panel-header{margin-bottom:36px}
+  .panel-eyebrow{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--terracotta-bright);margin-bottom:12px}
+  h2{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(2rem,6vw,3.2rem);line-height:1;letter-spacing:-.02em;color:var(--paper)}
+  h2 em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--terracotta-bright),var(--gold-bright));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .panel-intro{font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;color:var(--ink-soft);max-width:640px;margin-top:14px;font-weight:300}
+  .sub-section{margin-bottom:64px}
+  .sub-section h3{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--paper);font-weight:400;margin-bottom:6px;display:flex;align-items:center;gap:12px}
+  .sub-icon{width:20px;height:20px;color:var(--terracotta);flex:none}
+  .sub-section h3 em{font-style:italic;background:linear-gradient(135deg,var(--terracotta-bright),var(--gold-bright));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:300}
+  .sub-sub{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);margin-bottom:20px;font-size:.92rem}
 
-  /* entrance */
-  header,.plans,.datebar,.progress,.tabs{animation:rise .7s ease both}
-  .plans{animation-delay:.08s}.datebar{animation-delay:.14s}.progress{animation-delay:.2s}.tabs{animation-delay:.26s}
-  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion: reduce){header,.plans,.datebar,.progress,.tabs{animation:none}}
+  /* invitation */
+  .invitation{position:relative;padding:16px 0 40px}
+  .invitation::before{content:"";position:absolute;top:40px;right:0;width:340px;height:340px;background:radial-gradient(circle,var(--terracotta) 0%,transparent 70%);opacity:.22;border-radius:50%;filter:blur(70px);z-index:0;animation:float 7s ease-in-out infinite}
+  .invitation::after{content:"";position:absolute;bottom:0;left:0;width:300px;height:300px;background:radial-gradient(circle,var(--sea-glow) 0%,transparent 70%);opacity:.18;border-radius:50%;filter:blur(60px);z-index:0;animation:float 9s ease-in-out infinite reverse}
+  .stars-bg{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:
+    radial-gradient(1px 1px at 20% 30%,var(--gold-bright),transparent),
+    radial-gradient(1px 1px at 60% 70%,var(--ink-soft),transparent),
+    radial-gradient(1px 1px at 80% 20%,var(--gold),transparent),
+    radial-gradient(1px 1px at 40% 80%,var(--ink-soft),transparent),
+    radial-gradient(1px 1px at 90% 60%,var(--gold-bright),transparent);
+    opacity:.4;animation:shimmer 5s ease-in-out infinite}
+  .inv-content{position:relative;z-index:1}
+  .inv-eyebrow{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--terracotta-bright);margin-bottom:26px;display:flex;align-items:center;gap:14px}
+  .inv-eyebrow::before{content:"";height:1px;flex:0 0 40px;background:var(--terracotta-bright)}
+  .inv-eyebrow::after{content:"";height:1px;flex:1;background:var(--terracotta-bright);opacity:.2}
+  .inv-to{font-family:'Fraunces',serif;font-style:italic;font-size:1.5rem;color:var(--gold-bright);margin-bottom:8px;font-weight:300}
+  .inv-headline{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(2.5rem,8vw,4.8rem);line-height:1.02;letter-spacing:-.025em;color:var(--paper);margin-bottom:28px}
+  .inv-headline em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--terracotta-bright),var(--gold-bright));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .inv-prose{font-family:'Fraunces',serif;font-size:1.15rem;line-height:1.7;color:var(--ink-soft);max-width:640px;margin-bottom:22px;font-weight:300}
+  .inv-prose em{color:var(--gold-bright);font-style:italic}
+  .inv-prose strong{color:var(--paper);font-weight:500;font-style:normal}
+  .inv-dare{border-left:2px solid var(--terracotta);padding:18px 0 18px 26px;margin:36px 0;font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;color:var(--paper);line-height:1.5;max-width:600px;font-weight:300}
+  .inv-dare span{color:var(--terracotta-bright)}
+  .inv-cta-wrap{margin-top:40px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .yes-btn{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);border:none;cursor:pointer;padding:18px 44px;border-radius:50px;font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;font-style:italic;box-shadow:0 14px 50px -12px rgba(63,167,160,.55);transition:all .3s cubic-bezier(.16,1,.3,1)}
+  .yes-btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 22px 60px -12px rgba(63,167,160,.85)}
+  .yes-meta{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+  .inv-details{margin-top:60px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px;padding:28px 0;border-top:1px solid var(--night-border);border-bottom:1px solid var(--night-border);max-width:800px}
+  .inv-detail-label{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .inv-detail-label svg{width:13px;height:13px;color:var(--terracotta-bright)}
+  .inv-detail-value{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--gold-bright);font-weight:400}
+  .inv-secret{margin-top:44px;padding:22px 26px;background:linear-gradient(135deg,rgba(242,194,48,.05),rgba(63,167,160,.05));border:1px solid var(--night-border);border-radius:8px;max-width:580px;font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:.95rem;line-height:1.65;font-weight:300;position:relative}
+  .inv-secret::before{content:"";position:absolute;left:-1px;top:20px;bottom:20px;width:2px;background:var(--gold)}
+  .inv-secret strong{color:var(--gold-bright);font-style:normal;font-weight:500}
+  .inv-secret.pps{margin-top:18px;background:linear-gradient(135deg,rgba(63,167,160,.08),rgba(242,194,48,.04));font-size:1.02rem}
+  .inv-secret.pps::before{background:var(--terracotta)}
+  .inv-secret.pps strong{color:var(--terracotta-bright)}
+  .inv-secret.pps em{color:var(--paper);font-weight:400}
+  .confetti{position:fixed;width:8px;height:8px;pointer-events:none;z-index:300}
+  .heart-svg{position:fixed;width:30px;height:30px;pointer-events:none;z-index:300;color:var(--terracotta)}
 
-  /* ---------- plan picker ---------- */
-  .plans{display:flex;gap:7px;margin-top:20px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  /* logistics cards */
+  .log-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+  .log-card{background:var(--night-soft);border:1px solid var(--night-border);padding:20px;border-radius:8px;transition:all .3s ease}
+  .log-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+  .log-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .log-label svg{width:13px;height:13px;color:var(--terracotta-bright)}
+  .log-value{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--gold-bright);font-weight:500;line-height:1.3}
+  .log-note{font-family:'Fraunces',serif;font-style:italic;font-size:.85rem;color:var(--mute);margin-top:6px}
+  .log-note a{color:var(--sea-shallow)}
+  .book-btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--night-deep);text-decoration:none;padding:10px 18px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;transition:all .3s cubic-bezier(.16,1,.3,1)}
+  .book-btn:hover{background:var(--terracotta-bright);transform:translateY(-2px);box-shadow:0 10px 30px -10px var(--terracotta)}
+  .book-btn svg{width:12px;height:12px}
+  .book-btn.terra{background:var(--terracotta)} .book-btn.terra:hover{background:var(--gold-bright)}
+
+  /* plan picker */
+  .plans{display:flex;gap:7px;margin:6px 0 12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
   .plans::-webkit-scrollbar{display:none}
-  .plan-chip{flex:none;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;padding:8px 14px;border:1px solid var(--line);border-radius:99px;background:var(--deep);color:var(--mist);cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s,background .2s}
-  .plan-chip:hover{border-color:var(--tide-deep);color:var(--foam)}
-  .plan-chip.active{background:linear-gradient(135deg,var(--tide-deep),#1b4a46);border-color:var(--tide);color:var(--foam);box-shadow:0 0 18px -6px var(--tide-glow)}
-  .datebar{display:flex;align-items:center;gap:10px;margin-top:12px;font-family:var(--font-mono);font-size:12px;color:var(--kelp)}
-  .datebar input{background:var(--deep);border:1px solid var(--line);border-radius:9px;color:var(--foam);font-family:var(--font-mono);font-size:12px;padding:7px 9px;color-scheme:dark}
-  .datebar input:focus-visible{outline:2px solid var(--tide);outline-offset:1px}
-
-  .custom-panel{display:none;margin-top:12px;background:var(--deep);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .plan-chip{flex:none;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:8px 15px;border:1px solid var(--night-border);border-radius:50px;background:var(--night-soft);color:var(--ink-soft);cursor:pointer;white-space:nowrap;transition:all .2s}
+  .plan-chip:hover{border-color:var(--terracotta);color:var(--terracotta-bright)}
+  .plan-chip.active{background:var(--terracotta);border-color:var(--terracotta);color:var(--night-deep);font-weight:700}
+  .datebar{display:flex;align-items:center;gap:10px;margin-top:8px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--mute);flex-wrap:wrap}
+  .datebar input{background:var(--night-soft);border:1px solid var(--night-border);border-radius:6px;color:var(--paper);font-family:'DM Mono',monospace;font-size:.75rem;padding:7px 9px;color-scheme:dark}
+  .custom-panel{display:none;margin-top:12px;background:var(--night-soft);border:1px solid var(--night-border);border-radius:8px;padding:14px 16px}
   .custom-panel.show{display:block}
-  .custom-panel h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--tide);margin-bottom:8px;font-weight:600}
-  .stop-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13.5px;color:var(--mist);cursor:pointer}
-  .stop-row input{accent-color:#3fa7a0;width:16px;height:16px}
-  .stop-row .skm{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--kelp)}
-  .custom-warn{margin-top:8px;font-size:12.5px;color:var(--coral);display:none}
+  .custom-panel h4{font-family:'DM Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;color:var(--gold);margin-bottom:8px;font-weight:500}
+  .stop-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:.86rem;color:var(--ink-soft);cursor:pointer}
+  .stop-row input{accent-color:#e07856;width:16px;height:16px}
+  .stop-row .skm{margin-left:auto;font-family:'DM Mono',monospace;font-size:.66rem;color:var(--mute)}
+  .custom-warn{margin-top:8px;font-size:.8rem;color:var(--terracotta-bright);display:none;font-family:'Fraunces',serif;font-style:italic}
   .custom-warn.show{display:block}
 
-  /* ---------- progress ---------- */
-  .progress{margin-top:16px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;box-shadow:0 14px 34px -22px rgba(0,0,0,.9)}
-  .progress-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:12px;color:var(--mist)}
-  .progress-top b{color:var(--waymark);font-size:16px;font-weight:500}
-  .bar{margin-top:11px;height:9px;background:#0b1523;border-radius:99px;overflow:hidden;border:1px solid var(--line-soft);position:relative}
-  .bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--tide-deep),var(--tide) 60%,#6fd0c9);border-radius:99px;transition:width .6s cubic-bezier(.22,1,.36,1);position:relative}
-  .bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-100%);animation:sheen 3.2s ease-in-out infinite}
-  @keyframes sheen{60%{transform:translateX(100%)}100%{transform:translateX(100%)}}
-  @media (prefers-reduced-motion: reduce){.bar i::after{animation:none}}
-  .progress-sub{margin-top:9px;font-size:12px;color:var(--kelp)}
+  /* progress */
+  .progress{background:var(--night-soft);border:1px solid var(--night-border);border-radius:10px;padding:16px 18px;margin-bottom:26px}
+  .progress.fin{border-color:var(--gold);background:linear-gradient(135deg,rgba(242,194,48,.08),var(--night-soft))}
+  .progress-top{display:flex;justify-content:space-between;align-items:baseline;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+  .progress-top b{color:var(--gold-bright);font-family:'Fraunces',serif;font-size:1.25rem;font-weight:500;letter-spacing:0;text-transform:none}
+  .bar{margin-top:10px;height:8px;background:var(--night-deep);border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--terracotta),var(--gold));border-radius:99px;transition:width .6s cubic-bezier(.16,1,.3,1);box-shadow:0 0 10px var(--gold)}
+  .progress-sub{margin-top:9px;font-size:.82rem;color:var(--mute);font-family:'Fraunces',serif;font-style:italic}
+  .progress.fin .progress-sub{color:var(--gold-bright);font-size:.95rem}
+  .gps-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--sea-glow);color:var(--sea-shallow);padding:9px 16px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-left:auto}
+  .gps-btn:hover{background:var(--sea-deep)} .gps-btn.busy{opacity:.5}
+  .gps-btn svg{width:13px;height:13px}
+  .stage-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 
-  /* ---------- tabs ---------- */
-  .tabs{position:sticky;top:0;z-index:10;display:flex;gap:8px;padding:12px 0 14px;background:linear-gradient(var(--abyss) 72%,transparent)}
-  .tab{flex:1;text-align:center;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
-       padding:11px 0;border:1px solid var(--line);border-radius:99px;color:var(--mist);background:var(--deep);cursor:pointer;user-select:none;transition:.2s}
-  .tab:hover{color:var(--foam);border-color:var(--tide-deep)}
-  .tab.active{color:#101820;background:linear-gradient(135deg,#f4cb52,var(--waymark));border-color:var(--waymark);font-weight:600;box-shadow:0 6px 20px -8px rgba(242,194,48,.5)}
-  .gps-btn{flex:0 0 46px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:99px;background:var(--deep);color:var(--tide);cursor:pointer;transition:.2s}
-  .gps-btn:hover{border-color:var(--tide);box-shadow:0 0 14px -4px var(--tide-glow)}
-  .gps-btn.busy{opacity:.5}
-  .tab:focus-visible,.gps-btn:focus-visible,.plan-chip:focus-visible{outline:2px solid var(--tide);outline-offset:2px}
-
-  .panel{display:none}
-  .panel.active{display:block;animation:rise .45s ease both}
-
-  /* ---------- stages ---------- */
-  .stage{position:relative;padding:0 0 0 42px;margin-bottom:14px}
-  .stage::before{content:"";position:absolute;left:14px;top:0;bottom:-14px;width:2px;
-    background:repeating-linear-gradient(var(--tide-deep) 0 7px,transparent 7px 12px)}
+  /* stages */
+  .stage{position:relative;padding:0 0 0 34px;margin-bottom:14px}
+  .stage::before{content:"";position:absolute;left:10px;top:0;bottom:-14px;width:2px;background:linear-gradient(180deg,var(--terracotta),transparent)}
   .stage:last-of-type::before{bottom:auto;height:40px}
-  .node{position:absolute;left:3px;top:22px;width:24px;height:24px;border-radius:50%;background:var(--abyss);border:2px solid var(--tide);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;color:var(--tide);transition:.25s}
-  .stage.done .node{background:var(--tide);color:var(--abyss);box-shadow:0 0 14px -3px var(--tide-glow)}
-  .card{
-    background:linear-gradient(180deg,var(--card2),var(--card));
-    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;
-    box-shadow:0 16px 36px -26px rgba(0,0,0,.9);transition:border-color .25s,transform .25s;
-  }
-  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,var(--tide-glow),transparent)}
-  .stage.open .card{border-color:#2e455f}
-  .stage.done .card{opacity:.72}
-  .card-head{padding:18px 18px 16px;cursor:pointer;user-select:none;position:relative;overflow:hidden}
-  .ghost{position:absolute;right:6px;top:-26px;font-family:var(--font-display);font-weight:600;font-size:96px;line-height:1;color:#1c2c44;opacity:.55;pointer-events:none;font-style:italic}
+  .node{position:absolute;left:1px;top:24px;width:20px;height:20px;border-radius:50%;background:var(--night-deep);border:2px solid var(--terracotta);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--terracotta-bright)}
+  .stage.done .node{background:var(--terracotta);color:var(--night-deep);box-shadow:0 0 14px var(--terracotta)}
+  .stage.ann .node{border-color:var(--gold);color:var(--gold-bright);box-shadow:0 0 18px var(--gold);animation:pulse 2s ease-in-out infinite}
+  .card{background:var(--night-soft);border:1px solid var(--night-border);border-radius:10px;overflow:hidden;transition:all .3s ease}
+  .stage.open .card{border-color:rgba(242,194,48,.35)}
+  .stage.done .card{opacity:.75}
+  .stage.ann .card{border-left:2px solid var(--gold);background:linear-gradient(90deg,rgba(242,194,48,.07),var(--night-soft) 45%)}
+  .card-head{padding:18px;cursor:pointer;user-select:none;position:relative;overflow:hidden}
+  .ghost{position:absolute;right:4px;top:-24px;font-family:'Fraunces',serif;font-weight:600;font-style:italic;font-size:88px;line-height:1;color:rgba(242,194,48,.09);pointer-events:none}
   .stage-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;position:relative}
-  .stage-route{font-family:var(--font-display);font-weight:500;font-size:19.5px;flex:1;min-width:0;letter-spacing:-.01em}
-  .stage-route .to{color:var(--waymark);font-weight:300;padding:0 3px}
-  .stage-date{font-family:var(--font-mono);font-size:11px;color:var(--kelp);letter-spacing:.06em;margin-top:3px;position:relative}
-  .km{font-family:var(--font-mono);font-size:12px;color:var(--waymark);border:1px solid var(--waymark-dim);border-radius:99px;padding:2px 10px;white-space:nowrap;background:rgba(242,194,48,.06)}
-  .chev{color:var(--kelp);transition:transform .3s cubic-bezier(.22,1,.36,1);flex:none}
+  .stage-route{font-family:'Fraunces',serif;font-weight:500;font-size:1.2rem;flex:1;min-width:0;letter-spacing:-.01em;color:var(--paper)}
+  .stage-route .to{color:var(--terracotta-bright);font-weight:300;padding:0 3px}
+  .km{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold-bright);border:1px solid rgba(242,194,48,.4);border-radius:50px;padding:2px 10px;white-space:nowrap}
+  .chev{color:var(--mute);transition:transform .3s;flex:none}
   .stage.open .chev{transform:rotate(180deg)}
-  .head-elev{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:9px;font-family:var(--font-mono);font-size:12px;position:relative}
-  .head-elev .up{color:#7fd4a0}.head-elev .down{color:var(--coral)}
+  .stage-date{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-top:4px;display:flex;align-items:center;gap:10px;position:relative}
+  .ann-mark{display:inline-flex;align-items:center;gap:5px;color:var(--gold-bright);font-family:'Fraunces',serif;font-style:italic;font-size:.8rem;text-transform:none;letter-spacing:0}
+  .ann-mark svg{width:11px;height:11px}
+  .head-elev{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:9px;font-family:'DM Mono',monospace;font-size:.72rem;position:relative}
+  .head-elev .up{color:var(--success)} .head-elev .down{color:var(--terracotta-bright)}
   .dots{display:inline-flex;gap:4px;align-items:center}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--line);display:inline-block}
-  .dot.on{background:var(--waymark);box-shadow:0 0 6px -1px rgba(242,194,48,.7)}
-
-  .detail{display:none;padding:0 18px 18px;border-top:1px dashed var(--line)}
-  .stage.open .detail{display:block;animation:rise .35s ease both}
-  .detail .max{font-family:var(--font-mono);font-size:12px;color:var(--mist);padding:13px 0 0}
-
-  .miniprofile{margin-top:12px;background:#0b1523;border:1px solid var(--line-soft);border-radius:12px;padding:8px 6px 2px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--night-card);display:inline-block}
+  .dot.on{background:var(--gold);box-shadow:0 0 6px var(--gold)}
+  .detail{display:none;padding:0 18px 18px;border-top:1px dashed var(--night-border)}
+  .stage.open .detail{display:block;animation:fadeIn .35s ease}
+  .detail .max{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-soft);padding:13px 0 0;letter-spacing:.04em}
+  .miniprofile{margin-top:12px;background:var(--night-deep);border:1px solid var(--night-border);border-radius:8px;padding:8px 6px 2px}
   .miniprofile svg{width:100%;height:auto;display:block}
-  .wp-dot{fill:var(--tide);stroke:#0b1523;stroke-width:1.5;cursor:pointer}
-  .wp-dot.hi{fill:var(--waymark)}
-  .wp-dot.sel{fill:var(--waymark);stroke:var(--waymark);stroke-opacity:.35;stroke-width:8}
-  .gps-dot{fill:#fff;stroke:var(--coral);stroke-width:3;pointer-events:none}
-  .gps-pulse{fill:none;stroke:var(--coral);stroke-width:2;opacity:.6;pointer-events:none}
-  .wp-caption{font-family:var(--font-mono);font-size:11.5px;color:var(--kelp);padding:7px 10px 9px;min-height:30px}
-  .wp-caption b{color:var(--waymark);font-weight:500}
-  .gps-msg{margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--mist);background:#0b1523;border:1px solid var(--line-soft);border-radius:10px;padding:9px 12px;display:none}
-  .gps-msg.show{display:block}
-  .gps-msg b{color:var(--coral)}
-
-  .wx{margin-top:14px;border:1px solid var(--line-soft);border-radius:12px;overflow:hidden}
-  .wx-head{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--kelp);padding:8px 11px;background:#0b1523;display:flex;justify-content:space-between}
+  .wp-dot{fill:var(--sea-glow);stroke:#0a0e1a;stroke-width:1.5;cursor:pointer}
+  .wp-dot.hi{fill:var(--gold)}
+  .wp-dot.sel{fill:var(--gold-bright);stroke:var(--gold);stroke-opacity:.4;stroke-width:8}
+  .gps-dot{fill:#fff;stroke:var(--terracotta);stroke-width:3;pointer-events:none}
+  .gps-pulse{fill:none;stroke:var(--terracotta);stroke-width:2;opacity:.6;pointer-events:none}
+  .wp-caption{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--mute);padding:7px 10px 9px;min-height:30px}
+  .wp-caption b{color:var(--gold-bright);font-weight:500}
+  .gps-msg{margin-top:10px;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-soft);background:var(--night-deep);border:1px solid var(--night-border);border-radius:8px;padding:9px 12px;display:none}
+  .gps-msg.show{display:block} .gps-msg b{color:var(--terracotta-bright)}
+  .wx{margin-top:14px;border:1px solid var(--night-border);border-radius:8px;overflow:hidden}
+  .wx-head{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.14em;color:var(--mute);padding:8px 11px;background:var(--night-deep);display:flex;justify-content:space-between}
   .wx-body{display:flex}
-  .wx-day{flex:1;padding:11px 13px;font-size:12.5px;color:var(--mist)}
-  .wx-day+.wx-day{border-left:1px solid var(--line-soft)}
-  .wx-day b{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--tide);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-  .wx-day .t{color:var(--foam);font-family:var(--font-mono);font-size:14.5px}
-  .wx-day .rain{color:#8db8d9}
-
-  .alt-table{margin-top:12px;border:1px solid var(--line-soft);border-radius:12px;overflow:hidden}
-  .alt-table table{width:100%;border-collapse:collapse;font-size:12.5px}
-  .alt-table th{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--kelp);text-align:left;padding:8px 11px;background:#0b1523;font-weight:500}
-  .alt-table td{padding:6px 11px;border-top:1px solid var(--line-soft);color:var(--mist);transition:background .15s}
-  .alt-table tr{cursor:pointer}
-  .alt-table tbody tr:hover td{background:#152134}
-  .alt-table td:first-child{font-family:var(--font-mono);color:var(--kelp);width:48px}
-  .alt-table td.alt{font-family:var(--font-mono);text-align:right;width:70px;color:var(--tide)}
-  .alt-table td.pin{width:32px;text-align:center}
-  .alt-table td.pin a{color:var(--kelp);display:inline-flex;transition:color .15s}
-  .alt-table td.pin a:hover{color:var(--waymark)}
-  .alt-table tr.hi td{color:var(--foam)}
-  .alt-table tr.hi td.alt{color:var(--waymark)}
-  .alt-table tr.sel td{background:#1a2c46;color:var(--foam)}
-  .alt-table tr.sel td.alt{color:var(--waymark)}
-
-  .note{color:var(--mist);margin-top:13px;font-size:14px}
+  .wx-day{flex:1;padding:11px 13px;font-size:.78rem;color:var(--ink-soft)}
+  .wx-day+.wx-day{border-left:1px solid var(--night-border)}
+  .wx-day b{display:block;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--sea-shallow);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+  .wx-day .t{color:var(--gold-bright);font-family:'Fraunces',serif;font-size:.95rem;font-weight:500}
+  .wx-day .rain{color:var(--sea-shallow)}
+  .alt-table{margin-top:12px;border:1px solid var(--night-border);border-radius:8px;overflow:hidden}
+  .alt-table table{width:100%;border-collapse:collapse;font-size:.78rem}
+  .alt-table th{font-family:'DM Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mute);text-align:left;padding:8px 11px;background:var(--night-deep);font-weight:500}
+  .alt-table td{padding:6px 11px;border-top:1px solid var(--night-border);color:var(--ink-soft)}
+  .alt-table tr{cursor:pointer} .alt-table tbody tr:hover td{background:var(--night-card)}
+  .alt-table td:first-child{font-family:'DM Mono',monospace;color:var(--mute);width:46px}
+  .alt-table td.alt{font-family:'DM Mono',monospace;text-align:right;width:66px;color:var(--sea-shallow)}
+  .alt-table td.pin{width:30px;text-align:center}
+  .alt-table td.pin a{color:var(--mute);display:inline-flex}
+  .alt-table td.pin a:hover{color:var(--gold-bright)}
+  .alt-table tr.hi td{color:var(--paper)} .alt-table tr.hi td.alt{color:var(--gold-bright)}
+  .alt-table tr.sel td{background:var(--night-card);color:var(--paper)} .alt-table tr.sel td.alt{color:var(--gold-bright)}
+  .note{color:var(--ink-soft);margin-top:13px;font-size:.9rem}
+  .fieldnote{margin-top:13px;border-left:2px solid var(--gold);background:linear-gradient(90deg,rgba(242,194,48,.07),transparent 70%);border-radius:0 8px 8px 0;padding:12px 15px}
+  .fieldnote span{display:block;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:5px}
+  .fieldnote p{font-size:.88rem;color:var(--ink-soft);font-style:italic;font-family:'Fraunces',serif;line-height:1.6}
   .blk{margin-top:15px}
-  .blk h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--tide);font-weight:600;margin-bottom:8px}
+  .blk h4{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;color:var(--sea-shallow);font-weight:500;margin-bottom:8px}
   .blk ul{list-style:none}
-  .blk li{display:flex;gap:8px;align-items:baseline;padding:4px 0;font-size:13.5px}
-  .name{color:var(--foam);font-weight:500}
-  .meta{color:var(--kelp);font-size:12.5px}
-  .price{font-family:var(--font-mono);font-size:12px;color:var(--waymark);white-space:nowrap;margin-left:auto;padding-left:10px}
-  .svc{font-size:13px;color:var(--mist)}
-  .svc b{color:var(--foam);font-weight:500}
+  .blk li{display:flex;gap:8px;align-items:baseline;padding:4px 0;font-size:.85rem}
+  .name{color:var(--paper);font-weight:500}
+  .meta{color:var(--mute);font-size:.78rem;font-family:'Fraunces',serif;font-style:italic}
+  .price{font-family:'Fraunces',serif;font-size:.85rem;color:var(--terracotta-bright);white-space:nowrap;margin-left:auto;padding-left:10px;font-weight:500}
+  .svc{font-size:.83rem;color:var(--ink-soft)} .svc b{color:var(--paper);font-weight:500}
+  .done-btn{margin-top:17px;width:100%;padding:12px;border-radius:8px;border:1px solid var(--night-border);background:var(--night-deep);color:var(--ink-soft);font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .done-btn:hover{border-color:var(--terracotta);color:var(--terracotta-bright)}
+  .stage.done .done-btn{background:var(--terracotta);border-color:var(--terracotta);color:var(--night-deep);font-weight:700}
+  .ferry{margin:4px 0 16px 34px;border:1px solid var(--sea-deep);background:linear-gradient(180deg,#0d1a2c,#0a1422);border-radius:10px;padding:17px 18px;position:relative;overflow:hidden}
+  .ferry::after{content:"";position:absolute;right:-30px;bottom:-38px;width:130px;height:130px;border-radius:50%;border:1.5px solid var(--sea-deep);opacity:.6}
+  .ferry h3{font-family:'Fraunces',serif;font-weight:500;font-size:1rem;color:var(--sea-shallow);font-style:italic}
+  .ferry p{color:var(--ink-soft);font-size:.83rem;margin-top:7px}
+  .ferry b{color:var(--paper)}
 
-  .done-btn{margin-top:17px;width:100%;padding:13px;border-radius:11px;border:1px solid var(--line);
-    background:var(--deep);color:var(--mist);font-family:var(--font-mono);font-size:12.5px;letter-spacing:.08em;cursor:pointer;transition:.2s}
-  .done-btn:hover{border-color:var(--tide);color:var(--foam)}
-  .stage.done .done-btn{background:linear-gradient(135deg,var(--tide-deep),#1b4a46);border-color:var(--tide);color:var(--foam)}
+  /* map */
+  .map-wrap{background:linear-gradient(180deg,#061222 0%,#0a1a2e 100%);border:1px solid var(--night-border);padding:26px;border-radius:8px}
+  .map-svg{width:100%;height:auto;display:block;max-width:860px;margin:0 auto}
 
-  .ferry{margin:4px 0 18px 42px;border:1px solid var(--tide-deep);background:
-    linear-gradient(180deg,#0f2330,#0c1b27);border-radius:var(--radius);padding:17px 18px;position:relative;overflow:hidden}
-  .ferry::after{content:"";position:absolute;right:-30px;bottom:-38px;width:130px;height:130px;border-radius:50%;
-    border:1.5px solid var(--tide-deep);opacity:.5}
-  .ferry h3{font-family:var(--font-display);font-weight:500;font-size:16.5px;color:var(--tide);font-style:italic}
-  .ferry p{color:var(--mist);font-size:13.5px;margin-top:7px}
-  .ferry b{color:var(--foam)}
+  /* food cards */
+  .food-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+  .food-card{background:var(--night-soft);padding:20px;border:1px solid var(--night-border);border-radius:6px;transition:all .3s ease}
+  .food-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+  .food-name{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--gold-bright);font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .food-icon{width:17px;height:17px;color:var(--terracotta);flex:none}
+  .food-desc{color:var(--ink-soft);font-size:.85rem;line-height:1.55}
+  .food-desc strong{color:var(--paper)}
+  .food-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--terracotta-bright);text-decoration:none}
+  .food-link:hover{color:var(--gold-bright)}
+  .food-link svg{width:10px;height:10px}
 
-  .tipgrid{display:grid;grid-template-columns:1fr;gap:13px;margin-top:6px}
-  @media(min-width:560px){.tipgrid{grid-template-columns:1fr 1fr}}
-  .tip{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--radius);padding:17px 18px;box-shadow:0 14px 30px -24px rgba(0,0,0,.9)}
-  .tip h5{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--waymark);margin-bottom:6px;font-weight:600}
-  .tip p{font-size:13.5px;color:var(--mist)}
-  .tip a{color:var(--tide)}
-
-  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--kelp);font-size:12px;text-align:center}
-  footer .bo{font-family:var(--font-display);font-style:italic;font-size:15px;color:var(--mist);display:block;margin-top:8px}
-  .reset{margin-top:12px;background:none;border:none;color:var(--kelp);font-family:var(--font-mono);font-size:11px;text-decoration:underline;cursor:pointer}
-
-  /* field notes: the smart layer */
-  .fieldnote{margin-top:13px;border-left:2px solid var(--waymark);background:linear-gradient(90deg,rgba(242,194,48,.06),transparent 70%);border-radius:0 10px 10px 0;padding:11px 14px}
-  .fieldnote span{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--waymark);margin-bottom:4px}
-  .fieldnote p{font-size:13.5px;color:var(--mist);font-style:italic;font-family:var(--font-display)}
+  /* playlists */
+  .playlist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+  .playlist-card{background:var(--night-soft);border:1px solid var(--night-border);padding:20px;border-radius:8px;transition:all .3s ease}
+  .playlist-card:hover{border-color:var(--terracotta)}
+  .playlist-label{display:flex;align-items:center;gap:9px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--terracotta-bright);margin-bottom:9px}
+  .playlist-label svg{width:15px;height:15px}
+  .playlist-name{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--paper);margin-bottom:6px;font-weight:500}
+  .playlist-desc{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.82rem;margin-bottom:13px;line-height:1.5}
+  .playlist-embed{width:100%;height:420px;border:none;border-radius:8px;background:transparent}
 
   /* phrasebook */
-  .phrase{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
-  .phrase th{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--kelp);text-align:left;padding:6px 8px;font-weight:500;border-bottom:1px solid var(--line-soft)}
-  .phrase td{padding:6px 8px;border-bottom:1px solid var(--line-soft);color:var(--mist)}
-  .phrase td:first-child{color:var(--foam)}
-  .phrase td:nth-child(2){color:var(--tide)}
+  .phrase-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .phrase-cat-btn{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);padding:7px 14px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border-radius:50px;cursor:pointer;transition:all .2s}
+  .phrase-cat-btn:hover{border-color:var(--terracotta);color:var(--terracotta-bright)}
+  .phrase-cat-btn.active{background:var(--terracotta);color:var(--night-deep);border-color:var(--terracotta);font-weight:700}
+  .phrase-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px}
+  .phrase-card{background:var(--night-soft);border:1px solid var(--night-border);padding:16px;border-radius:6px;transition:all .3s ease}
+  .phrase-card:hover{border-color:var(--gold)}
+  .phrase-en{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+  .phrase-lang{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.12em;color:var(--sea-shallow);text-transform:uppercase;margin-left:6px}
+  .phrase-ca-row{display:flex;align-items:center;gap:12px;margin-bottom:5px}
+  .phrase-ca{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--gold-bright);font-weight:500;line-height:1.3;flex:1}
+  .phrase-speak{background:var(--terracotta);border:none;color:var(--night-deep);width:30px;height:30px;border-radius:50%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+  .phrase-speak:hover{background:var(--gold-bright);transform:scale(1.1)}
+  .phrase-speak svg{width:13px;height:13px;fill:var(--night-deep)}
+  .phrase-speak.playing{background:var(--gold-bright);animation:pulse .8s ease-in-out infinite}
+  .phrase-phonetic{font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:.8rem}
+  .phrase-note{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.76rem;margin-top:8px;padding-top:8px;border-top:1px dashed var(--night-border)}
 
-  /* packing */
-  .pack-row{display:flex;align-items:center;gap:11px;padding:7px 0;font-size:13.5px;color:var(--mist);cursor:pointer;border-bottom:1px dashed var(--line-soft)}
-  .pack-row:last-child{border-bottom:none}
-  .pack-row input{accent-color:#3fa7a0;width:17px;height:17px;flex:none}
-  .pack-row.on{color:var(--kelp);text-decoration:line-through}
-  .pack-row .why{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:var(--kelp);text-align:right;padding-left:10px;text-decoration:none}
-
-  /* the finish */
-  .progress.fin{border-color:var(--waymark-dim);background:linear-gradient(180deg,#1b2438,#161f31)}
-  .progress.fin .progress-sub{font-family:var(--font-display);font-style:italic;font-size:14.5px;color:var(--foam)}
-
+  /* packing / budget / expenses / journal (from the Costa Brava system) */
+  .we-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .we-cat{background:var(--night-soft);border:1px solid var(--night-border);padding:20px;border-radius:6px}
+  .we-cat-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:11px;border-bottom:1px solid var(--night-border)}
+  .we-cat-icon{width:20px;height:20px;color:var(--gold);flex-shrink:0}
+  .we-cat-title{font-family:'Fraunces',serif;font-size:1rem;color:var(--paper);font-weight:500;flex:1}
+  .we-cat-count{font-family:'DM Mono',monospace;font-size:.64rem;color:var(--mute)}
+  .we-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+  .we-item{display:flex;align-items:center;gap:10px;padding:6px 7px;border-radius:4px;cursor:pointer;transition:all .2s;user-select:none}
+  .we-item:hover{background:var(--night-card)}
+  .we-check{width:17px;height:17px;border:2px solid var(--mute);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .we-item.checked .we-check{background:var(--terracotta);border-color:var(--terracotta)}
+  .we-item.checked .we-check::after{content:"";width:4px;height:8px;border:solid var(--night-deep);border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-1px)}
+  .we-label{font-size:.85rem;color:var(--ink-soft);flex:1}
+  .we-item.checked .we-label{color:var(--mute);text-decoration:line-through;text-decoration-color:var(--terracotta)}
+  .we-note{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.72rem}
+  .pack-progress-wrap{background:var(--night-soft);border:1px solid var(--night-border);padding:18px 22px;border-radius:8px;margin-bottom:22px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .pack-progress-stat{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--gold-bright);font-weight:500}
+  .pack-progress-stat strong{color:var(--terracotta-bright)}
+  .pack-progress-bar-wrap{flex:1;min-width:180px}
+  .pack-progress-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--mute);margin-bottom:5px;display:flex;justify-content:space-between}
+  .pack-progress-bar{height:6px;background:var(--night-deep);border-radius:3px;overflow:hidden}
+  .pack-progress-fill{height:100%;background:linear-gradient(90deg,var(--terracotta),var(--gold));width:0%;transition:width .5s cubic-bezier(.16,1,.3,1);box-shadow:0 0 10px var(--gold)}
+  .pack-actions{display:flex;gap:8px}
+  .pack-action-btn{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);padding:7px 12px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .2s}
+  .pack-action-btn:hover{border-color:var(--terracotta);color:var(--terracotta-bright)}
+  .budget-table{width:100%;background:var(--night-soft);border:1px solid var(--night-border);border-collapse:collapse}
+  .budget-table td{padding:15px 20px;border-bottom:1px solid var(--night-border);color:var(--ink-soft);font-size:.9rem}
+  .budget-table tr:hover{background:var(--night-card)}
+  .budget-table tr:last-child td{border-bottom:none;background:linear-gradient(135deg,var(--night-deep),var(--sea-deep));color:var(--paper);font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500}
+  .budget-cost{text-align:right;font-family:'Fraunces',serif;font-size:.98rem;color:var(--terracotta-bright);font-weight:500}
+  .budget-table tr:last-child .budget-cost{color:var(--gold-bright);font-size:1.25rem}
+  .budget-cell{display:flex;align-items:center;gap:12px}
+  .budget-icon{width:18px;height:18px;color:var(--gold);flex-shrink:0}
+  .companion-note{background:linear-gradient(135deg,rgba(242,194,48,.05),rgba(63,167,160,.05));border:1px solid var(--night-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:6px;font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:.9rem;line-height:1.6;margin-bottom:28px;font-weight:300}
+  .companion-note strong{color:var(--gold-bright);font-style:normal;font-weight:500}
+  .expense-dash{background:var(--night-soft);border:1px solid var(--night-border);padding:22px;border-radius:8px;margin-bottom:22px}
+  .exp-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px;margin-bottom:18px}
+  .exp-stat-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+  .exp-stat-val{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--gold-bright);font-weight:500;line-height:1}
+  .exp-stat-val.spent{color:var(--terracotta-bright)}
+  .exp-stat-val.remaining{color:var(--success)}
+  .exp-stat-val.remaining.warn{color:var(--warn)} .exp-stat-val.remaining.over{color:var(--danger)}
+  .exp-stat-sub{font-family:'DM Mono',monospace;font-size:.64rem;color:var(--mute);margin-top:5px}
+  .exp-progress-bar{height:9px;background:var(--night-deep);border-radius:5px;overflow:hidden;margin-bottom:8px}
+  .exp-progress-fill{height:100%;background:linear-gradient(90deg,var(--success) 0%,var(--success) 50%,var(--warn) 75%,var(--danger) 100%);width:0%;transition:width .6s cubic-bezier(.16,1,.3,1)}
+  .exp-input-row{display:grid;grid-template-columns:1fr 1fr 100px auto;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--night-border)}
+  .exp-input{background:var(--night-deep);border:1px solid var(--night-border);color:var(--paper);padding:10px 12px;border-radius:5px;font-family:'Inter Tight',sans-serif;font-size:.85rem;transition:all .2s}
+  .exp-input:focus{outline:none;border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(63,167,160,.2)}
+  .exp-input::placeholder{color:var(--mute-dim)}
+  .exp-add-btn{background:var(--terracotta);color:var(--night-deep);border:none;padding:10px 18px;border-radius:5px;font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;transition:all .2s}
+  .exp-add-btn:hover{background:var(--gold-bright)}
+  .exp-list{background:var(--night-soft);border:1px solid var(--night-border);border-radius:6px;padding:6px;max-height:320px;overflow-y:auto}
+  .exp-empty{text-align:center;padding:28px 16px;font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.85rem}
+  .exp-row{display:grid;grid-template-columns:78px 1fr 84px 30px;gap:10px;padding:11px 13px;border-bottom:1px solid var(--night-border);align-items:center}
+  .exp-row:hover{background:var(--night-card)} .exp-row:last-child{border-bottom:none}
+  .exp-row-date{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--mute)}
+  .exp-row-desc{color:var(--paper);font-size:.85rem}
+  .exp-row-amt{font-family:'Fraunces',serif;font-size:.92rem;color:var(--gold-bright);text-align:right;font-weight:500}
+  .exp-row-del{background:transparent;border:none;color:var(--mute);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center}
+  .exp-row-del:hover{color:var(--danger)}
+  .journal-stats{background:var(--night-soft);border:1px solid var(--night-border);padding:16px 20px;border-radius:8px;margin-bottom:18px;display:flex;gap:28px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .journal-stat-grp{display:flex;gap:24px;flex-wrap:wrap}
+  .journal-stat-num{font-family:'Fraunces',serif;font-size:1.45rem;color:var(--gold-bright);font-weight:500;line-height:1}
+  .journal-stat-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mute);margin-top:5px}
+  .journal-add{background:var(--terracotta);color:var(--night-deep);border:none;padding:10px 18px;font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:6px;transition:all .2s;display:flex;align-items:center;gap:8px}
+  .journal-add:hover{background:var(--gold-bright)}
+  .journal-add svg{width:13px;height:13px}
+  .journal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .journal-empty-card{grid-column:1/-1;text-align:center;padding:44px 20px;background:var(--night-soft);border:1px dashed var(--night-border);border-radius:10px;font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.9rem}
+  .journal-entry{background:var(--night-soft);border:1px solid var(--night-border);border-radius:10px;overflow:hidden;transition:all .3s cubic-bezier(.16,1,.3,1);position:relative}
+  .journal-entry:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .journal-entry-img{width:100%;height:160px;object-fit:cover;background:var(--night-deep);display:block}
+  .journal-entry-placeholder{width:100%;height:160px;background:linear-gradient(135deg,var(--sea-deep),var(--night-soft));display:flex;align-items:center;justify-content:center;color:var(--mute)}
+  .journal-entry-placeholder svg{width:32px;height:32px}
+  .journal-entry-body{padding:14px}
+  .journal-entry-date{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--terracotta-bright);margin-bottom:6px}
+  .journal-entry-title{font-family:'Fraunces',serif;font-size:1rem;color:var(--paper);margin-bottom:5px;font-weight:500}
+  .journal-entry-note{font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:.8rem;line-height:1.5}
+  .journal-entry-del{position:absolute;top:10px;right:10px;background:rgba(10,14,26,.9);border:none;color:var(--ink-soft);width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .2s;backdrop-filter:blur(8px)}
+  .journal-entry:hover .journal-entry-del{opacity:1}
+  .journal-entry-del:hover{color:var(--danger)}
+  .modal-bg{position:fixed;inset:0;background:rgba(10,14,26,.85);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease}
+  .modal-bg.active{display:flex}
+  .modal{background:var(--night-soft);border:1px solid var(--gold);border-radius:14px;padding:26px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
+  .modal-title{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--paper);margin-bottom:16px;font-weight:500}
+  .modal-input{width:100%;background:var(--night-deep);border:1px solid var(--night-border);color:var(--paper);padding:11px 13px;border-radius:5px;font-family:'Inter Tight',sans-serif;font-size:.88rem;margin-bottom:12px;transition:all .2s}
+  .modal-input:focus{outline:none;border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(63,167,160,.2)}
+  textarea.modal-input{resize:vertical;min-height:76px;font-family:'Fraunces',serif;font-style:italic}
+  .photo-area{border:2px dashed var(--night-border);border-radius:6px;padding:22px;text-align:center;margin-bottom:12px;cursor:pointer;transition:all .2s}
+  .photo-area:hover{border-color:var(--terracotta);background:rgba(63,167,160,.05)}
+  .photo-area.has-photo{padding:0;border-style:solid;border-color:var(--gold)}
+  .photo-preview{width:100%;height:170px;object-fit:cover;display:block;border-radius:5px}
+  .photo-empty svg{width:30px;height:30px;color:var(--mute);margin-bottom:6px}
+  .photo-empty-text{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--mute);letter-spacing:.1em}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end}
+  .modal-btn{padding:9px 17px;border-radius:5px;font-family:'DM Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+  .modal-btn.primary{background:var(--terracotta);color:var(--night-deep)} .modal-btn.primary:hover{background:var(--gold-bright)}
+  .modal-btn.secondary{background:transparent;color:var(--ink-soft);border:1px solid var(--night-border)}
+  .modal-btn.secondary:hover{border-color:var(--terracotta);color:var(--terracotta-bright)}
+  footer{padding:44px 0 80px;text-align:center;border-top:1px solid var(--night-border);background:linear-gradient(180deg,transparent,rgba(224,120,86,.04))}
+  footer .signature{font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--gold-bright);margin-bottom:6px}
+  footer .sub{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+  footer .reset{margin-top:14px;background:none;border:none;color:var(--mute);font-family:'DM Mono',monospace;font-size:.6rem;text-decoration:underline;cursor:pointer;letter-spacing:.1em}
+  @media (max-width:640px){
+    .exp-input-row{grid-template-columns:1fr}
+    .inv-cta-wrap{flex-direction:column;align-items:flex-start}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div class="eyebrow">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 21C7 16 4 12.5 4 9a8 8 0 0 1 16 0c0 3.5-3 7-8 12z"/><path d="M12 21V9M8.5 10.5 12 9l3.5 1.5M6.5 13 12 9l5.5 4"/></svg>
-      Camino Portugu&eacute;s da Costa
+<div class="header-wrap">
+  <div class="header-top">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21C7 16 4 12.5 4 9a8 8 0 0 1 16 0c0 3.5-3 7-8 12z"/><path d="M12 21V9M8.5 10.5 12 9l3.5 1.5M6.5 13 12 9l5.5 4"/></svg>
+      <span>Manal <strong>&amp;</strong> Vane &middot; Porto &rarr; Vigo</span>
     </div>
-    <h1>Porto <em>&rarr;</em> Vigo</h1>
-    <div class="dedication">Vane <b>&amp;</b> Manal &mdash; the anniversary walk &middot; October 2026</div>
-    <div class="wave" aria-hidden="true">
-      <svg viewBox="0 0 720 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <g class="w1"><path d="M0 30 Q45 18 90 30 T180 30 T270 30 T360 30 T450 30 T540 30 T630 30 T720 30 T810 30 T900 30 T990 30 T1080 30 V52 H0 Z" fill="#101b2b"/></g>
-        <g class="w2"><path d="M0 38 Q60 26 120 38 T240 38 T360 38 T480 38 T600 38 T720 38 T840 38 T960 38 T1080 38 V52 H0 Z" fill="#14213366"/></g>
-        <path d="M0 46 L720 46" stroke="#22334a" stroke-width="1"/>
-      </svg>
+    <div class="countdown-pill" id="countdown-pill">&mdash; days</div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="invitation"><span class="tab-num">01</span>N&oacute;s</button>
+    <button class="tab" data-tab="viaxe"><span class="tab-num">02</span>A viaxe</button>
+    <button class="tab" data-tab="etapas"><span class="tab-num">03</span>As etapas</button>
+    <button class="tab" data-tab="sentidos"><span class="tab-num">04</span>Os sentidos</button>
+    <button class="tab" data-tab="levamos"><span class="tab-num">05</span>O que levamos</button>
+  </nav>
+</div>
+
+<!-- 01 INVITATION -->
+<section class="panel active" id="invitation">
+  <div class="invitation">
+    <div class="stars-bg"></div>
+    <div class="container inv-content">
+      <div class="inv-eyebrow">Our walk &middot; ten years in</div>
+      <p class="inv-to">Manal &amp; Vane &middot; October 2026</p>
+      <h1 class="inv-headline">We walk <em>to Vigo</em>.</h1>
+      <p class="inv-prose">
+        The Atlantic in October. Wooden boardwalks that go on for kilometres, eucalyptus hills, a river you cross by boat because there is no bridge, cliffs where the ocean argues with Galicia and loses. And us, <em>amor</em>, with backpacks and nowhere to be except the next albergue.
+      </p>
+      <p class="inv-prose">
+        So we gave ourselves a walk. <strong>160 kilometres. Porto to Vigo. Boots on October 2nd.</strong> Two countries, one coastline, seven-ish days, depending on how our legs vote. Anchovy-grade seafood on the Portuguese side, oysters waiting at the finish line.
+      </p>
+      <div class="inv-dare">
+        You. Me. The ocean, every single day. <span>Let's lace up.</span><br>
+        Let's <em>walk it together</em>.
+      </div>
+      <div class="inv-cta-wrap">
+        <button class="yes-btn" id="yes-btn">Si, imos &#10022;</button>
+        <span class="yes-meta" id="yes-meta">(Galego for "yes, let's go")</span>
+      </div>
+      <div class="inv-details">
+        <div>
+          <div class="inv-detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Dates</div>
+          <div class="inv-detail-value">Sep 30 &ndash; Oct 9</div>
+        </div>
+        <div>
+          <div class="inv-detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Route</div>
+          <div class="inv-detail-value">Porto &rarr; Vigo</div>
+        </div>
+        <div>
+          <div class="inv-detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Walkers</div>
+          <div class="inv-detail-value">Just us, 2</div>
+        </div>
+        <div>
+          <div class="inv-detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M2 12s4-8 10-8 10 8 10 8"/></svg>Theme</div>
+          <div class="inv-detail-value">Ocean &middot; Salt &middot; Steps</div>
+        </div>
+      </div>
+      <div class="inv-secret">
+        <strong>P.S.</strong> If we walk the classic seven stages, we arrive in Vigo on <strong>October 8th</strong>. Which, if we're counting right (and we are), is ten years since the first time. We didn't plan it. The camino did. 160 kilometres on foot to arrive at a decade, on the exact day, at the ocean. Some coincidences are just the universe showing off.
+      </div>
+      <div class="inv-secret pps">
+        <strong>P.P.S.</strong> Miami. October 2016. <em>"May I kiss you."</em><br>
+        Vigo. October 2026. Same question stands, but this time over oysters, with 160 km in our legs.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 A VIAXE -->
+<section class="panel" id="viaxe">
+  <div class="container">
+    <div class="panel-header">
+      <div class="panel-eyebrow">02 &middot; A viaxe</div>
+      <h2>How we <em>get there</em>.</h2>
+      <p class="panel-intro">Madrid to Porto by air. Porto to Vigo on foot. Vigo to Madrid by rail. The middle part is the point.</p>
     </div>
 
-    <div class="plans" id="plans"></div>
-    <div class="datebar">
-      <span>Start date</span>
-      <input type="date" id="start-date">
-      <span id="plan-summary"></span>
-    </div>
-    <div class="custom-panel" id="custom-panel">
-      <h4>Pick your overnight stops (Porto and Vigo are fixed)</h4>
-      <div id="stop-list"></div>
-      <div class="custom-warn" id="custom-warn"></div>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>Getting in &middot; <em>and out</em></h3>
+      <div class="log-grid">
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>Wed Sep 30 &middot; Flight</div>
+          <div class="log-value">Iberia &middot; MAD &rarr; OPO &middot; 07:20</div>
+          <div class="log-note">Painfully early, gloriously early &mdash; a whole first day in Porto.</div>
+        </div>
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Sep 30 &ndash; Oct 2 &middot; Base</div>
+          <div class="log-value">Almada Downtown 101</div>
+          <div class="log-note">Rua do Almada &mdash; 5 min from the Cathedral where stamp no. 1 lives. <a href="https://maps.apple.com/?q=Almada%20Downtown%20101%2C%20Porto" target="_blank" rel="noopener">Map</a></div>
+        </div>
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21C7 16 4 12.5 4 9a8 8 0 0 1 16 0c0 3.5-3 7-8 12z"/></svg>Arrival in Vigo</div>
+          <div class="log-value" id="trip-arrival">&mdash;</div>
+          <div class="log-note">Updates with the plan you pick below. Book the Vigo night from that date.</div>
+        </div>
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 19l-2 3M16 19l2 3"/></svg>Return &middot; AVE</div>
+          <div class="log-value">Vigo-Urz&aacute;iz &rarr; Madrid &middot; 17:25</div>
+          <div class="log-note">A whole last morning in Vigo. Urz&aacute;iz is a steep 15 min uphill from the old town &mdash; allow 30 with packs.</div>
+        </div>
+      </div>
     </div>
 
-    <div class="progress">
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Map &middot; <em>the coast</em></h3>
+      <p class="sub-sub">Two countries, one ocean, one boat.</p>
+      <div class="map-wrap">
+        <svg class="map-svg" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="seaG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a3a5c" stop-opacity=".4"/><stop offset="1" stop-color="#0a1a2e" stop-opacity=".15"/></linearGradient>
+            <linearGradient id="landG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f2740" stop-opacity=".95"/><stop offset="1" stop-color="#161c2e" stop-opacity=".85"/></linearGradient>
+            <pattern id="wl" x="0" y="0" width="60" height="22" patternUnits="userSpaceOnUse"><path d="M 0 11 Q 15 3, 30 11 T 60 11" fill="none" stroke="#4a90b8" stroke-width=".6" opacity=".25"/></pattern>
+            <filter id="dg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <rect width="900" height="560" fill="url(#seaG)"/><rect width="900" height="560" fill="url(#wl)"/>
+          <!-- land to the east, ocean west; coast runs S(bottom, Porto) to N(top, Vigo) -->
+          <path d="M 380 560 Q 360 500 370 450 Q 382 400 372 360 Q 360 320 375 280 Q 392 245 380 210 L 380 208 Q 370 200 378 185 Q 392 165 380 140 Q 365 110 385 80 Q 405 45 395 0 L 900 0 L 900 560 Z" fill="url(#landG)"/>
+          <path d="M 380 560 Q 360 500 370 450 Q 382 400 372 360 Q 360 320 375 280 Q 392 245 380 210 M 380 208 Q 370 200 378 185 Q 392 165 380 140 Q 365 110 385 80 Q 405 45 395 0" fill="none" stroke="#f2c230" stroke-width="1.2" stroke-dasharray="3 3" opacity=".55"/>
+          <text x="190" y="300" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="12" fill="#5fa7c8" opacity=".55">Oc&eacute;ano Atl&aacute;ntico</text>
+          <!-- Mino river mouth gap around y=209 -->
+          <path d="M 380 210 Q 430 208 480 214" fill="none" stroke="#4a90b8" stroke-width="3" opacity=".5"/>
+          <text x="505" y="218" font-family="DM Mono, monospace" font-size="9" fill="#5fa7c8" opacity=".7">R&Iacute;O MI&Ntilde;O</text>
+          <!-- boat crossing -->
+          <path d="M 372 218 Q 366 209 374 200" fill="none" stroke="#5fc2bb" stroke-width="2" stroke-dasharray="4 3"/>
+          <g transform="translate(340,206)" opacity=".9"><path d="M0 6 l5-2 5 2 -1.5 3 h-7z M5 4 V0 M3 1.5 h4" fill="none" stroke="#5fc2bb" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <!-- route along coast -->
+          <path d="M 385 535 Q 368 480 376 430 Q 384 385 370 350 Q 362 315 378 275 Q 390 243 379 215 M 373 198 Q 380 170 372 145 Q 366 115 388 85 Q 402 60 396 35" fill="none" stroke="#f2c230" stroke-width="2.2" stroke-dasharray="6 4" opacity=".8"/>
+          <!-- stops: bottom to top -->
+          <g><circle cx="385" cy="535" r="9" fill="#f2c230" stroke="#f6d35f" stroke-width="2"/><circle cx="385" cy="535" r="14" fill="#f2c230" opacity=".3" filter="url(#dg)"><animate attributeName="r" values="14;22;14" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".3;.1;.3" dur="3s" repeatCount="indefinite"/></circle><text x="405" y="540" font-family="DM Mono, monospace" font-size="12" font-weight="600" fill="#f6d35f" letter-spacing="1">PORTO</text><text x="405" y="553" font-family="DM Mono, monospace" font-size="8.5" fill="#f2c230" opacity=".7">DAY 0 &middot; START</text></g>
+          <g><circle cx="376" cy="470" r="5" fill="#3fa7a0"/><text x="394" y="474" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">VILA DO CONDE</text></g>
+          <g><circle cx="378" cy="418" r="5" fill="#3fa7a0"/><text x="396" y="422" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">ESPOSENDE</text></g>
+          <g><circle cx="368" cy="345" r="5" fill="#3fa7a0"/><text x="388" y="349" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">VIANA DO CASTELO</text></g>
+          <g><circle cx="379" cy="222" r="5" fill="#3fa7a0"/><text x="397" y="232" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">CAMINHA</text></g>
+          <g><circle cx="373" cy="196" r="5" fill="#3fa7a0"/><text x="391" y="196" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">A GUARDA</text><text x="391" y="208" font-family="DM Mono, monospace" font-size="8" fill="#7a7468">ESPA&Ntilde;A &middot; +1H</text></g>
+          <g><circle cx="371" cy="150" r="5" fill="#3fa7a0"/><text x="389" y="154" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">OIA / MOUG&Aacute;S</text></g>
+          <g><circle cx="384" cy="90" r="5" fill="#3fa7a0"/><text x="402" y="94" font-family="DM Mono, monospace" font-size="10" fill="#c8c0b0">BAIONA</text></g>
+          <g><circle cx="396" cy="35" r="9" fill="#f2c230" stroke="#f6d35f" stroke-width="2"/><circle cx="396" cy="35" r="14" fill="#f2c230" opacity=".3" filter="url(#dg)"><animate attributeName="r" values="14;22;14" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".3;.1;.3" dur="3s" repeatCount="indefinite"/></circle><text x="416" y="32" font-family="DM Mono, monospace" font-size="12" font-weight="600" fill="#f6d35f" letter-spacing="1">VIGO</text><text x="416" y="45" font-family="DM Mono, monospace" font-size="8.5" fill="#f2c230" opacity=".7">FINISH &middot; OYSTERS</text></g>
+          <g transform="translate(70,70)" opacity=".55"><circle r="22" fill="none" stroke="#f2c230" stroke-width="1"/><path d="M 0 -22 L 4 0 L 0 22 L -4 0 Z" fill="#3fa7a0" opacity=".75"/><text y="-28" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f2c230">N</text></g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15l8-3 8 3-2 4H6l-2-4z"/><path d="M12 12V6M9 8h6"/></svg>The boat &middot; <em>Caminha &rarr; A Guarda</em></h3>
+      <div class="companion-note">
+        <strong>The one reservation that can strand us.</strong> No bridge over the Mi&ntilde;o &mdash; we cross by water taxi (Xacobeo Transfer or Taxi Mar Caminha, 6-8 &euro;, 10-20 min). October runs a reduced, tide-dependent schedule: book 2-3 days ahead, confirm the evening before. Landing in Camposancos means Spain and <strong>clocks jump one hour forward</strong>. Plan B if the sea rebels: train to Valen&ccedil;a, cross the bridge to Tui.
+      </div>
+      <a href="https://www.xacobeotransfer.com" target="_blank" rel="noopener" class="book-btn terra">Book the crossing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </div>
+
+    
+  </div>
+</section>
+
+<!-- 03 AS ETAPAS -->
+<section class="panel" id="etapas">
+  <div class="container">
+    <div class="panel-header">
+      <div class="panel-eyebrow">03 &middot; As etapas</div>
+      <h2>Day <em>by day</em>, km by km.</h2>
+      <p class="panel-intro">Tap a stage to open it. Tap a waypoint to find it. Tap the locate button to find us.</p>
+    </div>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l4-7 4 4 6-10 4 13"/></svg>Our stages &middot; <em>sliced our way</em></h3>
+      <p class="sub-sub">Four presets, or Custom to pick our own overnight stops — every card below rebuilds around whatever we choose.</p>
+      <div class="plans" id="plans"></div>
+      <div class="datebar"><span>Boots on</span><input type="date" id="start-date"><span id="plan-summary"></span></div>
+      <div class="custom-panel" id="custom-panel">
+        <h4>Pick our overnight stops (Porto and Vigo are fixed)</h4>
+        <div id="stop-list"></div>
+        <div class="custom-warn" id="custom-warn"></div>
+      </div>
+    </div>
+    <div class="progress" id="progress">
       <div class="progress-top"><span>Walked</span><b id="km-done">0 km</b><span id="km-left"></span></div>
       <div class="bar"><i id="bar-fill"></i></div>
       <div class="progress-sub" id="progress-sub"></div>
     </div>
-  </header>
-
-  <nav class="tabs">
-    <div class="tab active" data-panel="stages">Stages</div>
-    <div class="tab" data-panel="tips">Tips</div>
-    <div class="tab" data-panel="trip">Trip</div>
-    <div class="gps-btn" id="gps-btn" title="Locate me on the route" aria-label="Locate me on the route"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg></div>
-  </nav>
-
-  <section class="panel active" id="panel-stages"></section>
-
-  <section class="panel" id="panel-tips">
-    <div class="tipgrid">
-      <div class="tip"><h5>Credencial</h5><p>Get it before leaving (Camino associations, Porto Cathedral or albergues). Stamp twice a day: needed for municipal albergues and, if you ever continue to Santiago, for the Compostela.</p></div>
-      <div class="tip"><h5>The boat</h5><p>Caminha &rarr; A Guarda by water taxi (Xacobeo Transfer / Taxi Mar Caminha), 6-8 &euro;, book online; times depend on the tide. In October the schedule is reduced: book 2-3 days ahead. Plan B: train to Valen&ccedil;a, cross to Tui.</p></div>
-      <div class="tip"><h5>Time zone</h5><p>Portugal is one hour behind Spain. On boat day you lose an hour at the dock: leave early or reach Oia by headlamp.</p></div>
-      <div class="tip"><h5>October daylight</h5><p>~11.5 h of light, sunset around 19:30. Fine for stages up to ~27 km if you start by 8:30; the 31 km option needs a headlamp mentality.</p></div>
-      <div class="tip"><h5>Bookings</h5><p>Portuguese municipals: first come, first served. Private albergues, Xunta and the boat: book online. October note: some seasonal albergues and trail bars close.</p></div>
-      <div class="tip"><h5>Backpack</h5><p>Max 10% of body weight. Rain jacket (October Atlantic means business), sunscreen still, poles for the Oia cliffs, earplugs for the albergues.</p></div>
-      <div class="tip"><h5>Budget</h5><p>35-45 &euro;/person/day: bed 10-18, breakfast 5-8, dinner 12-15. &Acirc;ncora seafood and Vigo oysters go under extraordinary expenses, as they should.</p></div>
-      <div class="tip"><h5>Apps and maps</h5><p>Buen Camino, Wise Pilgrim (offline maps) and Gronze.com for reviews. Download maps beforehand: coverage on the Oia cliffs comes and goes.</p></div>
-      <div class="tip"><h5>Getting home</h5><p>From Vigo: Celta train to Porto (~2h20, Guixar) or FlixBus/Alsa. To Madrid: direct AVE from Vigo-Urz&aacute;iz. Book before you leave.</p></div>
+    <div class="stage-toolbar">
+      <button class="gps-btn" id="gps-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>Where are we?</button>
     </div>
-  </section>
+    <div id="panel-stages"></div>
+  </div>
+</section>
 
-
-  <section class="panel" id="panel-trip">
-    <div class="tip" style="margin-top:6px">
-      <h5>Logistics</h5>
-      <p>
-        <b style="color:var(--ink)">Sep 30</b> — Iberia Madrid → Porto, 07:20. Two nights at <a href="https://maps.apple.com/?q=Almada%20Downtown%20101%2C%20Porto" target="_blank" rel="noopener" style="color:var(--sea)">Almada Downtown 101</a> (Rua do Almada, 5 min from the Cathedral start).<br>
-        <b style="color:var(--ink)">Oct 2</b> — boots on, stage 1.<br>
-        <b style="color:var(--ink)"><span id="trip-arrival">—</span></b> — arrival in Vigo on the current plan. Book the Vigo stay from that night.<br>
-        <b style="color:var(--ink)">Return</b> — AVE Vigo-Urzáiz → Madrid at 17:25. With a night in Vigo that leaves a full morning for the Casco Vello before the train.
-      </p>
+<!-- 04 OS SENTIDOS -->
+<section class="panel" id="sentidos">
+  <div class="container">
+    <div class="panel-header">
+      <div class="panel-eyebrow">04 &middot; Os sentidos</div>
+      <h2>The <em>senses</em>.</h2>
+      <p class="panel-intro">Porto before, Vigo after, music between, and enough Portuguese and Galego to make locals smile.</p>
     </div>
 
-    <div class="tip" style="margin-top:12px">
-      <h5>Porto · Day 1 · Wed Sep 30</h5>
-      <p>
-        You land absurdly early — use it. Drop bags at Almada Downtown 101, coffee and a pastel de nata around the corner.
-        Morning: São Bento station (twenty thousand azulejo tiles telling Portugal's history — find the 1140 battle scene), then downhill through the Ribeira lanes.
-        Lunch at Mercado do Bolhão, recently restored, eat where the vendors eat.
-        Afternoon: cross the upper deck of the Dom Luís I bridge on foot (Téophile Seyrig, Eiffel's partner — the exam question of the trip) to Gaia for a port lodge tasting; book the last slot at Ferreira or Cálem.
-        Sunset from Jardim do Morro with everyone else who read the same advice — it is popular because it is correct.
-      </p>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>Porto &middot; <em>Sep 30 &ndash; Oct 1</em></h3>
+      <div class="food-list">
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Day 1 &middot; land early, live fully</div>
+          <p class="food-desc">Bags at Almada Downtown 101, pastel de nata around the corner. <strong>S&atilde;o Bento azulejos</strong>, Ribeira lanes, lunch at Mercado do Bolh&atilde;o. Cross the Dom Lu&iacute;s I upper deck to Gaia for a <strong>port lodge tasting</strong> (book Ferreira or C&aacute;lem, last slot). Sunset at Jardim do Morro.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M2 12s4-8 10-8 10 8 10 8M2 12s4 8 10 8 10-8 10-8"/></svg>Day 2 &middot; save the legs</div>
+          <p class="food-desc">Livraria Lello only pre-booked, otherwise the Igreja do Carmo fa&ccedil;ade is free and photographs better. <strong>Historic tram 1 to Foz</strong> for an ocean-front coffee &mdash; a preview of the whole next week. Early night: stamp no. 1 waits at the Cathedral at 08:00.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M5 8h14v7a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8zM7 8V6a5 5 0 0 1 10 0v2"/></svg>Port wine in 60 seconds</div>
+          <p class="food-desc">All port is fortified mid-ferment &mdash; that's why it's sweet and 20%. <strong>Ruby</strong>: vat-aged, fruity. <strong>Tawny</strong>: barrel-aged, caramel and walnut ("10-year" = average age, not vintage). <strong>Vintage</strong>: one great year, decades of patience. Order: white port + tonic, then a 10-year tawny. Now we out-order the sommelier.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>Caf&eacute; Santiago &middot; the francesinha ruling</div>
+          <p class="food-desc">Porto's most famous francesinha house. One sandwich, <strong>split between two people</strong> &mdash; it is a weapon, not a dinner, and we walk 28 km on Friday.</p>
+          <a href="https://maps.apple.com/?q=Caf%C3%A9%20Santiago%20Porto" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
     </div>
 
-    <div class="tip" style="margin-top:12px">
-      <h5>Porto · Day 2 · Thu Oct 1 (save the legs)</h5>
-      <p>
-        Gentle day, big walk tomorrow. Livraria Lello only with a pre-booked timed ticket — otherwise skip without guilt; Porto's real bookshop soul is the tiny ones on Rua da Fábrica.
-        Clérigos tower if the queue is civilised; the Igreja do Carmo azulejo façade costs nothing and photographs better.
-        Take historic tram 1 along the river to Foz do Douro for an ocean-front coffee — a preview of your entire next week.
-        Early dinner: one francesinha, split between two people — it is a weapon, not a dinner — or petiscos at a tasca in Cedofeita.
-        Tonight: lay out the packs, stamp no. 1 waits at the Cathedral at 08:00.
-      </p>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/><circle cx="15" cy="12" r="1.5"/></svg>Vigo &middot; <em>the reward</em></h3>
+      <div class="food-list">
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>R&uacute;a da Pedra &middot; the oysters</div>
+          <p class="food-desc">The ostreiras have shucked oysters on this street for generations. From ~11:00. <strong>The contractual finish line</strong> &mdash; and with the 17:25 AVE, a whole victory morning for it.</p>
+          <a href="https://maps.apple.com/?q=R%C3%BAa%20da%20Pedra%20Vigo" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/></svg>Captain Nemo's harbour</div>
+          <p class="food-desc">Jules Verne set the Nautilus refuelling on the sunken treasure of Rande &mdash; in this exact r&iacute;a. His statue sits on the waterfront. <strong>Ending our walk at a Twenty Thousand Leagues pilgrimage site</strong> is the kind of detail we appreciate.</p>
+          <a href="https://maps.apple.com/?q=Monumento%20Julio%20Verne%20Vigo" target="_blank" rel="noopener" class="food-link">Verne statue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l4-7 4 4 6-10 4 13"/></svg>Monte do Castro</div>
+          <p class="food-desc">The panorama over the r&iacute;a and the C&iacute;es. A 20-minute climb our legs will find <strong>hilarious</strong>, but worth every complaint.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18s2-2 6-2 6 2 10 2 4-2 4-2M2 14s2-2 6-2 6 2 10 2 4-2 4-2"/></svg>C&iacute;es islands &middot; if the stars align</div>
+          <p class="food-desc">October ferries run mostly weekends and holidays, and you need the <strong>free Xunta permit + ferry booking</strong>. Check both a few days ahead. If it works: the best beach in the Atlantic, says everyone who has seen it.</p>
+        </div>
+      </div>
     </div>
 
-    <div class="tip" style="margin-top:12px">
-      <h5>Port wine in 60 seconds (for the smart one)</h5>
-      <p>
-        All port is fortified mid-ferment with grape spirit — that is why it is sweet and 20%.
-        <b style="color:var(--foam)">Ruby</b>: aged in huge vats, fruit-forward, young.
-        <b style="color:var(--foam)">Tawny</b>: aged in small barrels, oxidises to caramel and walnut; the "10/20/30 year" is an average age, not a vintage.
-        <b style="color:var(--foam)">Vintage</b>: single exceptional year, bottled unfiltered, ages decades — the one that needs decanting.
-        Order at a tasting: one white port with tonic (Porto's actual local drink), one 10-year tawny. Now you can out-order the sommelier.
-      </p>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music &middot; <em>for the boardwalks</em></h3>
+      <p class="sub-sub">Two to queue before we leave the wifi. Headphones optional; the ocean brings its own track.</p>
+      <div class="playlist-grid">
+        <div class="playlist-card">
+          <div class="playlist-label"><svg class="playlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Portugal side</div>
+          <h4 class="playlist-name">Am&aacute;lia Rodrigues &middot; fado</h4>
+          <p class="playlist-desc">The queen of fado, the sound of Portuguese saudade. For the eucalyptus stretches when the ocean disappears and you miss it after four minutes.</p>
+          <a href="https://music.apple.com/us/search?term=amalia%20rodrigues" target="_blank" rel="noopener" class="book-btn">Open in Apple Music<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="playlist-card">
+          <div class="playlist-label"><svg class="playlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Galicia side</div>
+          <h4 class="playlist-name">Luar na Lubre &middot; galego folk</h4>
+          <p class="playlist-desc">Bagpipes, hurdy-gurdy and Atlantic melancholy &mdash; Galicia is Celtic, and after the boat the soundtrack should be too.</p>
+          <a href="https://music.apple.com/us/search?term=luar%20na%20lubre" target="_blank" rel="noopener" class="book-btn">Open in Apple Music<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
     </div>
 
-    <div class="tip" style="margin-top:12px">
-      <h5>Vigo · the reward</h5>
-      <p>
-        Oysters on Rúa da Pedra (A Pedra market, from ~11:00) — the contractual finish line.
-        Casco Vello: Praza da Constitución, Concatedral, vermouth at any terrace that catches you.
-        Monte do Castro for the panorama over the ría — a 20 min climb your legs will find hilarious.
-        Cíes islands if the weather and your feet allow: in October ferries run mostly weekends and holidays and you need the free Xunta permit + ferry booking — check both a few days ahead.
-        Before the 17:25 AVE: seafood lunch near the Mercado da Pedra; Urzáiz station is a steep 15 min uphill from the old town, allow 30 with a backpack.
-      </p>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Two languages &middot; <em>fala comigo</em></h3>
+      <p class="sub-sub">Portuguese until the boat, Galego after. Tap the speaker. Locals melt when you try.</p>
+      <div class="phrase-cats">
+        <button class="phrase-cat-btn active" data-cat="essentials">Essentials</button>
+        <button class="phrase-cat-btn" data-cat="trail">On the trail</button>
+        <button class="phrase-cat-btn" data-cat="food">Food</button>
+        <button class="phrase-cat-btn" data-cat="charm">Charm</button>
+      </div>
+      <div class="phrase-list" id="phrase-list"></div>
     </div>
-  
-    <div class="tip" style="margin-top:12px">
-      <h5>Say it like a local · PT first, Galego after the boat</h5>
-      <table class="phrase">
-        <tr><th>Português</th><th>Galego</th><th></th></tr>
-        <tr><td>Bom caminho</td><td>Bo camiño</td><td>the greeting of the trail</td></tr>
-        <tr><td>Bom dia / boa tarde</td><td>Bo día / boa tarde</td><td>good morning / afternoon</td></tr>
-        <tr><td>Obrigada</td><td>Grazas</td><td>thank you (obrigadA — you are two women)</td></tr>
-        <tr><td>Um galão e uma nata, por favor</td><td>—</td><td>milky coffee + custard tart, the PT breakfast</td></tr>
-        <tr><td>—</td><td>Unha ración de polbo, por favor</td><td>the Galician victory order</td></tr>
-        <tr><td>Onde fica o albergue?</td><td>Onde está o albergue?</td><td>where is the albergue?</td></tr>
-        <tr><td>Pode carimbar, por favor?</td><td>Un selo, por favor</td><td>stamp my credencial, please</td></tr>
-      </table>
-      <p style="margin-top:8px;font-size:12px;color:var(--kelp)">Galego is not Spanish — it is Portuguese's sibling. Using even two words of it in A Guarda earns instant goodwill.</p>
+  </div>
+</section>
+
+<!-- 05 O QUE LEVAMOS -->
+<section class="panel" id="levamos">
+  <div class="container">
+    <div class="panel-header">
+      <div class="panel-eyebrow">05 &middot; O que levamos</div>
+      <h2>What we <em>carry</em>.</h2>
+      <p class="panel-intro">Ten percent of body weight, and everything earns its grams. Plus the budget, the expense log, and a diary that builds itself.</p>
     </div>
 
-    <div class="tip" style="margin-top:12px">
-      <h5>The pack · tick as you stow</h5>
-      <div id="pack-list"></div>
-      <p style="margin-top:8px;font-size:12px;color:var(--kelp)">Rule: 10% of body weight, and everything earns its grams. Checklist lives on this phone.</p>
+    <p class="companion-note"><strong>How this tab works.</strong> Before: pack and budget. During: log what we spend and what we want to remember. After: it's our diary of the walk. Everything lives on this phone.</p>
+
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11l-1 11h-9zM10 6.5V4a2 2 0 0 1 4 0v2.5"/></svg>Packing &middot; <em>the 10% rule</em></h3>
+      <div class="pack-progress-wrap">
+        <div class="pack-progress-stat"><strong id="pack-count">0</strong>/<span id="pack-total">0</span></div>
+        <div class="pack-progress-bar-wrap">
+          <div class="pack-progress-label"><span>STOWED</span><span id="pack-percent">0%</span></div>
+          <div class="pack-progress-bar"><div class="pack-progress-fill" id="pack-progress-fill"></div></div>
+        </div>
+        <div class="pack-actions">
+          <button class="pack-action-btn" id="pack-check-all">Check all</button>
+          <button class="pack-action-btn" id="pack-reset">Reset</button>
+        </div>
+      </div>
+      <div class="we-grid" id="packing-grid"></div>
     </div>
 
-  </section>
+    
 
-  <footer>
-    <p>Distances and elevations follow the official Camino da Costa track (~160 km with the standard variants); waypoint altitudes &plusmn;10-15 m. Prices and openings change every season.<span class="bo">Bo cami&ntilde;o, peregrinas.</span></p>
-    <button class="reset" id="reset">Reset progress for this plan</button>
-  </footer>
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Expenses &middot; <em>log as we walk</em></h3>
+      <div class="expense-dash">
+        <div class="exp-summary">
+          <div><div class="exp-stat-label">Spent so far</div><div class="exp-stat-val spent">&euro;<span id="exp-spent">0</span></div><div class="exp-stat-sub"><span id="exp-count">0</span> entries</div></div>
+          <div><div class="exp-stat-label">Per walking day</div><div class="exp-stat-val">&euro;<span id="exp-daily-avg">0</span></div><div class="exp-stat-sub">just so we know, not to worry</div></div>
+        </div>
+        <div class="exp-input-row">
+          <input type="text" class="exp-input" id="exp-desc" placeholder="What did we spend on?">
+          <select class="exp-input" id="exp-cat">
+            <option value="beds">Beds</option><option value="food" selected>Food</option><option value="transport">Transport</option><option value="extras">Extras</option>
+          </select>
+          <input type="number" class="exp-input" id="exp-amount" placeholder="&euro;" step="0.01" min="0">
+          <button class="exp-add-btn" id="exp-add-btn">+ Add</button>
+        </div>
+      </div>
+      <div class="exp-list" id="exp-list"><div class="exp-empty">Nothing logged yet. The first pastel de nata is coming.</div></div>
+    </div>
+
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Journal &middot; <em>memories</em></h3>
+      <p class="sub-sub">Snap a photo, jot a moment. Our diary of the walk builds itself.</p>
+      <div class="journal-stats">
+        <div class="journal-stat-grp">
+          <div><div class="journal-stat-num" id="journal-count">0</div><div class="journal-stat-label">Memories</div></div>
+          <div><div class="journal-stat-num" id="journal-photos">0</div><div class="journal-stat-label">With photo</div></div>
+        </div>
+        <button class="journal-add" id="journal-add-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add memory</button>
+      </div>
+      <div class="journal-grid" id="journal-grid"><div class="journal-empty-card">Empty for now. First entry writes itself: stamp no. 1, Porto Cathedral, October 2nd.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-bg" id="journal-modal">
+  <div class="modal">
+    <h3 class="modal-title">Add a memory</h3>
+    <input type="text" class="modal-input" id="memory-title" placeholder="Title. What happened?">
+    <textarea class="modal-input" id="memory-note" placeholder="Tell future-us about it..."></textarea>
+    <div class="photo-area" id="photo-area">
+      <input type="file" id="photo-input" accept="image/*" style="display:none;">
+      <div id="photo-empty" class="photo-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <div class="photo-empty-text">Tap to add photo (optional)</div>
+      </div>
+      <img id="photo-preview" class="photo-preview" style="display:none;" alt="">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="modal-cancel">Cancel</button>
+      <button class="modal-btn primary" id="modal-save">Save</button>
+    </div>
+  </div>
 </div>
 
+<footer>
+  <div class="container">
+    <p class="signature">Porto &rarr; Vigo &middot; ten years of us, on foot</p>
+    <p class="sub">A camino for two &middot; built by us, for us</p>
+    <button class="reset" id="reset">Reset stage progress for this plan</button>
+  </div>
+</footer>
 <script>
-/* ============ MASTER ROUTE DATA ============ */
-/* waypoint: {id?, km (cumulative from Porto), name, alt, q (maps query), lat, lon, sleep?: [[name,meta,price,rec],...]} */
-const WPTS = [
- {id:"porto", km:0,   name:"Porto, S\u00e9 Cathedral", alt:70, q:"Porto Cathedral, Portugal", lat:41.1427, lon:-8.6110, sleep:[]},
- {km:1.5, name:"Douro riverside (Ribeira)", alt:5,  q:"Ribeira, Porto, Portugal", lat:41.1406, lon:-8.6157},
- {km:9,   name:"Matosinhos", alt:5,  q:"Matosinhos, Portugal", lat:41.1844, lon:-8.6963},
- {km:15,  name:"Lavra boardwalks", alt:10, q:"Lavra, Matosinhos, Portugal", lat:41.2586, lon:-8.7183},
- {id:"vilacha", km:20, name:"Vila Ch\u00e3", alt:15, q:"Vila Ch\u00e3, Vila do Conde, Portugal", lat:41.2947, lon:-8.7359,
-  sleep:[["Albergue de Peregrinos de Vila Ch\u00e3","municipal","~10 \u20ac",1]]},
- {id:"vdc", km:28, name:"Vila do Conde", alt:8, q:"Vila do Conde, Portugal", lat:41.3517, lon:-8.7479,
-  sleep:[["Albergue Santa Clara","municipal, by the aqueduct","~12 \u20ac",1],["Bellamar Hostel","P\u00f3voa de Varzim, +3 km","~15 \u20ac",0]]},
- {km:32, name:"P\u00f3voa de Varzim", alt:10, q:"P\u00f3voa de Varzim, Portugal", lat:41.3830, lon:-8.7639},
- {km:39, name:"Agu\u00e7adoura", alt:15, q:"Agu\u00e7adoura, Portugal", lat:41.4275, lon:-8.7803},
- {id:"apulia", km:43, name:"Ap\u00falia (windmills)", alt:10, q:"Ap\u00falia, Esposende, Portugal", lat:41.4870, lon:-8.7770,
-  sleep:[["Albergue Santiago de Ap\u00falia","parish albergue","~10 \u20ac",1]]},
- {km:48, name:"F\u00e3o bridge, C\u00e1vado river", alt:5, q:"F\u00e3o, Esposende, Portugal", lat:41.5104, lon:-8.7743},
- {id:"esposende", km:52, name:"Esposende", alt:8, q:"Esposende, Portugal", lat:41.5320, lon:-8.7827,
-  sleep:[["Albergue S\u00e3o Jo\u00e3o de Deus","municipal, central","~12 \u20ac",1],["Eleven Hostel","private, book online","~18 \u20ac",0]]},
- {km:55, name:"Marinhas", alt:25, q:"Marinhas, Esposende, Portugal", lat:41.5560, lon:-8.7830},
- {km:59, name:"Belinho", alt:45, q:"Belinho, Esposende, Portugal", lat:41.5900, lon:-8.7860},
- {km:61, name:"Neiva river crossing (steep dip)", alt:15, q:"Rio Neiva, Portugal", lat:41.6080, lon:-8.7870},
- {id:"cneiva", km:63, name:"Castelo do Neiva", alt:70, q:"Castelo do Neiva, Portugal", lat:41.6290, lon:-8.7980,
-  sleep:[["Albergue S\u00e3o Tiago de Castelo do Neiva","parish albergue","donation",1]]},
- {km:66, name:"Chaf\u00e9", alt:145, q:"Chaf\u00e9, Viana do Castelo, Portugal", lat:41.6600, lon:-8.7860},
- {km:69, name:"Anha", alt:95, q:"Vila Nova de Anha, Portugal", lat:41.6730, lon:-8.8000},
- {km:74, name:"Darque / Eiffel bridge", alt:10, q:"Darque, Viana do Castelo, Portugal", lat:41.6860, lon:-8.8140},
- {id:"viana", km:77, name:"Viana do Castelo", alt:10, q:"Viana do Castelo, Portugal", lat:41.6946, lon:-8.8329,
-  sleep:[["S\u00e3o Jo\u00e3o da Cruz dos Caminhos","Carmelite monastery","donation",1],["Albergue do Caminho","private, modern","~16 \u20ac",0]]},
- {km:81, name:"Areosa", alt:20, q:"Areosa, Viana do Castelo, Portugal", lat:41.7180, lon:-8.8570},
- {km:85, name:"Carre\u00e7o", alt:55, q:"Carre\u00e7o, Portugal", lat:41.7450, lon:-8.8710},
- {km:87, name:"Above Montedor lighthouse", alt:90, q:"Farol de Montedor, Portugal", lat:41.7502, lon:-8.8752},
- {km:89, name:"Afife", alt:40, q:"Afife, Portugal", lat:41.7780, lon:-8.8600},
- {id:"ancora", km:93, name:"Vila Praia de \u00c2ncora", alt:5, q:"Vila Praia de \u00c2ncora, Portugal", lat:41.8130, lon:-8.8580,
-  sleep:[["Hospedaria Sra. da Bonan\u00e7a","guesthouse by the beach","~20 \u20ac",1]]},
- {km:96, name:"Moledo", alt:8, q:"Moledo, Caminha, Portugal", lat:41.8400, lon:-8.8630},
- {id:"caminha", km:104, name:"Caminha", alt:5, q:"Caminha, Portugal", lat:41.8760, lon:-8.8390,
-  sleep:[["Albergue de Peregrinos de Caminha","municipal, by the pier","~12 \u20ac",1]]},
- {km:104.2, name:"Camposancos dock (boat landing)", alt:0, q:"Camposancos, A Guarda, Spain", lat:41.8950, lon:-8.8670},
- {id:"aguarda", km:106.5, name:"A Guarda", alt:35, q:"A Guarda, Pontevedra, Spain", lat:41.9020, lon:-8.8740,
-  sleep:[["Albergue de A Guarda","public (Xunta)","~10 \u20ac",1]]},
- {km:112, name:"Portecelo", alt:40, q:"Portecelo, O Rosal, Spain", lat:41.9560, lon:-8.8830},
- {km:114, name:"Cliff path high point", alt:60, q:"Oia coast, Pontevedra, Spain", lat:41.9750, lon:-8.8840},
- {id:"oia", km:117, name:"Oia monastery", alt:15, q:"Monasterio de Oia, Spain", lat:41.9990, lon:-8.8800,
-  sleep:[["Albergue de Oia","next to the monastery","~14 \u20ac",1]]},
- {km:120, name:"Viladesuso", alt:30, q:"Viladesuso, Oia, Spain", lat:42.0250, lon:-8.8790},
- {id:"mougas", km:122.5, name:"Moug\u00e1s", alt:20, q:"Moug\u00e1s, Oia, Spain", lat:42.0430, lon:-8.8770,
-  sleep:[["Albergue Aguncheiro","communal dinner","~15 \u20ac",1]]},
- {km:126.5, name:"Upper path, Cabo Silleiro", alt:85, q:"Cabo Silleiro, Spain", lat:42.0870, lon:-8.8890},
- {km:129.5, name:"Silleiro lighthouse turn-off", alt:40, q:"Faro Silleiro, Baiona, Spain", lat:42.1030, lon:-8.8960},
- {km:132.5, name:"As Mari\u00f1as", alt:15, q:"Baredo, Baiona, Spain", lat:42.1130, lon:-8.8700},
- {id:"baiona", km:135.5, name:"Baiona", alt:5, q:"Baiona, Pontevedra, Spain", lat:42.1180, lon:-8.8500,
-  sleep:[["Albergue Estela do Mar","central","~14 \u20ac",1],["Hostel Baionamar","by the harbour","~16 \u20ac",0]]},
- {km:138.5, name:"A Ramallosa bridge (Mi\u00f1or)", alt:5, q:"A Ramallosa, Nigr\u00e1n, Spain", lat:42.1130, lon:-8.8180},
- {km:143.5, name:"Nigr\u00e1n, start of the climb", alt:40, q:"Nigr\u00e1n, Pontevedra, Spain", lat:42.1420, lon:-8.8060},
- {km:146.5, name:"Priegue", alt:150, q:"Priegue, Nigr\u00e1n, Spain", lat:42.1570, lon:-8.7990},
- {km:149.5, name:"Sai\u00e1ns", alt:90, q:"Sai\u00e1ns, Vigo, Spain", lat:42.1760, lon:-8.8120},
- {km:152.5, name:"Coruxo", alt:60, q:"Coruxo, Vigo, Spain", lat:42.1910, lon:-8.7880},
- {id:"vigo", km:160.5, name:"Vigo, Casco Vello", alt:25, q:"Casco Vello, Vigo, Spain", lat:42.2390, lon:-8.7250,
-  sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac",1],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac",0]]}
-];
-const IDX = {}; WPTS.forEach((w,i)=>{ if(w.id) IDX[w.id]=i; });
+/* ================= tabs ================= */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
 
-/* up/down between consecutive SLEEP points, keyed "fromId>toId" */
-const SEG_ELEV = {
- "porto>vilacha":[75,130], "vilacha>vdc":[30,35], "vdc>apulia":[55,55], "apulia>esposende":[45,45],
- "esposende>cneiva":[140,80], "cneiva>viana":[190,250], "viana>ancora":[180,185], "ancora>caminha":[60,60],
- "caminha>aguarda":[40,5], "aguarda>oia":[150,170], "oia>mougas":[40,35], "mougas>baiona":[160,175],
- "baiona>vigo":[380,360]
+/* ================= storage ================= */
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 };
-const SLEEP_ORDER = ["porto","vilacha","vdc","apulia","esposende","cneiva","viana","ancora","caminha","aguarda","oia","mougas","baiona","vigo"];
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 
-/* narrative + services snippets by km range [from,to) */
-const NOTES = [
- [0,28,"Boardwalks hug the ocean from Matosinhos onwards; metro line A skips the 9 urban km out of Porto if you want mercy on day one."],
- [28,52,"P\u00f3voa, endless beaches, the Ap\u00falia windmills and the C\u00e1vado dunes. Cobblestone: the silent enemy of your soles."],
- [52,77,"The Portuguese climb: the Neiva river dip (muddy after rain), Castelo do Neiva, and Chaf\u00e9 at 145 m. Enter Viana over Eiffel's iron bridge; the funicular to Santa Luzia is earned machinery."],
- [77,104,"Rolling coast past the Montedor lighthouse; Vila Praia de \u00c2ncora is a highly defensible seafood stop. Book the boat the evening you reach Caminha at the latest."],
+/* ================= master route ================= */
+const WPTS=[
+ {id:"porto",km:0,name:"Porto, S\u00e9 Cathedral",alt:70,q:"Porto Cathedral, Portugal",lat:41.1427,lon:-8.6110,sleep:[]},
+ {km:1.5,name:"Douro riverside (Ribeira)",alt:5,q:"Ribeira, Porto, Portugal",lat:41.1406,lon:-8.6157},
+ {km:9,name:"Matosinhos",alt:5,q:"Matosinhos, Portugal",lat:41.1844,lon:-8.6963},
+ {km:15,name:"Lavra boardwalks",alt:10,q:"Lavra, Matosinhos, Portugal",lat:41.2586,lon:-8.7183},
+ {id:"vilacha",km:20,name:"Vila Ch\u00e3",alt:15,q:"Vila Ch\u00e3, Vila do Conde, Portugal",lat:41.2947,lon:-8.7359,sleep:[["Albergue de Peregrinos de Vila Ch\u00e3","municipal","~10 \u20ac"]]},
+ {id:"vdc",km:28,name:"Vila do Conde",alt:8,q:"Vila do Conde, Portugal",lat:41.3517,lon:-8.7479,sleep:[["Albergue Santa Clara","municipal, by the aqueduct","~12 \u20ac"],["Bellamar Hostel","P\u00f3voa de Varzim, +3 km","~15 \u20ac"]]},
+ {km:32,name:"P\u00f3voa de Varzim",alt:10,q:"P\u00f3voa de Varzim, Portugal",lat:41.3830,lon:-8.7639},
+ {km:39,name:"Agu\u00e7adoura",alt:15,q:"Agu\u00e7adoura, Portugal",lat:41.4275,lon:-8.7803},
+ {id:"apulia",km:43,name:"Ap\u00falia (windmills)",alt:10,q:"Ap\u00falia, Esposende, Portugal",lat:41.4870,lon:-8.7770,sleep:[["Albergue Santiago de Ap\u00falia","parish albergue","~10 \u20ac"]]},
+ {km:48,name:"F\u00e3o bridge, C\u00e1vado river",alt:5,q:"F\u00e3o, Esposende, Portugal",lat:41.5104,lon:-8.7743},
+ {id:"esposende",km:52,name:"Esposende",alt:8,q:"Esposende, Portugal",lat:41.5320,lon:-8.7827,sleep:[["Albergue S\u00e3o Jo\u00e3o de Deus","municipal, central","~12 \u20ac"],["Eleven Hostel","private, book online","~18 \u20ac"]]},
+ {km:55,name:"Marinhas",alt:25,q:"Marinhas, Esposende, Portugal",lat:41.5560,lon:-8.7830},
+ {km:59,name:"Belinho",alt:45,q:"Belinho, Esposende, Portugal",lat:41.5900,lon:-8.7860},
+ {km:61,name:"Neiva river crossing (steep dip)",alt:15,q:"Rio Neiva, Portugal",lat:41.6080,lon:-8.7870},
+ {id:"cneiva",km:63,name:"Castelo do Neiva",alt:70,q:"Castelo do Neiva, Portugal",lat:41.6290,lon:-8.7980,sleep:[["Albergue S\u00e3o Tiago de Castelo do Neiva","parish albergue","donation"]]},
+ {km:66,name:"Chaf\u00e9",alt:145,q:"Chaf\u00e9, Viana do Castelo, Portugal",lat:41.6600,lon:-8.7860},
+ {km:69,name:"Anha",alt:95,q:"Vila Nova de Anha, Portugal",lat:41.6730,lon:-8.8000},
+ {km:74,name:"Darque / Eiffel bridge",alt:10,q:"Darque, Viana do Castelo, Portugal",lat:41.6860,lon:-8.8140},
+ {id:"viana",km:77,name:"Viana do Castelo",alt:10,q:"Viana do Castelo, Portugal",lat:41.6946,lon:-8.8329,sleep:[["S\u00e3o Jo\u00e3o da Cruz dos Caminhos","Carmelite monastery","donation"],["Albergue do Caminho","private, modern","~16 \u20ac"]]},
+ {km:81,name:"Areosa",alt:20,q:"Areosa, Viana do Castelo, Portugal",lat:41.7180,lon:-8.8570},
+ {km:85,name:"Carre\u00e7o",alt:55,q:"Carre\u00e7o, Portugal",lat:41.7450,lon:-8.8710},
+ {km:87,name:"Above Montedor lighthouse",alt:90,q:"Farol de Montedor, Portugal",lat:41.7502,lon:-8.8752},
+ {km:89,name:"Afife",alt:40,q:"Afife, Portugal",lat:41.7780,lon:-8.8600},
+ {id:"ancora",km:93,name:"Vila Praia de \u00c2ncora",alt:5,q:"Vila Praia de \u00c2ncora, Portugal",lat:41.8130,lon:-8.8580,sleep:[["Hospedaria Sra. da Bonan\u00e7a","guesthouse by the beach","~20 \u20ac"]]},
+ {km:96,name:"Moledo",alt:8,q:"Moledo, Caminha, Portugal",lat:41.8400,lon:-8.8630},
+ {id:"caminha",km:104,name:"Caminha",alt:5,q:"Caminha, Portugal",lat:41.8760,lon:-8.8390,sleep:[["Albergue de Peregrinos de Caminha","municipal, by the pier","~12 \u20ac"]]},
+ {km:104.2,name:"Camposancos dock (boat landing)",alt:0,q:"Camposancos, A Guarda, Spain",lat:41.8950,lon:-8.8670},
+ {id:"aguarda",km:106.5,name:"A Guarda",alt:35,q:"A Guarda, Pontevedra, Spain",lat:41.9020,lon:-8.8740,sleep:[["Albergue de A Guarda","public (Xunta)","~10 \u20ac"]]},
+ {km:112,name:"Portecelo",alt:40,q:"Portecelo, O Rosal, Spain",lat:41.9560,lon:-8.8830},
+ {km:114,name:"Cliff path high point",alt:60,q:"Oia coast, Pontevedra, Spain",lat:41.9750,lon:-8.8840},
+ {id:"oia",km:117,name:"Oia monastery",alt:15,q:"Monasterio de Oia, Spain",lat:41.9990,lon:-8.8800,sleep:[["Albergue de Oia","next to the monastery","~14 \u20ac"]]},
+ {km:120,name:"Viladesuso",alt:30,q:"Viladesuso, Oia, Spain",lat:42.0250,lon:-8.8790},
+ {id:"mougas",km:122.5,name:"Moug\u00e1s",alt:20,q:"Moug\u00e1s, Oia, Spain",lat:42.0430,lon:-8.8770,sleep:[["Albergue Aguncheiro","communal dinner","~15 \u20ac"]]},
+ {km:126.5,name:"Upper path, Cabo Silleiro",alt:85,q:"Cabo Silleiro, Spain",lat:42.0870,lon:-8.8890},
+ {km:129.5,name:"Silleiro lighthouse turn-off",alt:40,q:"Faro Silleiro, Baiona, Spain",lat:42.1030,lon:-8.8960},
+ {km:132.5,name:"As Mari\u00f1as",alt:15,q:"Baredo, Baiona, Spain",lat:42.1130,lon:-8.8700},
+ {id:"baiona",km:135.5,name:"Baiona",alt:5,q:"Baiona, Pontevedra, Spain",lat:42.1180,lon:-8.8500,sleep:[["Albergue Estela do Mar","central","~14 \u20ac"],["Hostel Baionamar","by the harbour","~16 \u20ac"]]},
+ {km:138.5,name:"A Ramallosa bridge (Mi\u00f1or)",alt:5,q:"A Ramallosa, Nigr\u00e1n, Spain",lat:42.1130,lon:-8.8180},
+ {km:143.5,name:"Nigr\u00e1n, start of the climb",alt:40,q:"Nigr\u00e1n, Pontevedra, Spain",lat:42.1420,lon:-8.8060},
+ {km:146.5,name:"Priegue",alt:150,q:"Priegue, Nigr\u00e1n, Spain",lat:42.1570,lon:-8.7990},
+ {km:149.5,name:"Sai\u00e1ns",alt:90,q:"Sai\u00e1ns, Vigo, Spain",lat:42.1760,lon:-8.8120},
+ {km:152.5,name:"Coruxo",alt:60,q:"Coruxo, Vigo, Spain",lat:42.1910,lon:-8.7880},
+ {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
+];
+const IDX={};WPTS.forEach((w,i)=>{if(w.id)IDX[w.id]=i;});
+const SEG_ELEV={"porto>vilacha":[75,130],"vilacha>vdc":[30,35],"vdc>apulia":[55,55],"apulia>esposende":[45,45],"esposende>cneiva":[140,80],"cneiva>viana":[190,250],"viana>ancora":[180,185],"ancora>caminha":[60,60],"caminha>aguarda":[40,5],"aguarda>oia":[150,170],"oia>mougas":[40,35],"mougas>baiona":[160,175],"baiona>vigo":[380,360]};
+const SLEEP_ORDER=["porto","vilacha","vdc","apulia","esposende","cneiva","viana","ancora","caminha","aguarda","oia","mougas","baiona","vigo"];
+const NOTES=[
+ [0,28,"Boardwalks hug the ocean from Matosinhos onwards; metro line A skips the 9 urban km out of Porto if we want mercy on day one."],
+ [28,52,"P\u00f3voa, endless beaches, the Ap\u00falia windmills and the C\u00e1vado dunes. Cobblestone: the silent enemy of our soles."],
+ [52,77,"The Portuguese climb: the Neiva river dip (muddy after rain), Castelo do Neiva, and Chaf\u00e9 at 145 m. We enter Viana over Eiffel's iron bridge; the funicular to Santa Luzia is earned machinery."],
+ [77,104,"Rolling coast past the Montedor lighthouse; Vila Praia de \u00c2ncora is a highly defensible seafood stop. Book the boat the evening we reach Caminha at the latest."],
  [104,122.5,"Boat across the Mi\u00f1o (clocks +1 h in Spain). Then the queen stretch: cliff paths from A Guarda to the Oia monastery, poles welcome. Side quest: Monte Santa Trega hillfort, 341 m of criminal views."],
  [122.5,135.5,"One gentle rise above Cabo Silleiro, then downhill into Baiona bay, where the Pinta docked returning from America. Arrival at vermouth o'clock: planning, not coincidence."],
- [135.5,160.5,"At A Ramallosa the route splits: yellow arrows climb inland via Priegue (~150 m); green arrows hug the flat coast past Panx\u00f3n, Patos and Samil. Mandatory finish: oysters on R\u00faa da Pedra, Casco Vello."]
+ [135.5,160.5,"At A Ramallosa the route splits: yellow arrows climb inland via Priegue (~150 m); green arrows hug the flat coast past Panx\u00f3n, Patos and Samil. Mandatory finish: oysters on R\u00faa da Pedra."]
 ];
-const SVCS = [
+const SVCS=[
  [0,28,"Caf\u00e9s every 2-4 km on the promenades; zero shade, sunscreen from minute one."],
  [28,52,"P\u00f3voa (early on) has everything; the Ap\u00falia\u2013F\u00e3o dunes have nothing, carry water."],
  [52,77,"After Castelo do Neiva, ~8 km with little service until Anha."],
  [77,104,"Between Carre\u00e7o and \u00c2ncora: nothing. In \u00c2ncora: supermarket, pharmacy, ATM."],
- [104,122.5,"Loneliest stretch of the route; seasonal bars mostly closed in October. Last reliable ATM: A Guarda. Food and water in the pack."],
+ [104,122.5,"Loneliest stretch; seasonal bars mostly closed in October. Last reliable ATM: A Guarda. Food and water in the pack."],
  [122.5,135.5,"Bars in Moug\u00e1s and As Mari\u00f1as; Baiona has everything, including a gear shop."],
  [135.5,160.5,"A Ramallosa, Nigr\u00e1n and Coruxo have everything; save a snack for the Priegue climb."]
 ];
-
-/* ============ PLANS ============ */
-const PLANS = {
- A:{label:"A \u00b7 Classic \u00b7 7d", stops:["porto","vdc","esposende","viana","caminha","mougas","baiona","vigo"]},
- B:{label:"B \u00b7 Comfort \u00b7 8d", stops:["porto","vdc","esposende","viana","ancora","aguarda","mougas","baiona","vigo"]},
- C:{label:"C \u00b7 Relaxed \u00b7 9d", stops:["porto","vdc","apulia","cneiva","viana","ancora","aguarda","mougas","baiona","vigo"]},
- D:{label:"D \u00b7 Sporty \u00b7 6d", stops:["porto","vdc","esposende","viana","caminha","baiona","vigo"]},
- X:{label:"Custom", stops:null}
+const FIELD=[
+ [0,28,"Vila do Conde's Santa Clara aqueduct ran 999 arches and nearly 5 km \u2014 one of Iberia's longest \u2014 to feed one convent. The Ave shipyards below it built ships for the Age of Discoveries."],
+ [28,52,"The sunken fields behind the Ap\u00falia dunes are masseiras: crops dug below dune level so the sand walls trap heat and block wind \u2014 desert agriculture, invented on a rainy coast."],
+ [52,77,"Viana's iron bridge is an Eiffel company work (1878). The town is the heart of Portuguese gold filigree \u2014 the cora\u00e7\u00e3o de Viana heart in every jewellery window."],
+ [77,104,"The Camarido pine forest before Caminha was planted centuries ago on royal orders to pin down the marching dunes \u2014 medieval geoengineering. Offshore at Moledo sits the \u00cdnsua fort on a tidal islet."],
+ [104,122.5,"Monte Santa Trega holds a Celtic castro where ~5,000 people lived around 100 BC. And Oia's Cistercian monastery fired cannons at pirates in 1624: the artillery monks."],
+ [122.5,135.5,"On 1 March 1493 the caravel Pinta limped into Baiona bay \u2014 the first place in Europe to hear that Columbus had reached land. A full-size replica floats in the harbour."],
+ [135.5,160.5,"Vigo's r\u00eda hides the treasure wrecks of Rande (1702). Jules Verne loved the legend so much that Captain Nemo funds the Nautilus from these very wrecks \u2014 Vigo thanked him with a statue."]
+];
+const EVENINGS={
+ vilacha:"A quiet fishing village evening: dinner at the harbour tasca, early night \u2014 we chose the gentle plan.",
+ vdc:"Walk the aqueduct arches to the Santa Clara convent at dusk; see the replica caravel by the Ave; grilled fish on the riverfront.",
+ apulia:"Windmill silhouettes at sunset over the dunes; seafood rice at a beach restaurant.",
+ esposende:"Sunset walk to the C\u00e1vado sandspit lighthouse; arroz de marisco somewhere warm.",
+ cneiva:"Parish albergue calm; the church above the village bears the oldest known inscription naming Santiago pilgrims in Portugal.",
+ viana:"Funicular up to Santa Luzia for the coast we just walked, laid out like a map. Gold filigree windows on the way down.",
+ ancora:"Harbour seafood with the boats that caught it. Tomorrow is short \u2014 linger.",
+ caminha:"Confirm the boat, then Pra\u00e7a Conselheiro Silva Torres under the clock tower: our farewell-to-Portugal dinner. Vinho verde is mandatory.",
+ aguarda:"If legs allow, taxi or climb Santa Trega for sunset over two countries and one r\u00eda. Lobster-pot harbour below for dinner.",
+ oia:"The monastery faces due west \u2014 sit on the sea wall for the best sunset of the trip. One bar, no rush; that is the point.",
+ mougas:"Communal dinner at the albergue \u2014 the camino's best social hour \u2014 then step outside: darkest sky of the route, actual stars.",
+ baiona:"Monterreal fortress walls at golden hour, vermouth at the harbour, the Pinta replica. One stage left.",
+ vigo:"We made it. Oysters, then everything else."
 };
-
-const store = {
-  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
-  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+const PLANS={
+ A:{label:"A \u00b7 Classic \u00b7 7d",stops:["porto","vdc","esposende","viana","caminha","mougas","baiona","vigo"]},
+ B:{label:"B \u00b7 Comfort \u00b7 8d",stops:["porto","vdc","esposende","viana","ancora","aguarda","mougas","baiona","vigo"]},
+ C:{label:"C \u00b7 Relaxed \u00b7 9d",stops:["porto","vdc","apulia","cneiva","viana","ancora","aguarda","mougas","baiona","vigo"]},
+ D:{label:"D \u00b7 Sporty \u00b7 6d",stops:["porto","vdc","esposende","viana","caminha","baiona","vigo"]},
+ X:{label:"Custom",stops:null}
 };
-
-let planId = store.get("camino-plan","A");
-let customStops = store.get("camino-custom", ["vdc","esposende","viana","caminha","mougas","baiona"]);
-let startDate = store.get("camino-start","2026-10-02");
-const sel = {}; const GEOM = {};
+const ANNIV="2026-10-08";
+let planId=store.get("camino-plan","A");
+let customStops=store.get("camino-custom",["vdc","esposende","viana","caminha","mougas","baiona"]);
+let startDate=store.get("camino-start","2026-10-02");
+const sel={};const GEOM={};
 
 function currentStops(){
-  if(planId!=="X") return PLANS[planId].stops;
-  const mids = SLEEP_ORDER.slice(1,-1).filter(id=>customStops.includes(id));
+  if(planId!=="X")return PLANS[planId].stops;
+  const mids=SLEEP_ORDER.slice(1,-1).filter(id=>customStops.includes(id));
   return ["porto",...mids,"vigo"];
 }
 function buildStages(){
-  const stops = currentStops();
-  const stages = [];
+  const stops=currentStops();const stages=[];
   for(let i=0;i<stops.length-1;i++){
-    const a=WPTS[IDX[stops[i]]], b=WPTS[IDX[stops[i+1]]];
-    const seg = WPTS.filter(w=>w.km>=a.km && w.km<=b.km);
-    // sum elevation over the sleep-segments covered
-    const ai=SLEEP_ORDER.indexOf(stops[i]), bi=SLEEP_ORDER.indexOf(stops[i+1]);
+    const a=WPTS[IDX[stops[i]]],b=WPTS[IDX[stops[i+1]]];
+    const seg=WPTS.filter(w=>w.km>=a.km&&w.km<=b.km);
+    const ai=SLEEP_ORDER.indexOf(stops[i]),bi=SLEEP_ORDER.indexOf(stops[i+1]);
     let up=0,down=0;
-    for(let j=ai;j<bi;j++){ const e=SEG_ELEV[SLEEP_ORDER[j]+">"+SLEEP_ORDER[j+1]]; up+=e[0]; down+=e[1]; }
-    const km = +(b.km-a.km).toFixed(1);
-    const diff = km>=28||up>=330 ? 3 : (km>=20||up>=150 ? 2 : 1) + (km>30?2:0);
-    const notes = NOTES.filter(x=>x[0]<b.km && x[1]>a.km).map(x=>x[2]).join(" ");
-    const svc = SVCS.filter(x=>x[0]<b.km && x[1]>a.km).map(x=>x[2]).join(" ");
-    stages.push({n:i+1, a, b, seg, km, up, down, diff:Math.min(diff,5), notes, svc,
-                 ferry: a.km<104.2 && b.km>104});
+    for(let j=ai;j<bi;j++){const e=SEG_ELEV[SLEEP_ORDER[j]+">"+SLEEP_ORDER[j+1]];up+=e[0];down+=e[1];}
+    const km=+(b.km-a.km).toFixed(1);
+    const diff=Math.min(5,(km>=28||up>=330?3:(km>=20||up>=150?2:1))+(km>30?1:0));
+    const notes=NOTES.filter(x=>x[0]<b.km&&x[1]>a.km).map(x=>x[2]).join(" ");
+    const svc=SVCS.filter(x=>x[0]<b.km&&x[1]>a.km).map(x=>x[2]).join(" ");
+    stages.push({n:i+1,a,b,seg,km,up,down,diff,notes,svc,ferry:a.km<104.2&&b.km>104});
   }
   return stages;
 }
-let STAGES = buildStages();
-function doneKey(){ return "camino-done-"+(planId==="X" ? "X-"+currentStops().join(".") : planId); }
+let STAGES=buildStages();
+function doneKey(){return "camino-done-"+(planId==="X"?"X-"+currentStops().join("."):planId);}
+function stageDateObj(i){const d=new Date(startDate+"T12:00:00");d.setDate(d.getDate()+i);return d;}
+function stageDateLabel(i){return stageDateObj(i).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});}
+function stageISO(i){const d=stageDateObj(i);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 
-/* ============ dates ============ */
-function stageDate(i){
-  const d = new Date(startDate+"T12:00:00");
-  d.setDate(d.getDate()+i);
-  return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
-}
-
-/* ============ profile SVG ============ */
+/* profile svg */
 function smoothPath(pts){
-  if(pts.length<3) return "M"+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L");
+  if(pts.length<3)return "M"+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L");
   let d="M"+pts[0][0].toFixed(1)+" "+pts[0][1].toFixed(1);
   for(let i=0;i<pts.length-1;i++){
-    const p0=pts[Math.max(0,i-1)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(pts.length-1,i+2)];
-    const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
-    const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+    const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
     d+=` C${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
   }
   return d;
@@ -548,26 +925,21 @@ function smoothPath(pts){
 function profileSVG(st){
   const W=800,H=96,padL=20,padR=20,padT=16,padB=20;
   const maxAlt=Math.max(...st.seg.map(w=>w.alt),20);
-  const X=km=>padL+((km-st.a.km)/(st.km))*(W-padL-padR);
+  const X=km=>padL+((km-st.a.km)/st.km)*(W-padL-padR);
   const Y=a=>padT+(1-a/maxAlt)*(H-padT-padB);
   GEOM[st.n]={X,Y,maxAlt,a:st.a.km,b:st.b.km};
   const pts=st.seg.map(w=>[X(w.km),Y(w.alt)]);
   const line=smoothPath(pts);
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
-  const dots=st.seg.map((w,i)=>
-    `<circle class="wp-dot ${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${i}" cx="${X(w.km).toFixed(1)}" cy="${Y(w.alt).toFixed(1)}" r="5" onclick="selectWp(${st.n},${i});event.stopPropagation()"/>`).join("");
+  const dots=st.seg.map((w,i)=>`<circle class="wp-dot ${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${i}" cx="${X(w.km).toFixed(1)}" cy="${Y(w.alt).toFixed(1)}" r="5" onclick="selectWp(${st.n},${i});event.stopPropagation()"/>`).join("");
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="pf${st.n}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#3fa7a0" stop-opacity=".35"/><stop offset="1" stop-color="#3fa7a0" stop-opacity="0"/>
-      </linearGradient>
-      <linearGradient id="ps${st.n}" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#255e5a"/><stop offset=".6" stop-color="#3fa7a0"/><stop offset="1" stop-color="#6fd0c9"/>
-      </linearGradient>
+      <linearGradient id="pf${st.n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a90b8" stop-opacity=".35"/><stop offset="1" stop-color="#4a90b8" stop-opacity="0"/></linearGradient>
+      <linearGradient id="ps${st.n}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a4d6e"/><stop offset=".6" stop-color="#4a90b8"/><stop offset="1" stop-color="#5fa7c8"/></linearGradient>
     </defs>
-    <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#22334a"/>
-    <text x="${W-padR}" y="${padT-4}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#5b6d85">scale 0\u2013${maxAlt} m</text>
+    <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#1f2740"/>
+    <text x="${W-padR}" y="${padT-4}" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="#7a7468">scale 0\u2013${maxAlt} m</text>
     <path d="${area}" fill="url(#pf${st.n})"/>
     <path d="${line}" fill="none" stroke="url(#ps${st.n})" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
     ${dots}
@@ -575,24 +947,23 @@ function profileSVG(st){
     <circle class="gps-dot" id="gps-dot-${st.n}" cx="-99" cy="-99" r="5" style="display:none"/></svg>`;
 }
 
-/* ============ weather ============ */
-function wxCode(c){ if(c<=1)return"clear"; if(c<=3)return"clouds"; if(c<=48)return"fog"; if(c<=67)return"rain"; if(c<=77)return"snow"; if(c<=82)return"showers"; return"storm"; }
+/* weather */
+function wxCode(c){if(c<=1)return"clear";if(c<=3)return"clouds";if(c<=48)return"fog";if(c<=67)return"rain";if(c<=77)return"snow";if(c<=82)return"showers";return"storm";}
 async function loadWeather(n){
-  const st=STAGES.find(x=>x.n===n); const el=document.getElementById("wx-"+n); if(!el||!st)return;
-  const key="camino-wx-"+st.b.id;
-  const cached=store.get(key,null);
-  if(cached) paintWeather(n,cached.d,cached.t);
-  if(cached && (Date.now()-cached.t)<3*3600*1000) return;
+  const st=STAGES.find(x=>x.n===n);const el=document.getElementById("wx-"+n);if(!el||!st)return;
+  const key="camino-wx-"+st.b.id;const cached=store.get(key,null);
+  if(cached)paintWeather(n,cached.d,cached.t);
+  if(cached&&(Date.now()-cached.t)<3*3600*1000)return;
   const url=`https://api.open-meteo.com/v1/forecast?latitude=${st.b.lat}&longitude=${st.b.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,weather_code&timezone=auto&forecast_days=2`;
   try{
-    const r=await fetch(url); const d=await r.json();
-    store.set(key,{t:Date.now(),d}); paintWeather(n,d,Date.now());
+    const r=await fetch(url);const d=await r.json();
+    store.set(key,{t:Date.now(),d});paintWeather(n,d,Date.now());
   }catch(e){
-    if(!cached) el.querySelector(".wx-body").innerHTML=`<div class="wx-day">Weather unavailable offline \u2014 will refresh when you have signal.</div>`;
+    if(!cached)el.querySelector(".wx-body").innerHTML=`<div class="wx-day">Weather unavailable offline \u2014 will refresh with signal.</div>`;
   }
 }
 function paintWeather(n,d,ts){
-  const el=document.getElementById("wx-"+n); if(!el||!d||!d.daily)return;
+  const el=document.getElementById("wx-"+n);if(!el||!d||!d.daily)return;
   const names=["Today","Tomorrow"];
   el.querySelector(".wx-body").innerHTML=d.daily.time.map((_,i)=>`
     <div class="wx-day"><b>${names[i]||d.daily.time[i]}</b>
@@ -603,21 +974,20 @@ function paintWeather(n,d,ts){
   el.querySelector(".wx-age").textContent=age<2?"live":`updated ${age<60?age+" min":Math.round(age/60)+" h"} ago`;
 }
 
-/* ============ GPS ============ */
+/* GPS */
 function projSeg(P,A,B){
-  const toR=Math.PI/180, latR=P[0]*toR;
-  const ax=(A[1]-P[1])*Math.cos(latR), ay=A[0]-P[0];
-  const bx=(B[1]-P[1])*Math.cos(latR), by=B[0]-P[0];
-  const dx=bx-ax, dy=by-ay, len2=dx*dx+dy*dy;
-  let t=len2===0?0:(-(ax*dx+ay*dy))/len2; t=Math.max(0,Math.min(1,t));
-  const cx=ax+t*dx, cy=ay+t*dy;
-  return {frac:t, distKm:Math.sqrt(cx*cx+cy*cy)*111.32};
+  const toR=Math.PI/180,latR=P[0]*toR;
+  const ax=(A[1]-P[1])*Math.cos(latR),ay=A[0]-P[0];
+  const bx=(B[1]-P[1])*Math.cos(latR),by=B[0]-P[0];
+  const dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;
+  let t=len2===0?0:(-(ax*dx+ay*dy))/len2;t=Math.max(0,Math.min(1,t));
+  const cx=ax+t*dx,cy=ay+t*dy;
+  return {frac:t,distKm:Math.sqrt(cx*cx+cy*cy)*111.32};
 }
 function locateOnRoute(lat,lon){
   let best=null;
   for(let i=0;i<WPTS.length-1;i++){
-    const A=[WPTS[i].lat,WPTS[i].lon], B=[WPTS[i+1].lat,WPTS[i+1].lon];
-    const p=projSeg([lat,lon],A,B);
+    const p=projSeg([lat,lon],[WPTS[i].lat,WPTS[i].lon],[WPTS[i+1].lat,WPTS[i+1].lon]);
     if(!best||p.distKm<best.distKm){
       const km=WPTS[i].km+p.frac*(WPTS[i+1].km-WPTS[i].km);
       const alt=WPTS[i].alt+p.frac*(WPTS[i+1].alt-WPTS[i].alt);
@@ -628,46 +998,44 @@ function locateOnRoute(lat,lon){
 }
 function showGps(){
   const btn=document.getElementById("gps-btn");
-  if(!navigator.geolocation){ alert("This browser has no geolocation."); return; }
+  if(!navigator.geolocation){alert("This browser has no geolocation.");return;}
   btn.classList.add("busy");
   navigator.geolocation.getCurrentPosition(pos=>{
     btn.classList.remove("busy");
-    const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude); if(!b)return;
-    const st=STAGES.find(s=>b.km>=s.a.km && b.km<=s.b.km) || STAGES[0];
-    document.querySelector('.tab[data-panel="stages"]').click();
+    const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude);if(!b)return;
+    const st=STAGES.find(s=>b.km>=s.a.km&&b.km<=s.b.km)||STAGES[0];
     const art=document.querySelector(`.stage[data-n="${st.n}"]`);
-    if(art&&!art.classList.contains("open")){ art.classList.add("open"); loadWeather(st.n); }
+    if(art&&!art.classList.contains("open")){art.classList.add("open");loadWeather(st.n);}
     document.querySelectorAll(".gps-dot,.gps-pulse").forEach(e=>e.style.display="none");
     const g=GEOM[st.n];
-    const x=g.X(Math.min(Math.max(b.km,g.a),g.b)).toFixed(1), y=g.Y(Math.max(0,b.alt)).toFixed(1);
-    const dot=document.getElementById("gps-dot-"+st.n), pul=document.getElementById("gps-pulse-"+st.n);
-    [dot,pul].forEach(e=>{e.setAttribute("cx",x);e.setAttribute("cy",y);e.style.display="";});
+    const x=g.X(Math.min(Math.max(b.km,g.a),g.b)).toFixed(1),y=g.Y(Math.max(0,b.alt)).toFixed(1);
+    [document.getElementById("gps-dot-"+st.n),document.getElementById("gps-pulse-"+st.n)].forEach(e=>{e.setAttribute("cx",x);e.setAttribute("cy",y);e.style.display="";});
     const kmIn=(b.km-st.a.km).toFixed(1);
     const next=st.seg.find(w=>w.km>b.km);
     let txt;
-    if(b.distKm>3) txt=`You are <b>${b.distKm.toFixed(1)} km off the route</b> \u2014 nearest point: km ${kmIn} of stage ${st.n}.`;
-    else txt=`You are at <b>~km ${kmIn}</b> of stage ${st.n} (\u2248${Math.round(b.alt)} m)`+(next?` \u00b7 next: ${next.name} in ${(next.km-b.km).toFixed(1)} km`:` \u00b7 the end is near`);
+    if(b.distKm>3)txt=`We are <b>${b.distKm.toFixed(1)} km off the route</b> \u2014 nearest point: km ${kmIn} of stage ${st.n}.`;
+    else txt=`We are at <b>~km ${kmIn}</b> of stage ${st.n} (\u2248${Math.round(b.alt)} m)`+(next?` \u00b7 next: ${next.name} in ${(next.km-b.km).toFixed(1)} km`:` \u00b7 the end is near`);
     const msg=document.getElementById("gpsmsg-"+st.n);
     document.querySelectorAll(".gps-msg").forEach(e=>e.classList.remove("show"));
-    if(msg){ msg.innerHTML=txt; msg.classList.add("show"); }
+    if(msg){msg.innerHTML=txt;msg.classList.add("show");}
     art&&art.scrollIntoView({behavior:"smooth",block:"start"});
-  }, err=>{
+  },err=>{
     btn.classList.remove("busy");
-    alert("Could not get your position ("+err.message+"). Check location permission for this site.");
+    alert("Could not get position ("+err.message+"). Check location permission.");
   },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
 }
 
-/* ============ UI: plan picker ============ */
-const PIN_SVG=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21C7.5 16.5 5 13 5 9.5a7 7 0 0 1 14 0c0 3.5-2.5 7-7 11.5z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
-const FERRY_HTML=`<aside class="ferry"><h3>The boat: Caminha \u2192 A Guarda</h3><p>No bridge: cross the Mi\u00f1o by water taxi (<b>Xacobeo Transfer</b> / <b>Taxi Mar Caminha</b>), 6-8 \u20ac, book online \u2014 reduced October schedule, book 2-3 days ahead. Landing at Camposancos = Spain: <b>clocks jump one hour forward</b>.</p></aside>`;
+/* plans UI */
+const PIN_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21C7.5 16.5 5 13 5 9.5a7 7 0 0 1 14 0c0 3.5-2.5 7-7 11.5z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
+const FERRY_HTML=`<aside class="ferry"><h3>The boat: Caminha \u2192 A Guarda</h3><p>No bridge: water taxi across the Mi\u00f1o (<b>Xacobeo Transfer</b> / <b>Taxi Mar Caminha</b>), 6-8 \u20ac, booked 2-3 days ahead in October. Landing at Camposancos = Spain: <b>clocks jump one hour forward</b>.</p></aside>`;
+const HEART_SVG=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
 
 function renderPlans(){
-  document.getElementById("plans").innerHTML = Object.entries(PLANS).map(([id,p])=>
-    `<div class="plan-chip ${id===planId?"active":""}" onclick="setPlan('${id}')">${p.label}</div>`).join("");
+  document.getElementById("plans").innerHTML=Object.entries(PLANS).map(([id,p])=>`<div class="plan-chip ${id===planId?"active":""}" onclick="setPlan('${id}')">${p.label}</div>`).join("");
   const cp=document.getElementById("custom-panel");
-  cp.classList.toggle("show", planId==="X");
+  cp.classList.toggle("show",planId==="X");
   if(planId==="X"){
-    document.getElementById("stop-list").innerHTML = SLEEP_ORDER.slice(1,-1).map(id=>{
+    document.getElementById("stop-list").innerHTML=SLEEP_ORDER.slice(1,-1).map(id=>{
       const w=WPTS[IDX[id]];
       return `<label class="stop-row"><input type="checkbox" ${customStops.includes(id)?"checked":""} onchange="toggleStop('${id}')"> ${w.name}<span class="skm">km ${w.km}</span></label>`;
     }).join("");
@@ -677,21 +1045,23 @@ function renderPlans(){
   const longest=Math.max(...st.map(s=>s.km));
   document.getElementById("plan-summary").textContent=`${st.length} days \u00b7 avg ${(total/st.length).toFixed(1)} km`;
   const warn=document.getElementById("custom-warn");
-  if(planId==="X" && longest>32){ warn.textContent=`Careful: your longest day is ${longest.toFixed(1)} km. In October daylight that is a headlamp situation.`; warn.classList.add("show"); }
+  if(planId==="X"&&longest>32){warn.textContent=`Careful: our longest day is ${longest.toFixed(1)} km. In October daylight that is a headlamp situation.`;warn.classList.add("show");}
   else warn.classList.remove("show");
 }
-function setPlan(id){ planId=id; store.set("camino-plan",id); STAGES=buildStages(); renderPlans(); render(); updateTrip(); renderPack(); }
+function setPlan(id){planId=id;store.set("camino-plan",id);STAGES=buildStages();renderPlans();render();}
 function toggleStop(id){
-  customStops = customStops.includes(id) ? customStops.filter(x=>x!==id) : [...customStops,id];
+  customStops=customStops.includes(id)?customStops.filter(x=>x!==id):[...customStops,id];
   store.set("camino-custom",customStops);
-  STAGES=buildStages(); renderPlans(); render();
+  STAGES=buildStages();renderPlans();render();
 }
 
-/* ============ render stages ============ */
+/* stages render */
 function render(){
   const done=store.get(doneKey(),[]);
-  document.getElementById("panel-stages").innerHTML = STAGES.map((st,i)=>{
+  document.getElementById("panel-stages").innerHTML=STAGES.map((st,i)=>{
     const isDone=done.includes(st.n);
+    const iso=stageISO(i);
+    const isAnn=iso===ANNIV;
     const dots=[1,2,3,4,5].map(k=>`<i class="dot ${k<=st.diff?"on":""}"></i>`).join("");
     const hiAlt=Math.max(...st.seg.map(w=>w.alt));
     const rows=st.seg.map((w,j)=>{
@@ -700,11 +1070,9 @@ function render(){
         <td>${(w.km-st.a.km).toFixed(1).replace(".0","")}</td><td>${w.name}</td><td class="alt">~${w.alt} m</td>
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
-    const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u2014 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")
-      || `<li><span class="meta">End of the road \u2014 you pick the celebration venue.</span></li>`;
-    const metro = (st.a.id==="porto" && st.km>=28) ? "" : "";
+    const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u2014 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road \u2014 we pick the celebration venue.</span></li>`;
     return `${st.ferry?FERRY_HTML:""}
-    <article class="stage ${isDone?"done":""}" data-n="${st.n}">
+    <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
       <div class="node">${isDone?"\u2713":st.n}</div>
       <div class="card">
         <div class="card-head" onclick="toggle(${st.n})"><span class="ghost">${st.n}</span>
@@ -713,7 +1081,7 @@ function render(){
             <span class="km">${st.km} km</span>
             <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="stage-date">${stageDate(i)}${st.ferry?" \u00b7 boat day, clocks +1 h":""}</div>
+          <div class="stage-date">${stageDateLabel(i)}${st.ferry?" \u00b7 boat day, clocks +1 h":""}${isAnn?`<span class="ann-mark">${HEART_SVG} ten years, this exact day</span>`:""}</div>
           <div class="head-elev">
             <span class="up">\u25b2 +${st.up} m</span>
             <span class="down">\u25bc \u2212${st.down} m</span>
@@ -722,7 +1090,7 @@ function render(){
         </div>
         <div class="detail">
           <div class="max">High point of the day: ${st.seg.find(w=>w.alt===hiAlt).name} (~${hiAlt} m)</div>
-          <div class="miniprofile">${profileSVG(st)}<div class="wp-caption" id="cap-${st.n}">Tap a waypoint (dot or row) to locate it. The pin opens Maps; the crosshair up top finds YOU.</div></div>
+          <div class="miniprofile">${profileSVG(st)}<div class="wp-caption" id="cap-${st.n}">Tap a waypoint (dot or row) to locate it. The pin opens Maps.</div></div>
           <div class="gps-msg" id="gpsmsg-${st.n}"></div>
           <div class="wx" id="wx-${st.n}">
             <div class="wx-head"><span>Weather at ${st.b.name.split(",")[0]}</span><span class="wx-age"></span></div>
@@ -731,37 +1099,32 @@ function render(){
           <div class="alt-table"><table><tr><th>km</th><th>Waypoint</th><th style="text-align:right">Alt.</th><th></th></tr>${rows}</table></div>
           <p class="note">${st.notes}</p>
           <div class="fieldnote"><span>Field note</span><p>${FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ")}</p></div>
-          <div class="blk"><h4>Where to sleep</h4><ul>${sleep}</ul></div>
+          <div class="blk"><h4>Where we sleep</h4><ul>${sleep}</ul></div>
           <div class="blk"><h4>Services along the way</h4><p class="svc">${st.svc}</p></div>
-          <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"You pick — it is your route."}</p></div>
-          <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Completed \u2014 tap to undo":"Mark stage as walked"}</button>
+          <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"We pick \u2014 it is our route."}</p></div>
+          <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Walked \u2014 tap to undo":"Mark stage as walked"}</button>
         </div>
       </div>
     </article>`;
   }).join("");
-  updateProgress();
-  updateTrip();
+  updateProgress();updateTrip();
 }
-
 function selectWp(n,i){
   sel[n]=(sel[n]===i)?null:i;
   document.querySelectorAll(`.alt-table tr[data-s="${n}"]`).forEach(tr=>tr.classList.toggle("sel",+tr.dataset.i===sel[n]));
   document.querySelectorAll(`.wp-dot[data-s="${n}"]`).forEach(d=>{
     const on=+d.dataset.i===sel[n];
-    d.classList.toggle("sel",on); d.setAttribute("r",on?7:5);
+    d.classList.toggle("sel",on);d.setAttribute("r",on?7:5);
   });
   const cap=document.getElementById("cap-"+n);
-  if(sel[n]==null) cap.innerHTML="Tap a waypoint (dot or row) to locate it. The pin opens Maps; the crosshair up top finds YOU.";
-  else{
-    const st=STAGES.find(x=>x.n===n), w=st.seg[sel[n]];
-    cap.innerHTML=`<b>${w.name}</b> \u2014 km ${(w.km-st.a.km).toFixed(1)} of the stage \u00b7 ~${w.alt} m`;
-  }
+  if(sel[n]==null)cap.innerHTML="Tap a waypoint (dot or row) to locate it. The pin opens Maps.";
+  else{const st=STAGES.find(x=>x.n===n),w=st.seg[sel[n]];cap.innerHTML=`<b>${w.name}</b> \u2014 km ${(w.km-st.a.km).toFixed(1)} of the stage \u00b7 ~${w.alt} m`;}
 }
 function toggle(n){
   const art=document.querySelector(`.stage[data-n="${n}"]`);
   const opening=!art.classList.contains("open");
   art.classList.toggle("open");
-  if(opening) loadWeather(n);
+  if(opening)loadWeather(n);
 }
 function markDone(n){
   let done=store.get(doneKey(),[]);
@@ -769,14 +1132,7 @@ function markDone(n){
   store.set(doneKey(),done);
   const open=[...document.querySelectorAll(".stage.open")].map(el=>+el.dataset.n);
   render();
-  open.forEach(x=>{const el=document.querySelector(`.stage[data-n="${x}"]`); if(el){el.classList.add("open"); loadWeather(x);}});
-}
-function updateTrip(){
-  const el=document.getElementById("trip-arrival");
-  if(!el) return;
-  const d=new Date(startDate+"T12:00:00");
-  d.setDate(d.getDate()+STAGES.length-1);
-  el.textContent=d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ("+STAGES.length+"-day plan)";
+  open.forEach(x=>{const el=document.querySelector(`.stage[data-n="${x}"]`);if(el){el.classList.add("open");loadWeather(x);}});
 }
 function updateProgress(){
   const done=store.get(doneKey(),[]);
@@ -785,79 +1141,323 @@ function updateProgress(){
   document.getElementById("km-done").textContent=Math.round(km)+" km";
   document.getElementById("km-left").textContent=Math.round(total-km)+" km to go";
   document.getElementById("bar-fill").style.width=Math.min(100,Math.round(km/total*100))+"%";
-  document.querySelector(".progress").classList.toggle("fin", done.length===STAGES.length && STAGES.length>0);
+  const fin=done.length===STAGES.length&&STAGES.length>0;
+  document.getElementById("progress").classList.toggle("fin",fin);
   const sub=document.getElementById("progress-sub");
-  if(done.length===0) sub.textContent=STAGES.length+" stages ahead. Tap a stage to open it; mark it done when your feet confirm it.";
-  else if(done.length===STAGES.length) sub.textContent=Math.round(total)+" km of ocean, walked together. Happy anniversary, Vane & Manal — the oysters are waiting.";
+  if(done.length===0)sub.textContent=STAGES.length+" stages ahead. Tap one to open it; mark it walked when our feet confirm it.";
+  else if(fin)sub.textContent=Math.round(total)+" km of ocean, walked together. Ten years. Happy anniversary to us \u2014 the oysters are waiting.";
   else sub.textContent=done.length+" of "+STAGES.length+" stages walked. Keep going, the ocean is not moving.";
 }
+function updateTrip(){
+  const el=document.getElementById("trip-arrival");if(!el)return;
+  el.textContent=stageDateLabel(STAGES.length-1)+" ("+STAGES.length+"-day plan)";
+}
 
+/* countdown */
+function updateCountdown(){
+  const pill=document.getElementById("countdown-pill");
+  const now=new Date();
+  const fly=new Date("2026-09-30T07:20:00");
+  const walk=new Date(startDate+"T08:00:00");
+  const end=stageDateObj(STAGES.length-1);end.setHours(23,59,59);
+  if(now<fly){pill.textContent=Math.ceil((fly-now)/(864e5))+" days to Porto";}
+  else if(now<walk){pill.textContent="Porto days \u00b7 boots on soon";}
+  else if(now<=end){const d=Math.floor((now-walk)/864e5)+1;pill.textContent=`Day ${d} of ${STAGES.length}`;}
+  else{pill.textContent=Math.ceil((now-end)/864e5)+" days since Vigo";}
+}
 
-/* ---------- the smart layer ---------- */
-const FIELD = [
- [0,28,"Vila do Conde's Santa Clara aqueduct ran 999 arches and nearly 5 km — one of Iberia's longest — to feed one convent. The Ave shipyards below it built ships for the Age of Discoveries; a full-size replica caravel floats by the bridge."],
- [28,52,"The sunken fields behind the Apúlia dunes are masseiras: farmers dug crops below dune level so the sand walls trap heat and block the wind — desert agriculture, invented on a rainy coast."],
- [52,77,"Viana's iron bridge is an Eiffel company work (1878). The town is also the heart of Portuguese gold filigree — the hand-worked coração de Viana heart you will see in every jewellery window walking in."],
- [77,104,"The Camarido pine forest before Caminha was planted centuries ago on royal orders to pin down the marching dunes — medieval geoengineering. Offshore at Moledo sits the Ínsua fort, a monastery-fortress on a tidal islet."],
- [104,122.5,"Monte Santa Trega above A Guarda holds a Celtic castro where ~5,000 people lived around 100 BC — walk among round stone houses. And Oia's Cistercian monastery earned royal favour by firing cannons at Turkish pirates in 1624: the artillery monks."],
- [122.5,135.5,"On 1 March 1493 the caravel Pinta limped into Baiona bay — making it the first place in Europe to hear that Columbus had reached land across the ocean. A full-size replica floats in the harbour."],
- [135.5,160.5,"Vigo's ría hides the wrecks of Rande (1702): a Spanish treasure fleet sunk in battle with silver aboard. Jules Verne loved the legend so much that Captain Nemo funds the Nautilus from these very wrecks in Twenty Thousand Leagues — Vigo thanked him with a statue you can visit at the end."]
-];
-const EVENINGS = {
- vilacha:"A quiet fishing village evening: dinner at the harbour tasca, early night — you chose the gentle plan.",
- vdc:"Walk the aqueduct arches to the Santa Clara convent at dusk; see the replica caravel by the Ave; grilled fish on the riverfront.",
- apulia:"Windmill silhouettes at sunset over the dunes; seafood rice at a beach restaurant.",
- esposende:"Sunset walk to the Cávado sandspit lighthouse; arroz de marisco somewhere warm.",
- cneiva:"Parish albergue calm; the church above the village has the oldest known inscription naming Santiago pilgrims in Portugal.",
- viana:"Funicular up to Santa Luzia for the coast you just walked, laid out like a map. Gold filigree windows on the way down; the Gil Eannes hospital ship museum if energy remains.",
- ancora:"Harbour seafood with the boats that caught it. Tomorrow is short — linger.",
- caminha:"Confirm the boat, then Praça Conselheiro Silva Torres under the clock tower: your farewell-to-Portugal dinner. Vinho verde is mandatory.",
- aguarda:"If legs allow, taxi or climb to Santa Trega for sunset over two countries and one ría. Lobster-pot harbour below for dinner.",
- oia:"The monastery faces due west — sit on the sea wall for the best sunset of the trip. One bar, no rush, that is the point.",
- mougas:"Communal dinner at the albergue — the camino's best social hour — then step outside: darkest sky of the route, actual stars.",
- baiona:"Walk the Monterreal fortress walls at golden hour, vermouth at the harbour, visit the Pinta replica. Feel smug: one stage left.",
- vigo:"You made it. Oysters, then everything else."
+/* invitation */
+document.getElementById("yes-btn").addEventListener("click",function(){
+  launchConfetti();launchHearts(this);
+  this.textContent="Si \u2726 Si \u2726 Si";
+  document.getElementById("yes-meta").textContent="(it was always going to be yes)";
+});
+function launchConfetti(){
+  const colors=['#3fa7a0','#f2c230','#5fc2bb','#f6d35f','#4a90b8','#7ab87a'];
+  for(let i=0;i<60;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    c.style.left=Math.random()*100+'vw';c.style.top='-20px';
+    c.style.width=(6+Math.random()*8)+'px';c.style.height=c.style.width;
+    c.style.animation=`confetti-fall ${2.5+Math.random()*2}s linear forwards`;
+    c.style.animationDelay=(Math.random()*0.4)+'s';
+    document.body.appendChild(c);setTimeout(()=>c.remove(),5000);
+  }
+}
+function launchHearts(originEl){
+  const rect=originEl.getBoundingClientRect();
+  const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  for(let i=0;i<12;i++){
+    const angle=(Math.PI*2*i)/12,dist=100+Math.random()*80;
+    const h=document.createElement('div');h.className='heart-svg';
+    h.innerHTML=HEART_SVG;
+    h.style.left=(cx-15)+'px';h.style.top=(cy-15)+'px';
+    h.style.color=['#3fa7a0','#f2c230','#5fc2bb'][i%3];
+    document.body.appendChild(h);
+    h.animate([
+      {transform:'translate(0,0) scale(0)',opacity:1},
+      {transform:`translate(${Math.cos(angle)*dist*0.6}px,${Math.sin(angle)*dist*0.6-30}px) scale(1.4)`,opacity:1,offset:0.5},
+      {transform:`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist-60}px) scale(2)`,opacity:0}
+    ],{duration:1400,easing:'cubic-bezier(0.16,1,0.3,1)'});
+    setTimeout(()=>h.remove(),1500);
+  }
+}
+
+/* phrasebook */
+const PHRASES={
+ essentials:[
+  {en:'Good morning',ca:'Bom dia',lang:'PT',phon:'bong DEE-ah'},
+  {en:'Good morning',ca:'Bo d\u00eda',lang:'GAL',phon:'boh DEE-ah'},
+  {en:'Thank you (said by a woman)',ca:'Obrigada',lang:'PT',phon:'oh-bree-GAH-dah'},
+  {en:'Thank you',ca:'Grazas',lang:'GAL',phon:'GRAH-thas'},
+  {en:'Please',ca:'Por favor / se fai favor',lang:'PT\u00b7GAL',phon:'poor fah-VOR'},
+  {en:'Where is the albergue?',ca:'Onde fica o albergue?',lang:'PT',phon:'ON-deh FEE-kah oo al-BER-geh'}
+ ],
+ trail:[
+  {en:'The trail greeting',ca:'Bom caminho',lang:'PT',phon:'bong kah-MEEN-yoo'},
+  {en:'The trail greeting',ca:'Bo cami\u00f1o',lang:'GAL',phon:'boh kah-MEEN-yoh',note:'Switch the moment you step off the boat.'},
+  {en:'Stamp my credencial, please',ca:'Pode carimbar, por favor?',lang:'PT',phon:'POH-deh kah-reem-BAR'},
+  {en:'A stamp, please',ca:'Un selo, por favor',lang:'GAL',phon:'oon SEH-loh'},
+  {en:'How far to...?',ca:'Canto queda ata...?',lang:'GAL',phon:'KAN-toh KEH-dah AH-tah'},
+  {en:'Two beds, please',ca:'Duas camas, por favor',lang:'PT',phon:'DOO-ash KAH-mash'}
+ ],
+ food:[
+  {en:'Milky coffee + custard tart',ca:'Um gal\u00e3o e uma nata, por favor',lang:'PT',phon:'oong gah-LOWNG ee OO-mah NAH-tah',note:'The Portuguese breakfast of champions.'},
+  {en:'The victory order',ca:'Unha raci\u00f3n de polbo, por favor',lang:'GAL',phon:'OO-nyah rah-thee-ON deh POL-boh',note:'Octopus. Galicia will judge us if we skip it.'},
+  {en:'A glass of vinho verde',ca:'Um copo de vinho verde',lang:'PT',phon:'oong KOH-poo deh VEEN-yoo VER-deh'},
+  {en:'A glass of albari\u00f1o',ca:'Unha copa de albari\u00f1o',lang:'GAL',phon:'OO-nyah KOH-pah deh al-bah-REE-nyoh'},
+  {en:'The bill, please',ca:'A conta, por favor',lang:'PT\u00b7GAL',phon:'ah KON-tah'},
+  {en:'Delicious!',ca:'Riqu\u00edsimo!',lang:'GAL',phon:'ree-KEE-see-moh'}
+ ],
+ charm:[
+  {en:'It is very beautiful',ca:'\u00c9 moi bonito',lang:'GAL',phon:'eh moy boh-NEE-toh'},
+  {en:'My love',ca:'Meu amor',lang:'PT\u00b7GAL',phon:'MEH-oo ah-MOR',note:'For the Oia sunset, obviously.'},
+  {en:'Ten years',ca:'Dez anos',lang:'GAL',phon:'deth AH-nos',note:'For October 8th. Say it slowly.'},
+  {en:'We walked from Porto',ca:'Vi\u00f1emos andando desde Porto',lang:'GAL',phon:'vee-NYEH-mos an-DAN-doh',note:'Earned bragging rights.'},
+  {en:'See you tomorrow',ca:'Ata ma\u00f1\u00e1',lang:'GAL',phon:'AH-tah mah-NYAH'},
+  {en:'It is perfect',ca:'\u00c9 perfecto',lang:'GAL',phon:'eh per-FEK-toh'}
+ ]
 };
-const PACK = [
- ["Worn-in shoes + fresh socks x3","blisters are a choice"],
- ["Rain jacket","October Atlantic means business"],
- ["Poles","the Oia cliffs will thank you"],
- ["Credencial","no stamp, no municipal bed"],
- ["Blister kit (Compeed + tape)","apply at 'warm spot', not at 'blister'"],
- ["Earplugs + eye mask","snorers never rest"],
- ["Sunscreen + cap","boardwalks have zero shade"],
- ["Quick-dry towel + liner","municipal albergues are BYO"],
- ["Power bank + cable","the app needs its host alive"],
- ["DNI / passport","two countries, one walk"],
- ["Cash 50-80 EUR small notes","municipals and trail cafés"],
- ["One nice-ish outfit","anniversary dinner in Vigo deserves it"]
-];
-function renderPack(){
-  const host=document.getElementById("pack-list"); if(!host) return;
-  const done=store.get("camino-pack",[]);
-  host.innerHTML=PACK.map((p,i)=>`<label class="pack-row ${done.includes(i)?"on":""}"><input type="checkbox" ${done.includes(i)?"checked":""} onchange="togglePack(${i})"> ${p[0]}<span class="why">${p[1]}</span></label>`).join("");
+function speak(text,lang){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang&&lang.indexOf('PT')>=0?'pt-PT':'gl-ES';u.rate=0.85;
+  const voices=speechSynthesis.getVoices();
+  const v=voices.find(v=>v.lang.startsWith(u.lang.slice(0,2)))||voices.find(v=>v.lang.startsWith('es'));
+  if(v)u.voice=v;
+  speechSynthesis.speak(u);
 }
-function togglePack(i){
-  let done=store.get("camino-pack",[]);
-  done=done.includes(i)?done.filter(x=>x!==i):[...done,i];
-  store.set("camino-pack",done); renderPack();
+function renderPhrases(cat){
+  const list=document.getElementById('phrase-list');
+  list.innerHTML=PHRASES[cat].map(p=>`
+    <div class="phrase-card">
+      <div class="phrase-en">${escapeHtml(p.en)}<span class="phrase-lang">${p.lang}</span></div>
+      <div class="phrase-ca-row">
+        <span class="phrase-ca">${escapeHtml(p.ca)}</span>
+        <button class="phrase-speak" data-phrase="${escapeHtml(p.ca)}" data-lang="${p.lang}" title="Hear it">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+      </div>
+      <div class="phrase-phonetic">/${escapeHtml(p.phon)}/</div>
+      ${p.note?`<div class="phrase-note">${escapeHtml(p.note)}</div>`:''}
+    </div>`).join('');
+  list.querySelectorAll('.phrase-speak').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      btn.classList.add('playing');
+      speak(btn.dataset.phrase,btn.dataset.lang);
+      setTimeout(()=>btn.classList.remove('playing'),1200);
+    });
+  });
 }
+document.querySelectorAll('.phrase-cat-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.phrase-cat-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');renderPhrases(b.dataset.cat);
+  });
+});
+renderPhrases('essentials');
+if('speechSynthesis' in window)speechSynthesis.getVoices();
 
-/* ============ boot ============ */
-const dateInput=document.getElementById("start-date");
+/* packing */
+const PACK_DATA={
+ 'Trail':{icon:'M3 21l4-7 4 4 6-10 4 13',items:[
+  {l:'Worn-in shoes',n:'blisters are a choice'},{l:'Hiking socks x3'},{l:'Poles',n:'Oia cliffs'},{l:'Rain jacket',n:'October Atlantic'},{l:'Cap + sunglasses'},{l:'Sunscreen SPF 50',n:'zero shade'},{l:'Blister kit',n:'apply at warm spot'},{l:'Water bottles 1L each'}
+ ]},
+ 'Albergue kit':{icon:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',items:[
+  {l:'Sleeping bag liner'},{l:'Quick-dry towel'},{l:'Earplugs + eye mask',n:'snorers never rest'},{l:'Flip flops',n:'shower armour'},{l:'Laundry soap sheet'},{l:'Safety pins',n:'sock-drying tech'}
+ ]},
+ 'Clothing':{icon:'M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z',items:[
+  {l:'2 walking sets'},{l:'Evening set'},{l:'Fleece / light down',n:'albergue evenings'},{l:'One nice-ish outfit',n:'anniversary dinner, Vigo'},{l:'Underwear x4'},{l:'Buff / scarf'}
+ ]},
+ 'Tech':{icon:'M5 2h14v20H5z',items:[
+  {l:'Phone + cable'},{l:'Power bank',n:'the app needs its host alive'},{l:'EU plug (just one)'},{l:'Headlamp',n:'October sunsets at 19:30'},{l:'Earbuds'}
+ ]},
+ 'Documents':{icon:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',items:[
+  {l:'DNI x2'},{l:'Credencial x2',n:'no stamp, no bed'},{l:'Cash 50-80\u20ac small notes'},{l:'Cards'},{l:'Boat booking confirmation'},{l:'AVE tickets'}
+ ]},
+ 'Extras':{icon:'M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z',items:[
+  {l:'Tiny notebook',n:'or use the journal tab'},{l:'Trail snacks day 1'},{l:'Small first aid'},{l:'Ziplock for the credencial',n:'rain-proofing'}
+ ]}
+};
+function buildPacking(){
+  const grid=document.getElementById('packing-grid');
+  grid.innerHTML='';
+  Object.entries(PACK_DATA).forEach(([catName,cat])=>{
+    const div=document.createElement('div');div.className='we-cat';
+    let itemsHtml='';
+    cat.items.forEach(item=>{
+      itemsHtml+=`<li class="we-item"><div class="we-check"></div><div class="we-label">${escapeHtml(item.l)}${item.n?` <span class="we-note">${escapeHtml(item.n)}</span>`:''}</div></li>`;
+    });
+    div.innerHTML=`<div class="we-cat-header"><svg class="we-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="${cat.icon}"/></svg><div class="we-cat-title">${catName}</div><div class="we-cat-count" data-counter></div></div><ul class="we-list">${itemsHtml}</ul>`;
+    grid.appendChild(div);
+  });
+  const items=document.querySelectorAll('.we-item');
+  document.getElementById('pack-total').textContent=items.length;
+  function update(){
+    const checked=document.querySelectorAll('.we-item.checked').length;
+    document.getElementById('pack-count').textContent=checked;
+    const pct=(checked/items.length)*100;
+    document.getElementById('pack-progress-fill').style.width=pct+'%';
+    document.getElementById('pack-percent').textContent=Math.round(pct)+'%';
+    document.querySelectorAll('.we-cat').forEach(c=>{
+      const t=c.querySelectorAll('.we-item').length,d=c.querySelectorAll('.we-item.checked').length;
+      const counter=c.querySelector('[data-counter]');if(counter)counter.textContent=`${d}/${t}`;
+    });
+  }
+  function save(){
+    const s={};items.forEach((it,i)=>{if(it.classList.contains('checked'))s[i]=true;});
+    store.set('camino-pack-v2',s);
+  }
+  const saved=store.get('camino-pack-v2',{});
+  items.forEach((it,i)=>{if(saved[i])it.classList.add('checked');});
+  items.forEach(it=>it.addEventListener('click',()=>{it.classList.toggle('checked');update();save();}));
+  document.getElementById('pack-check-all').addEventListener('click',()=>{items.forEach(it=>it.classList.add('checked'));update();save();});
+  document.getElementById('pack-reset').addEventListener('click',()=>{items.forEach(it=>it.classList.remove('checked'));update();save();});
+  update();
+}
+buildPacking();
+
+/* expenses */
+const EXP_KEY='camino-expenses';
+let expenses=store.get(EXP_KEY,[]);
+function renderExp(){
+  const listEl=document.getElementById('exp-list');
+  const total=expenses.reduce((s,e)=>s+e.amount,0);
+  document.getElementById('exp-spent').textContent=total.toFixed(2);
+  document.getElementById('exp-count').textContent=expenses.length;
+  document.getElementById('exp-daily-avg').textContent=(total/Math.max(1,STAGES.length)).toFixed(0);
+  if(expenses.length===0){listEl.innerHTML='<div class="exp-empty">Nothing logged yet. The first pastel de nata is coming.</div>';return;}
+  listEl.innerHTML='';
+  [...expenses].reverse().forEach(exp=>{
+    const r=document.createElement('div');r.className='exp-row';
+    r.innerHTML=`<div class="exp-row-date">${exp.date}</div><div class="exp-row-desc">${escapeHtml(exp.desc)}</div><div class="exp-row-amt">\u20ac${exp.amount.toFixed(2)}</div><button class="exp-row-del" data-id="${exp.id}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+    listEl.appendChild(r);
+  });
+  listEl.querySelectorAll('.exp-row-del').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      expenses=expenses.filter(x=>x.id!==parseInt(btn.dataset.id));
+      store.set(EXP_KEY,expenses);renderExp();
+    });
+  });
+}
+document.getElementById('exp-add-btn').addEventListener('click',()=>{
+  const desc=document.getElementById('exp-desc').value.trim();
+  const amount=parseFloat(document.getElementById('exp-amount').value);
+  if(!desc||isNaN(amount)||amount<=0)return;
+  expenses.push({id:Date.now(),date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),desc,category:document.getElementById('exp-cat').value,amount});
+  document.getElementById('exp-desc').value='';document.getElementById('exp-amount').value='';
+  store.set(EXP_KEY,expenses);renderExp();
+});
+['exp-desc','exp-amount'].forEach(id=>document.getElementById(id).addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('exp-add-btn').click();}));
+renderExp();
+
+/* journal */
+const JOURNAL_KEY='camino-journal';
+let journal=store.get(JOURNAL_KEY,[]);
+let currentPhotoData=null;
+function renderJournal(){
+  const grid=document.getElementById('journal-grid');
+  document.getElementById('journal-count').textContent=journal.length;
+  document.getElementById('journal-photos').textContent=journal.filter(m=>m.photo).length;
+  if(journal.length===0){grid.innerHTML='<div class="journal-empty-card">Empty for now. First entry writes itself: stamp no. 1, Porto Cathedral, October 2nd.</div>';return;}
+  grid.innerHTML='';
+  [...journal].reverse().forEach(mem=>{
+    const entry=document.createElement('div');entry.className='journal-entry';
+    entry.innerHTML=`
+      ${mem.photo?`<img class="journal-entry-img" src="${mem.photo}" alt="">`:'<div class="journal-entry-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'}
+      <button class="journal-entry-del" data-id="${mem.id}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="journal-entry-body">
+        <div class="journal-entry-date">${mem.date}</div>
+        <div class="journal-entry-title">${escapeHtml(mem.title)}</div>
+        ${mem.note?`<div class="journal-entry-note">${escapeHtml(mem.note)}</div>`:''}
+      </div>`;
+    grid.appendChild(entry);
+  });
+  grid.querySelectorAll('.journal-entry-del').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!confirm('Delete this memory?'))return;
+      journal=journal.filter(m=>m.id!==parseInt(btn.dataset.id));
+      try{store.set(JOURNAL_KEY,journal);}catch(e){}
+      renderJournal();
+    });
+  });
+}
+const modal=document.getElementById('journal-modal');
+const photoInput=document.getElementById('photo-input');
+const photoArea=document.getElementById('photo-area');
+const photoEmpty=document.getElementById('photo-empty');
+const photoPreview=document.getElementById('photo-preview');
+document.getElementById('journal-add-btn').addEventListener('click',()=>{
+  document.getElementById('memory-title').value='';
+  document.getElementById('memory-note').value='';
+  currentPhotoData=null;
+  photoEmpty.style.display='block';photoPreview.style.display='none';
+  photoArea.classList.remove('has-photo');
+  modal.classList.add('active');
+  document.getElementById('memory-title').focus();
+});
+document.getElementById('modal-cancel').addEventListener('click',()=>modal.classList.remove('active'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('active');});
+photoArea.addEventListener('click',()=>photoInput.click());
+photoInput.addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      let w=img.width,h=img.height;const max=800;
+      if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      currentPhotoData=canvas.toDataURL('image/jpeg',0.7);
+      photoPreview.src=currentPhotoData;
+      photoPreview.style.display='block';photoEmpty.style.display='none';
+      photoArea.classList.add('has-photo');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('modal-save').addEventListener('click',()=>{
+  const title=document.getElementById('memory-title').value.trim();
+  if(!title)return;
+  journal.push({id:Date.now(),date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),title,note:document.getElementById('memory-note').value.trim(),photo:currentPhotoData});
+  try{store.set(JOURNAL_KEY,journal);}catch(e){alert('Photo too large to save on this phone \u2014 memory kept without it for this session.');}
+  renderJournal();modal.classList.remove('active');
+});
+renderJournal();
+
+/* boot */
+const dateInput=document.getElementById('start-date');
 dateInput.value=startDate;
-dateInput.addEventListener("change",()=>{ startDate=dateInput.value||startDate; store.set("camino-start",startDate); render(); });
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
-  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-  t.classList.add("active");
-  document.getElementById("panel-"+t.dataset.panel).classList.add("active");
-}));
-document.getElementById("reset").addEventListener("click",()=>{ store.set(doneKey(),[]); render(); });
-document.getElementById("gps-btn").addEventListener("click",showGps);
-
-renderPlans(); render();
-if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js"); }catch(e){} }
+dateInput.addEventListener('change',()=>{startDate=dateInput.value||startDate;store.set('camino-start',startDate);render();updateCountdown();});
+document.getElementById('reset').addEventListener('click',()=>{store.set(doneKey(),[]);render();});
+document.getElementById('gps-btn').addEventListener('click',showGps);
+renderPlans();render();updateCountdown();setInterval(updateCountdown,60000);
+if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js');}catch(e){}}
 </script>
 </body>
 </html>
