@@ -437,6 +437,13 @@
   .bigview-svg svg{max-height:100%;width:100%}
   .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px}
 
+
+  /* toolbar chips, boat form, sunset */
+  .sync-chip{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border:1px solid var(--night-border);border-radius:50px;padding:8px 13px;white-space:nowrap}
+  .sunset{color:rgba(242,194,48,.75)}
+  .boat-form{display:grid;grid-template-columns:150px 120px 1fr;gap:10px;margin:0 0 16px;max-width:560px}
+  @media(max-width:640px){.boat-form{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -506,6 +513,9 @@
       <div class="inv-secret pps">
         <strong>P.P.S.</strong> Miami. October 2016. <em>"May I kiss you."</em><br>
         Vigo. October 2026. Same question stands, but this time over oysters, with 160 km in our legs.
+      </div>
+      <div class="inv-secret" style="margin-top:18px">
+        <strong>P.P.P.S.</strong> Santiago already has our January footsteps. From Vigo it is only 90 km more, and every shell on this coast points north. Next next time.
       </div>
     </div>
   </div>
@@ -595,6 +605,11 @@
       <div class="companion-note">
         <strong>The one reservation that can strand us.</strong> No bridge over the Mi&ntilde;o, we cross by water taxi (Xacobeo Transfer or Taxi Mar Caminha, 6-8 &euro;, 10-20 min). October runs a reduced, tide-dependent schedule: book 2-3 days ahead, confirm the evening before. Landing in Camposancos means Spain and <strong>clocks jump one hour forward</strong>. Plan B if the sea rebels: train to Valen&ccedil;a, cross the bridge to Tui.
       </div>
+      <div class="boat-form">
+        <select id="boat-status"><option>Not booked</option><option>Booked</option></select>
+        <input type="time" id="boat-time" class="exp-input">
+        <input type="text" id="boat-code" class="exp-input" placeholder="Confirmation code">
+      </div>
       <a href="https://www.xacobeotransfer.com" target="_blank" rel="noopener" class="book-btn terra">Book the crossing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
     </div>
 
@@ -628,6 +643,10 @@
     </div>
     <div class="stage-toolbar">
       <button class="gps-btn" id="gps-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>Where are we?</button>
+      <button class="gps-btn" id="gpx-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 21h16"/></svg>Load GPX</button>
+      <input type="file" id="gpx-input" accept=".gpx" style="display:none">
+      <span class="sync-chip" id="track-chip"></span>
+      <span class="sync-chip" id="sync-chip"></span>
     </div>
     <div id="panel-stages"></div>
   </div>
@@ -996,7 +1015,7 @@ function projSeg(P,A,B){
   const cx=ax+t*dx,cy=ay+t*dy;
   return {frac:t,distKm:Math.sqrt(cx*cx+cy*cy)*111.32};
 }
-function locateOnRoute(lat,lon){
+function locateOnWaypoints(lat,lon){
   let best=null;
   for(let i=0;i<WPTS.length-1;i++){
     const p=projSeg([lat,lon],[WPTS[i].lat,WPTS[i].lon],[WPTS[i+1].lat,WPTS[i+1].lon]);
@@ -1039,7 +1058,12 @@ function showGps(){
 
 /* plans UI */
 const PIN_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21C7.5 16.5 5 13 5 9.5a7 7 0 0 1 14 0c0 3.5-2.5 7-7 11.5z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
-const FERRY_HTML=`<aside class="ferry"><h3>The boat: Caminha \u2192 A Guarda</h3><p>No bridge: water taxi across the Mi\u00f1o (<b>Xacobeo Transfer</b> / <b>Taxi Mar Caminha</b>), 6-8 \u20ac, booked 2-3 days ahead in October. Landing at Camposancos = Spain: <b>clocks jump one hour forward</b>.</p></aside>`;
+function ferryHTML(){
+  const b=store.get("camino-boat",null);
+  const booked=b&&b.s==="Booked";
+  const line=booked?`<b>Booked${b.t?" \u00b7 "+b.t:""}${b.c?" \u00b7 "+b.c:""}.</b>`:`<b>Not booked yet</b>; October runs a reduced, tide-dependent schedule, book 2-3 days ahead (form in A viaxe).`;
+  return `<aside class="ferry"><h3>The boat: Caminha \u2192 A Guarda</h3><p>No bridge: water taxi across the Mi\u00f1o (Xacobeo Transfer / Taxi Mar Caminha), 6-8 \u20ac. ${line} Landing at Camposancos = Spain: <b>clocks jump one hour forward</b>.</p></aside>`;
+}
 const SHELL_S=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5c-5 0-8.5-3.4-8.5-8C3.5 8 7 3.5 12 2.5c5 1 8.5 5.5 8.5 11 0 4.6-3.5 8-8.5 8z"/><path d="M12 21.5v-19M6.7 19.8 9.2 3.6M17.3 19.8 14.8 3.6M4.1 16.2 12 2.5l7.9 13.7"/></svg>`;
 const FLECHA_S=`<svg viewBox="0 0 44 18" fill="none"><path d="M3 9.5c8-1 16-1 25-.5" stroke="#f2c230" stroke-width="5.5" stroke-linecap="round"/><path d="M26 2.5 41 9l-15 6.8c1.6-4.6 1.6-9.2 0-13.3z" fill="#f2c230"/></svg>`;
 const HEART_SVG=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
@@ -1088,7 +1112,7 @@ function render(){
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
     const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
-    return `${st.ferry?FERRY_HTML:""}
+    return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
       <div class="node">${isDone?"\u2713":st.n}</div>
       <div class="card">
@@ -1103,6 +1127,7 @@ function render(){
             <span class="up">\u25b2 +${st.up} m</span>
             <span class="down">\u25bc \u2212${st.down} m</span>
             <span class="dots">${dots}</span>
+            <span class="sunset">sunset ~${sunsetLabel(i,st)}</span>
           </div>
         </div>
         <div class="detail">
@@ -1147,6 +1172,7 @@ function markDone(n){
   let done=store.get(doneKey(),[]);
   done=done.includes(n)?done.filter(x=>x!==n):[...done,n];
   store.set(doneKey(),done);
+  pushShared();
   const open=[...document.querySelectorAll(".stage.open")].map(el=>+el.dataset.n);
   render();
   open.forEach(x=>{const el=document.querySelector(`.stage[data-n="${x}"]`);if(el){el.classList.add("open");loadWeather(x);}});
@@ -1426,6 +1452,151 @@ function bigLocate(){
 document.getElementById("big-close").addEventListener("click",()=>document.getElementById("bigview").classList.remove("active"));
 document.getElementById("big-locate").addEventListener("click",bigLocate);
 
+
+/* haversine + GPX track */
+function hav(a,b,c,d){const R=6371,rad=Math.PI/180;const dLat=(c-a)*rad,dLon=(d-b)*rad;const x=Math.sin(dLat/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+function locateOnRoute(lat,lon){const g=store.get("camino-gpx",null);if(g&&g.P&&g.P.length>10)return locateOnTrack(lat,lon,g);return locateOnWaypoints(lat,lon);}
+function locateOnTrack(lat,lon,g){
+  let bi=0,bd=1e9;
+  g.P.forEach((p,i)=>{const d=hav(lat,lon,p[0],p[1]);if(d<bd){bd=d;bi=i;}});
+  const t=g.cum[bi];let routeKm=null,alt=null;
+  for(let s=0;s<SLEEP_ORDER.length-1;s++){
+    const ia=g.anchors[SLEEP_ORDER[s]],ib=g.anchors[SLEEP_ORDER[s+1]];
+    const ca=g.cum[ia],cb=g.cum[ib];
+    if(cb!==ca&&t>=Math.min(ca,cb)&&t<=Math.max(ca,cb)){
+      const f=(t-ca)/(cb-ca);
+      const ra=WPTS[IDX[SLEEP_ORDER[s]]].km,rb=WPTS[IDX[SLEEP_ORDER[s+1]]].km;
+      routeKm=ra+f*(rb-ra);break;
+    }
+  }
+  if(routeKm==null)routeKm=t/(g.cum[g.cum.length-1]||1)*160.5;
+  const ele=g.P[bi][2];
+  if(ele!=null&&!isNaN(ele))alt=ele;
+  else{
+    for(let i=0;i<WPTS.length-1;i++){
+      if(routeKm>=WPTS[i].km&&routeKm<=WPTS[i+1].km){
+        const f=(routeKm-WPTS[i].km)/((WPTS[i+1].km-WPTS[i].km)||1);
+        alt=WPTS[i].alt+f*(WPTS[i+1].alt-WPTS[i].alt);break;
+      }
+    }
+    if(alt==null)alt=0;
+  }
+  return {km:routeKm,alt,distKm:bd};
+}
+function loadGpxFile(file){
+  file.text().then(txt=>{
+    try{
+      const doc=new DOMParser().parseFromString(txt,"text/xml");
+      let pts=[...doc.querySelectorAll("trkpt")];
+      if(!pts.length)pts=[...doc.querySelectorAll("rtept")];
+      if(pts.length<10){alert("No track points found in that GPX.");return;}
+      const stride=Math.max(1,Math.floor(pts.length/500));
+      const P=[];
+      for(let i=0;i<pts.length;i+=stride){
+        const p=pts[i];const ele=p.querySelector("ele");
+        P.push([+p.getAttribute("lat"),+p.getAttribute("lon"),ele?+ele.textContent:null]);
+      }
+      const cum=[0];
+      for(let i=1;i<P.length;i++)cum.push(cum[i-1]+hav(P[i-1][0],P[i-1][1],P[i][0],P[i][1]));
+      const anchors={};
+      SLEEP_ORDER.forEach(id=>{
+        const w=WPTS[IDX[id]];let b2=0,bd=1e9;
+        P.forEach((p,i)=>{const d=hav(w.lat,w.lon,p[0],p[1]);if(d<bd){bd=d;b2=i;}});
+        anchors[id]=b2;
+      });
+      store.set("camino-gpx",{P,cum,anchors});
+      setTrackChip();
+      alert("Track loaded: "+P.length+" points along "+cum[cum.length-1].toFixed(1)+" km. GPS is now surgical.");
+    }catch(e){alert("Could not read that GPX.");}
+  });
+}
+function setTrackChip(){
+  const c=document.getElementById("track-chip");if(!c)return;
+  const g=store.get("camino-gpx",null);
+  c.textContent=g&&g.P?("Track: GPX \u00b7 "+g.P.length+" pts"):"Track: waypoints \u00b7 \u00b10.5 km";
+}
+
+/* sunset (approx, \u00b115 min) */
+function sunsetLabel(i,st){
+  const d=stageDateObj(i);const tz=st.b.km<=104?1:2;const rad=Math.PI/180;
+  const day=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+  const decl=23.45*Math.sin(rad*(360/365)*(284+day));
+  const cosH=(Math.cos(90.833*rad)-Math.sin(st.b.lat*rad)*Math.sin(decl*rad))/(Math.cos(st.b.lat*rad)*Math.cos(decl*rad));
+  if(cosH<-1||cosH>1)return "";
+  const ha=Math.acos(cosH)/rad;
+  const B=rad*(360/365)*(day-81);
+  const eq=9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
+  let ss=12+tz-st.b.lon/15-eq/60+ha/15-0.17;
+  let hh=Math.floor(ss),mm=Math.round((ss-hh)*60);
+  if(mm===60){hh++;mm=0;}
+  return hh+":"+String(mm).padStart(2,"0");
+}
+
+/* shared sync (Supabase, optional) */
+const SUPA_URL="";  // paste your Supabase project URL, e.g. https://xxxx.supabase.co
+const SUPA_KEY="";  // paste the anon public key
+const SYNC_TABLE="camino_shared";
+function setChip(err){
+  const c=document.getElementById("sync-chip");if(!c)return;
+  if(!SUPA_URL){c.textContent="Sync: this phone only";return;}
+  c.textContent=err?"Sync: retrying":"Synced";
+}
+function collectShared(){
+  const done={};
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf("camino-done-")===0)done[k]=store.get(k,[]);}}catch(e){}
+  return {done,boat:store.get("camino-boat",null),ts:Date.now()};
+}
+function mergeShared(remote){
+  if(remote.done)Object.entries(remote.done).forEach(([k,v])=>{
+    const uni=[...new Set([...store.get(k,[]),...(v||[])])];store.set(k,uni);
+  });
+  if(remote.boat){const lb=store.get("camino-boat",null);
+    if(!lb||(remote.boat.ts||0)>(lb.ts||0))store.set("camino-boat",remote.boat);}
+}
+async function pullShared(){
+  if(!SUPA_URL)return;
+  try{
+    const r=await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE+"?id=eq.camino&select=data",{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    const rows=await r.json();
+    if(rows&&rows[0]&&rows[0].data)mergeShared(rows[0].data);
+    setChip();
+  }catch(e){setChip(true);}
+}
+async function pushShared(){
+  if(!SUPA_URL)return;
+  try{
+    await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:"camino",data:collectShared()}])});
+    setChip();
+  }catch(e){setChip(true);}
+}
+
+/* boat form */
+function initBoat(){
+  const s=document.getElementById("boat-status"),t=document.getElementById("boat-time"),c=document.getElementById("boat-code");
+  if(!s)return;
+  const b=store.get("camino-boat",{s:"Not booked",t:"",c:""});
+  s.value=b.s||"Not booked";t.value=b.t||"";c.value=b.c||"";
+  const save=()=>{store.set("camino-boat",{s:s.value,t:t.value,c:c.value,ts:Date.now()});render();pushShared();};
+  [s,t,c].forEach(el=>el.addEventListener("change",save));
+}
+
+/* today mode */
+function openToday(){
+  const t=new Date();
+  const iso=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
+  for(let i=0;i<STAGES.length;i++){
+    if(stageISO(i)===iso){
+      document.querySelector('.tab[data-tab="etapas"]').click();
+      const n=STAGES[i].n;
+      setTimeout(()=>{
+        const art=document.querySelector('.stage[data-n="'+n+'"]');
+        if(art){art.classList.add("open");loadWeather(n);art.scrollIntoView({behavior:"smooth",block:"start"});}
+      },300);
+      break;
+    }
+  }
+}
+
 /* boot */
 const dateInput=document.getElementById('start-date');
 dateInput.value=startDate;
@@ -1433,6 +1604,11 @@ dateInput.addEventListener('change',()=>{startDate=dateInput.value||startDate;st
 document.getElementById('reset').addEventListener('click',()=>{store.set(doneKey(),[]);render();});
 document.getElementById('gps-btn').addEventListener('click',showGps);
 renderPlans();render();updateCountdown();setInterval(updateCountdown,60000);
+initBoat();setChip();setTrackChip();
+pullShared().then(()=>{render();});
+openToday();
+document.getElementById("gpx-btn").addEventListener("click",()=>document.getElementById("gpx-input").click());
+document.getElementById("gpx-input").addEventListener("change",e=>{if(e.target.files[0])loadGpxFile(e.target.files[0]);e.target.value="";});
 if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js');}catch(e){}}
 </script>
 </body>
