@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
     --night-deep:#0a111c; --night:#0f1826; --night-soft:#131f31; --night-card:#182842;
@@ -444,6 +445,26 @@
   .boat-form{display:grid;grid-template-columns:150px 120px 1fr;gap:10px;margin:0 0 16px;max-width:560px}
   @media(max-width:640px){.boat-form{grid-template-columns:1fr}}
 
+
+  /* real map */
+  .route-map{height:460px;border-radius:8px;overflow:hidden;border:1px solid var(--night-border);z-index:1}
+  .leaflet-container{background:#0a111c;font-family:'Inter Tight',sans-serif}
+  .leaflet-popup-content-wrapper{background:var(--night-soft);color:var(--paper);border:1px solid var(--night-border);border-radius:8px;font-family:'Inter Tight',sans-serif}
+  .leaflet-popup-content{font-size:.82rem;line-height:1.45}
+  .leaflet-popup-tip{background:var(--night-soft)}
+  .leaflet-bar a{background:var(--night-soft);color:var(--gold-bright);border-color:var(--night-border)}
+  .leaflet-bar a:hover{background:var(--night-card)}
+  .leaflet-control-attribution{background:rgba(10,17,28,.75) !important;color:#5b6d85 !important}
+  .leaflet-control-attribution a{color:#5b6d85 !important}
+  .map-note{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
+  .map-note i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  /* progress bar shores */
+  .bar-ends{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.2em;color:var(--mute-dim);margin-top:6px}
+  /* stamp slams in */
+  @keyframes stampin{0%{transform:rotate(-14deg) scale(2.3);opacity:0}55%{transform:rotate(-14deg) scale(.94);opacity:1}100%{transform:rotate(-14deg) scale(1);opacity:1}}
+  .stamp{animation:stampin .5s cubic-bezier(.16,1,.3,1) both}
+  @media (prefers-reduced-motion:reduce){.stamp{animation:none}}
+
 </style>
 </head>
 <body>
@@ -565,6 +586,9 @@
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Map &middot; <em>the coast</em></h3>
       <p class="sub-sub">Two countries, one ocean, one boat.</p>
       <div class="map-wrap">
+        <div id="route-map" class="route-map"></div>
+        <div class="map-note"><span><i style="background:#f2c230"></i>Our route</span><span><i style="background:#5fc2bb"></i>The boat</span><span><i style="background:#3fa7a0;height:8px;width:8px;border-radius:50%"></i>Overnight stops</span></div>
+        <div id="map-fallback" style="display:none">
         <svg class="map-svg" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="seaG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a3a5c" stop-opacity=".4"/><stop offset="1" stop-color="#0a1a2e" stop-opacity=".15"/></linearGradient>
@@ -597,6 +621,7 @@
           <g><circle cx="396" cy="35" r="9" fill="#f2c230" stroke="#f6d35f" stroke-width="2"/><circle cx="396" cy="35" r="14" fill="#f2c230" opacity=".3" filter="url(#dg)"><animate attributeName="r" values="14;22;14" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".3;.1;.3" dur="3s" repeatCount="indefinite"/></circle><text x="416" y="32" font-family="DM Mono, monospace" font-size="12" font-weight="600" fill="#f6d35f" letter-spacing="1">VIGO</text><text x="416" y="45" font-family="DM Mono, monospace" font-size="8.5" fill="#f2c230" opacity=".7">FINISH &middot; OYSTERS</text></g>
           <g transform="translate(70,70)" opacity=".55"><circle r="22" fill="none" stroke="#f2c230" stroke-width="1"/><path d="M 0 -22 L 4 0 L 0 22 L -4 0 Z" fill="#3fa7a0" opacity=".75"/><text y="-28" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f2c230">N</text></g>
         </svg>
+        </div>
       </div>
     </div>
 
@@ -639,6 +664,7 @@
     <div class="progress" id="progress">
       <div class="progress-top"><span>Walked</span><b id="km-done">0 km</b><span id="km-left"></span></div>
       <div class="bar"><i id="bar-fill"></i><span class="walker" id="shell-walker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5c-5 0-8.5-3.4-8.5-8C3.5 8 7 3.5 12 2.5c5 1 8.5 5.5 8.5 11 0 4.6-3.5 8-8.5 8z"/><path d="M12 21.5v-19M6.7 19.8 9.2 3.6M17.3 19.8 14.8 3.6M4.1 16.2 12 2.5l7.9 13.7"/></svg></span></div>
+      <div class="bar-ends"><span>PORTO</span><span>VIGO</span></div>
       <div class="progress-sub" id="progress-sub"></div>
     </div>
     <div class="stage-toolbar">
@@ -793,6 +819,8 @@
     <button class="reset" id="reset">Reset stage progress for this plan</button>
   </div>
 </footer>
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 /* ================= tabs ================= */
 document.querySelectorAll('.tab').forEach(tab=>{
@@ -801,6 +829,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById(tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab==='viaxe'){setTimeout(()=>{initMap();if(MAP)MAP.invalidateSize();},90);}
     window.scrollTo({top:0,behavior:'smooth'});
   });
 });
@@ -1506,6 +1535,7 @@ function loadGpxFile(file){
       });
       store.set("camino-gpx",{P,cum,anchors});
       setTrackChip();
+      if(MAP)drawRoute();
       alert("Track loaded: "+P.length+" points along "+cum[cum.length-1].toFixed(1)+" km. GPS is now surgical.");
     }catch(e){alert("Could not read that GPX.");}
   });
@@ -1533,8 +1563,8 @@ function sunsetLabel(i,st){
 }
 
 /* shared sync (Supabase, optional) */
-const SUPA_URL="https://oulevgbmxgszewrcotzt.supabase.co";  // paste your Supabase project URL, e.g. https://xxxx.supabase.co
-const SUPA_KEY="sb_publishable_lj8Utx5f2Fu07USkpHUPOQ_OV_pY8Qm";  // paste the anon public key
+const SUPA_URL=window.SUPA_URL||"";  // set in config.js
+const SUPA_KEY=window.SUPA_KEY||"";  // set in config.js
 const SYNC_TABLE="camino_shared";
 function setChip(err){
   const c=document.getElementById("sync-chip");if(!c)return;
@@ -1595,6 +1625,49 @@ function openToday(){
       break;
     }
   }
+}
+
+
+/* the real map */
+let MAP=null,MAPLAYER=null,MAPME=null;
+function initMap(){
+  const fb=document.getElementById("map-fallback"),rm=document.getElementById("route-map");
+  if(typeof L==="undefined"){if(fb&&rm){fb.style.display="";rm.style.display="none";}return;}
+  if(MAP)return;
+  MAP=L.map("route-map",{scrollWheelZoom:false});
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(MAP);
+  const Ctl=L.Control.extend({onAdd:function(){
+    const d=L.DomUtil.create("div","leaflet-bar");
+    d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
+    d.onclick=e=>{e.preventDefault();mapLocate();};return d;}});
+  new Ctl({position:"topleft"}).addTo(MAP);
+  drawRoute();
+}
+function drawRoute(){
+  if(!MAP)return;
+  if(MAPLAYER)MAPLAYER.remove();
+  const g=store.get("camino-gpx",null);
+  const latlngs=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
+  const grp=L.layerGroup();
+  L.polyline(latlngs,{color:"#f2c230",weight:3,dashArray:"7 6",opacity:.9}).addTo(grp);
+  L.polyline([[41.876,-8.839],[41.895,-8.867]],{color:"#5fc2bb",weight:3,dashArray:"2 7",opacity:.95}).addTo(grp);
+  WPTS.filter(w=>w.id).forEach(w=>{
+    const end=(w.id==="porto"||w.id==="vigo");
+    const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#3fa7a0",weight:2,fillColor:end?"#f2c230":"#0a111c",fillOpacity:end?1:.9}).addTo(grp);
+    const alb=(w.sleep&&w.sleep[0])?("<br><span style=\'opacity:.7\'>"+w.sleep[0][0]+"</span>"):"";
+    m.bindPopup("<b>"+w.name.split(",")[0]+"</b><br>km "+w.km+" \u00b7 K. "+(160.5-w.km).toFixed(1).replace(".0","")+" to Vigo"+alb);
+  });
+  grp.addTo(MAP);MAPLAYER=grp;
+  MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+}
+function mapLocate(){
+  if(!navigator.geolocation||!MAP)return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const ll=[pos.coords.latitude,pos.coords.longitude];
+    if(MAPME)MAPME.remove();
+    MAPME=L.circleMarker(ll,{radius:9,color:"#fff",weight:3,fillColor:"#f2c230",fillOpacity:1}).addTo(MAP).bindPopup("Us, right now").openPopup();
+    MAP.setView(ll,13);
+  });
 }
 
 /* boot */

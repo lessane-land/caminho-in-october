@@ -14,9 +14,12 @@ SHARED SYNC BETWEEN BOTH PHONES (optional, recommended)
        create table camino_shared (id text primary key, data jsonb);
        alter table camino_shared enable row level security;
        create policy "open" on camino_shared for all using (true) with check (true);
-  2. In index.html, near the bottom, paste your values into:
-       const SUPA_URL="";   <- your project URL (https://xxxx.supabase.co)
-       const SUPA_KEY="";   <- the anon public key
+  2. Open config.js and paste your values:
+       window.SUPA_URL = "";   <- your project URL (https://xxxx.supabase.co)
+       window.SUPA_KEY = "";   <- the anon public key
+     config.js is read by the app and is NOT touched by app updates:
+     when a new version of the app arrives, replace index.html and sw.js
+     but KEEP your config.js.
   3. Redeploy. Both phones now share stage progress and the boat booking.
   Note: with the open policy, anyone who has BOTH the app URL and reads the key
   could write to this table. For a two-person trip app this is acceptable;
