@@ -485,6 +485,16 @@
   .big-stats>div{min-width:74px}
   .big-actions button{min-width:42px}
 
+
+  .big-cap{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ink-soft);text-align:center;margin-top:4px;min-height:20px}
+  .big-cap b{color:var(--gold-bright);font-weight:500}
+  .big-cap a{color:var(--sea-shallow);text-decoration:none;border-bottom:1px dotted var(--sea-shallow)}
+  .big-wp{cursor:pointer}
+
+
+  .big-cap .cap-poi{display:block;font-family:'Fraunces',serif;font-style:italic;font-size:.82rem;letter-spacing:0;text-transform:none;color:var(--gold-bright);margin-top:3px}
+  .big-cap .cap-beds{display:block;font-size:.68rem;letter-spacing:.02em;text-transform:none;color:#5fc2bb;margin-top:2px}
+
 </style>
 </head>
 <body>
@@ -891,6 +901,7 @@
     <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
   <div class="bigview-svg" id="big-svg"></div>
+  <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
   <div class="big-hint" id="big-hint">Rotate to landscape for the full ribbon.</div>
 </div>
 
@@ -925,49 +936,49 @@ function escapeHtml(t){const d=document.createElement('div');d.textContent=t;ret
 
 /* ================= master route ================= */
 const WPTS=[
- {id:"porto",km:0,name:"Porto, S\u00e9 Cathedral",alt:70,q:"Porto Cathedral, Portugal",lat:41.1427,lon:-8.6110,sleep:[]},
+ {id:"porto",km:0,name:"Porto, S\u00e9 Cathedral",alt:70,q:"Porto Cathedral, Portugal",poi:"S\u00e9 Cathedral, stamp no. 1 waits at 08:00",lat:41.1427,lon:-8.6110,sleep:[]},
  {km:1.5,name:"Douro riverside (Ribeira)",alt:5,q:"Ribeira, Porto, Portugal",lat:41.1406,lon:-8.6157},
  {km:9,name:"Matosinhos",alt:5,q:"Matosinhos, Portugal",lat:41.1844,lon:-8.6963},
  {km:15,name:"Lavra boardwalks",alt:10,q:"Lavra, Matosinhos, Portugal",lat:41.2586,lon:-8.7183},
  {id:"vilacha",km:20,name:"Vila Ch\u00e3",alt:15,q:"Vila Ch\u00e3, Vila do Conde, Portugal",lat:41.2947,lon:-8.7359,sleep:[["Albergue de Peregrinos de Vila Ch\u00e3","municipal","~10 \u20ac"]]},
- {id:"vdc",km:28,name:"Vila do Conde",alt:8,q:"Vila do Conde, Portugal",lat:41.3517,lon:-8.7479,sleep:[["Albergue Santa Clara","municipal, by the aqueduct","~12 \u20ac"],["Bellamar Hostel","P\u00f3voa de Varzim, +3 km","~15 \u20ac"]]},
- {km:32,name:"P\u00f3voa de Varzim",alt:10,q:"P\u00f3voa de Varzim, Portugal",lat:41.3830,lon:-8.7639},
+ {id:"vdc",km:28,name:"Vila do Conde",alt:8,q:"Vila do Conde, Portugal",poi:"999-arch Santa Clara aqueduct, replica caravel by the Ave",lat:41.3517,lon:-8.7479,sleep:[["Albergue Santa Clara","municipal, by the aqueduct","~12 \u20ac"],["Bellamar Hostel","P\u00f3voa de Varzim, +3 km","~15 \u20ac"]]},
+ {km:32,name:"P\u00f3voa de Varzim",alt:10,q:"P\u00f3voa de Varzim, Portugal",lat:41.3830,lon:-8.7639,sleep:[["Albergue S\u00e3o Jos\u00e9 de Ribamar","parish albergue, central","donation"]]},
  {km:39,name:"Agu\u00e7adoura",alt:15,q:"Agu\u00e7adoura, Portugal",lat:41.4275,lon:-8.7803},
- {id:"apulia",km:43,name:"Ap\u00falia (windmills)",alt:10,q:"Ap\u00falia, Esposende, Portugal",lat:41.4870,lon:-8.7770,sleep:[["Albergue Santiago de Ap\u00falia","parish albergue","~10 \u20ac"]]},
- {km:48,name:"F\u00e3o bridge, C\u00e1vado river",alt:5,q:"F\u00e3o, Esposende, Portugal",lat:41.5104,lon:-8.7743},
+ {id:"apulia",km:43,name:"Ap\u00falia (windmills)",alt:10,q:"Ap\u00falia, Esposende, Portugal",poi:"working windmills on the dunes, masseiras sunken fields",lat:41.4870,lon:-8.7770,sleep:[["Albergue Santiago de Ap\u00falia","parish albergue","~10 \u20ac"]]},
+ {km:48,name:"F\u00e3o bridge, C\u00e1vado river",alt:5,q:"F\u00e3o, Esposende, Portugal",poi:"iron bridge over the C\u00e1vado, dune boardwalks",lat:41.5104,lon:-8.7743},
  {id:"esposende",km:52,name:"Esposende",alt:8,q:"Esposende, Portugal",lat:41.5320,lon:-8.7827,sleep:[["Albergue S\u00e3o Jo\u00e3o de Deus","municipal, central","~12 \u20ac"],["Eleven Hostel","private, book online","~18 \u20ac"]]},
- {km:55,name:"Marinhas",alt:25,q:"Marinhas, Esposende, Portugal",lat:41.5560,lon:-8.7830},
+ {km:55,name:"Marinhas",alt:25,q:"Marinhas, Esposende, Portugal",lat:41.5560,lon:-8.7830,sleep:[["Albergue S\u00e3o Miguel de Marinhas","municipal, 3 km past Esposende","~8 \u20ac"]]},
  {km:59,name:"Belinho",alt:45,q:"Belinho, Esposende, Portugal",lat:41.5900,lon:-8.7860},
- {km:61,name:"Neiva river crossing (steep dip)",alt:15,q:"Rio Neiva, Portugal",lat:41.6080,lon:-8.7870},
+ {km:61,name:"Neiva river crossing (steep dip)",alt:15,q:"Rio Neiva, Portugal",poi:"steep river dip, muddy after rain, take it slow",lat:41.6080,lon:-8.7870},
  {id:"cneiva",km:63,name:"Castelo do Neiva",alt:70,q:"Castelo do Neiva, Portugal",lat:41.6290,lon:-8.7980,sleep:[["Albergue S\u00e3o Tiago de Castelo do Neiva","parish albergue","donation"]]},
  {km:66,name:"Chaf\u00e9",alt:145,q:"Chaf\u00e9, Viana do Castelo, Portugal",lat:41.6600,lon:-8.7860},
  {km:69,name:"Anha",alt:95,q:"Vila Nova de Anha, Portugal",lat:41.6730,lon:-8.8000},
- {km:74,name:"Darque / Eiffel bridge",alt:10,q:"Darque, Viana do Castelo, Portugal",lat:41.6860,lon:-8.8140},
+ {km:74,name:"Darque / Eiffel bridge",alt:10,q:"Darque, Viana do Castelo, Portugal",poi:"Eiffel company iron bridge into Viana (1878)",lat:41.6860,lon:-8.8140},
  {id:"viana",km:77,name:"Viana do Castelo",alt:10,q:"Viana do Castelo, Portugal",lat:41.6946,lon:-8.8329,sleep:[["S\u00e3o Jo\u00e3o da Cruz dos Caminhos","Carmelite monastery","donation"],["Albergue do Caminho","private, modern","~16 \u20ac"]]},
  {km:81,name:"Areosa",alt:20,q:"Areosa, Viana do Castelo, Portugal",lat:41.7180,lon:-8.8570},
- {km:85,name:"Carre\u00e7o",alt:55,q:"Carre\u00e7o, Portugal",lat:41.7450,lon:-8.8710},
- {km:87,name:"Above Montedor lighthouse",alt:90,q:"Farol de Montedor, Portugal",lat:41.7502,lon:-8.8752},
+ {km:85,name:"Carre\u00e7o",alt:55,q:"Carre\u00e7o, Portugal",lat:41.7450,lon:-8.8710,sleep:[["Casa do Sard\u00e3o","private albergue in a farmhouse","~15 \u20ac"]]},
+ {km:87,name:"Above Montedor lighthouse",alt:90,q:"Farol de Montedor, Portugal",poi:"clifftop lighthouse and old windmill",lat:41.7502,lon:-8.8752},
  {km:89,name:"Afife",alt:40,q:"Afife, Portugal",lat:41.7780,lon:-8.8600},
  {id:"ancora",km:93,name:"Vila Praia de \u00c2ncora",alt:5,q:"Vila Praia de \u00c2ncora, Portugal",lat:41.8130,lon:-8.8580,sleep:[["Hospedaria Sra. da Bonan\u00e7a","guesthouse by the beach","~20 \u20ac"]]},
- {km:96,name:"Moledo",alt:8,q:"Moledo, Caminha, Portugal",lat:41.8400,lon:-8.8630},
- {id:"caminha",km:104,name:"Caminha",alt:5,q:"Caminha, Portugal",lat:41.8760,lon:-8.8390,sleep:[["Albergue de Peregrinos de Caminha","municipal, by the pier","~12 \u20ac"]]},
- {km:104.2,name:"Camposancos dock (boat landing)",alt:0,q:"Camposancos, A Guarda, Spain",lat:41.8950,lon:-8.8670},
- {id:"aguarda",km:106.5,name:"A Guarda",alt:35,q:"A Guarda, Pontevedra, Spain",lat:41.9020,lon:-8.8740,sleep:[["Albergue de A Guarda","public (Xunta)","~10 \u20ac"]]},
+ {km:96,name:"Moledo",alt:8,q:"Moledo, Caminha, Portugal",lat:41.8400,lon:-8.8630,sleep:[["Guesthouses by the beach","book ahead, small village","25-40 \u20ac"]]},
+ {id:"caminha",km:104,name:"Caminha",alt:5,q:"Caminha, Portugal",poi:"clock-tower square, farewell-to-Portugal dinner, confirm the boat",lat:41.8760,lon:-8.8390,sleep:[["Albergue de Peregrinos de Caminha","municipal, by the pier","~12 \u20ac"]]},
+ {km:104.2,name:"Camposancos dock (boat landing)",alt:0,q:"Camposancos, A Guarda, Spain",poi:"boat landing, Spain begins, clocks jump +1 h",lat:41.8950,lon:-8.8670},
+ {id:"aguarda",km:106.5,name:"A Guarda",alt:35,q:"A Guarda, Pontevedra, Spain",poi:"Santa Trega Celtic hillfort above town, 341 m side quest",lat:41.9020,lon:-8.8740,sleep:[["Albergue de A Guarda","public (Xunta)","~10 \u20ac"]]},
  {km:112,name:"Portecelo",alt:40,q:"Portecelo, O Rosal, Spain",lat:41.9560,lon:-8.8830},
  {km:114,name:"Cliff path high point",alt:60,q:"Oia coast, Pontevedra, Spain",lat:41.9750,lon:-8.8840},
- {id:"oia",km:117,name:"Oia monastery",alt:15,q:"Monasterio de Oia, Spain",lat:41.9990,lon:-8.8800,sleep:[["Albergue de Oia","next to the monastery","~14 \u20ac"]]},
- {km:120,name:"Viladesuso",alt:30,q:"Viladesuso, Oia, Spain",lat:42.0250,lon:-8.8790},
+ {id:"oia",km:117,name:"Oia monastery",alt:15,q:"Monasterio de Oia, Spain",poi:"Cistercian monastery that fired cannons at pirates, best sunset of the trip",lat:41.9990,lon:-8.8800,sleep:[["Albergue de Oia","next to the monastery","~14 \u20ac"]]},
+ {km:120,name:"Viladesuso",alt:30,q:"Viladesuso, Oia, Spain",lat:42.0250,lon:-8.8790,sleep:[["Hotel Glasgow","pilgrim-friendly, on the coast road","~40 \u20ac room"]]},
  {id:"mougas",km:122.5,name:"Moug\u00e1s",alt:20,q:"Moug\u00e1s, Oia, Spain",lat:42.0430,lon:-8.8770,sleep:[["Albergue Aguncheiro","communal dinner","~15 \u20ac"]]},
  {km:126.5,name:"Upper path, Cabo Silleiro",alt:85,q:"Cabo Silleiro, Spain",lat:42.0870,lon:-8.8890},
- {km:129.5,name:"Silleiro lighthouse turn-off",alt:40,q:"Faro Silleiro, Baiona, Spain",lat:42.1030,lon:-8.8960},
+ {km:129.5,name:"Silleiro lighthouse turn-off",alt:40,q:"Faro Silleiro, Baiona, Spain",poi:"Silleiro lighthouse on the cape",lat:42.1030,lon:-8.8960},
  {km:132.5,name:"As Mari\u00f1as",alt:15,q:"Baredo, Baiona, Spain",lat:42.1130,lon:-8.8700},
- {id:"baiona",km:135.5,name:"Baiona",alt:5,q:"Baiona, Pontevedra, Spain",lat:42.1180,lon:-8.8500,sleep:[["Albergue Estela do Mar","central","~14 \u20ac"],["Hostel Baionamar","by the harbour","~16 \u20ac"]]},
- {km:138.5,name:"A Ramallosa bridge (Mi\u00f1or)",alt:5,q:"A Ramallosa, Nigr\u00e1n, Spain",lat:42.1130,lon:-8.8180},
+ {id:"baiona",km:135.5,name:"Baiona",alt:5,q:"Baiona, Pontevedra, Spain",poi:"Monterreal fortress walls, the Pinta replica in the harbour",lat:42.1180,lon:-8.8500,sleep:[["Albergue Estela do Mar","central","~14 \u20ac"],["Hostel Baionamar","by the harbour","~16 \u20ac"]]},
+ {km:138.5,name:"A Ramallosa bridge (Mi\u00f1or)",alt:5,q:"A Ramallosa, Nigr\u00e1n, Spain",lat:42.1130,lon:-8.8180,sleep:[["Pensi\u00f3ns by the Mi\u00f1or bridge","several small ones, book ahead","25-40 \u20ac"]]},
  {km:143.5,name:"Nigr\u00e1n, start of the climb",alt:40,q:"Nigr\u00e1n, Pontevedra, Spain",lat:42.1420,lon:-8.8060},
  {km:146.5,name:"Priegue",alt:150,q:"Priegue, Nigr\u00e1n, Spain",lat:42.1570,lon:-8.7990},
  {km:149.5,name:"Sai\u00e1ns",alt:90,q:"Sai\u00e1ns, Vigo, Spain",lat:42.1760,lon:-8.8120},
  {km:152.5,name:"Coruxo",alt:60,q:"Coruxo, Vigo, Spain",lat:42.1910,lon:-8.7880},
- {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
+ {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",poi:"Verne statue on the waterfront, oysters on R\u00faa da Pedra",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
 ];
 const IDX={};WPTS.forEach((w,i)=>{if(w.id)IDX[w.id]=i;});
 const SEG_ELEV={"porto>vilacha":[75,130],"vilacha>vdc":[30,35],"vdc>apulia":[55,55],"apulia>esposende":[45,45],"esposende>cneiva":[140,80],"cneiva>viana":[190,250],"viana>ancora":[180,185],"ancora>caminha":[60,60],"caminha>aguarda":[40,5],"aguarda>oia":[150,170],"oia>mougas":[40,35],"mougas>baiona":[160,175],"baiona>vigo":[380,360]};
@@ -1064,26 +1075,73 @@ function smoothPath(pts){
   }
   return d;
 }
+/* shared terrain detail from the GPX track (real elevation), fallback: waypoints */
+function stageDetail(st,N){
+  const g=store.get("camino-gpx",null);
+  if(!g||!g.P||!g.anchors||!st.a.id||!st.b.id)return null;
+  const ia=g.anchors[st.a.id],ib=g.anchors[st.b.id];
+  if(ia==null||ib==null)return null;
+  const lo=Math.min(ia,ib),hi=Math.max(ia,ib);
+  if(hi-lo<8)return null;
+  let ok=0;for(let i=lo;i<=hi;i++)if(g.P[i][2]!=null&&!isNaN(g.P[i][2]))ok++;
+  if(ok<(hi-lo)*0.6)return null;
+  const ca=g.cum[ia],cb=g.cum[ib];if(cb===ca)return null;
+  const step=Math.max(1,Math.floor((hi-lo)/N));
+  const out=[];
+  for(let i=lo;i<=hi;i+=step){
+    const ele=g.P[i][2];if(ele==null||isNaN(ele))continue;
+    const f=Math.min(1,Math.max(0,(g.cum[i]-ca)/(cb-ca)));
+    out.push([st.a.km+f*st.km,Math.max(0,ele)]);
+  }
+  if(out.length<8)return null;
+  out[0]=[st.a.km,out[0][1]];out[out.length-1]=[st.b.km,out[out.length-1][1]];
+  for(let i=1;i<out.length-1;i++)out[i][1]=(out[i-1][1]+out[i][1]+out[i+1][1])/3;
+  return out;
+}
+function snapAlt(det,km,fb){
+  if(!det)return fb;
+  let b=fb,bd=1e9;
+  for(const p of det){const d=Math.abs(p[0]-km);if(d<bd){bd=d;b=p[1];}}
+  return b;
+}
+function steepStops(base,X,padL,plotW){
+  let stops="";
+  for(let i=0;i<base.length-1;i++){
+    const dk=Math.max(0.03,base[i+1][0]-base[i][0]);
+    const gr=Math.abs(base[i+1][1]-base[i][1])/dk/10;
+    const c=gradeColor(gr);
+    const o0=((X(base[i][0])-padL)/plotW).toFixed(4),o1=((X(base[i+1][0])-padL)/plotW).toFixed(4);
+    stops+=`<stop offset="${o0}" stop-color="${c}"/><stop offset="${o1}" stop-color="${c}"/>`;
+  }
+  return stops;
+}
 function profileSVG(st){
   const W=800,H=96,padL=20,padR=20,padT=16,padB=20;
-  const maxAlt=Math.max(...st.seg.map(w=>w.alt),20);
+  const det=stageDetail(st,70);
+  const base=det||st.seg.map(w=>[w.km,w.alt]);
+  const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.map(w=>w.alt),20);
   const X=km=>padL+((km-st.a.km)/st.km)*(W-padL-padR);
   const Y=a=>padT+(1-a/maxAlt)*(H-padT-padB);
   GEOM[st.n]={X,Y,maxAlt,a:st.a.km,b:st.b.km};
-  const pts=st.seg.map(w=>[X(w.km),Y(w.alt)]);
+  const pts=base.map(p=>[X(p[0]),Y(p[1])]);
   const line=smoothPath(pts);
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
+  const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
-  const dots=st.seg.map((w,i)=>`<circle class="wp-dot ${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${i}" cx="${X(w.km).toFixed(1)}" cy="${Y(w.alt).toFixed(1)}" r="5" onclick="selectWp(${st.n},${i});event.stopPropagation()"/>`).join("");
+  const dots=st.seg.map((w,i)=>{
+    const y=Y(snapAlt(det,w.km,w.alt));
+    const hiTxt=w.alt===hiAlt?`<text x="${X(w.km).toFixed(1)}" y="${(y-9).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#f2c230">${w.alt}</text>`:"";
+    return `<circle class="wp-dot ${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${i}" cx="${X(w.km).toFixed(1)}" cy="${y.toFixed(1)}" r="5" onclick="selectWp(${st.n},${i});event.stopPropagation()"/>${hiTxt}`;
+  }).join("");
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="pf${st.n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a90b8" stop-opacity=".35"/><stop offset="1" stop-color="#4a90b8" stop-opacity="0"/></linearGradient>
-      <linearGradient id="ps${st.n}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a4d6e"/><stop offset=".6" stop-color="#4a90b8"/><stop offset="1" stop-color="#5fa7c8"/></linearGradient>
+      <linearGradient id="pf${st.n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a90b8" stop-opacity=".3"/><stop offset="1" stop-color="#4a90b8" stop-opacity="0"/></linearGradient>
+      <linearGradient id="psx${st.n}" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#1f2740"/>
-    <text x="${W-padR}" y="${padT-4}" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="#7a7468">scale 0\u2013${maxAlt} m</text>
+    <text x="${W-padR}" y="${padT-4}" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="#7a7468">0\u2013${Math.round(maxAlt)} m${det?" \u00b7 gpx terrain":""}</text>
     <path d="${area}" fill="url(#pf${st.n})"/>
-    <path d="${line}" fill="none" stroke="url(#ps${st.n})" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${line}" fill="none" stroke="url(#psx${st.n})" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
     ${dots}
     <circle class="gps-pulse" id="gps-pulse-${st.n}" cx="-99" cy="-99" r="8" style="display:none"/>
     <circle class="gps-dot" id="gps-dot-${st.n}" cx="-99" cy="-99" r="5" style="display:none"/></svg>`;
@@ -1231,6 +1289,8 @@ function render(){
         <td>${(w.km-st.a.km).toFixed(1).replace(".0","")}</td><td>${w.name}</td><td class="alt">~${w.alt} m</td>
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
+    const midStops=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
+    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 km ${(w.km-st.a.km).toFixed(1).replace(".0","")} of the stage</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
     const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
     return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
@@ -1261,7 +1321,8 @@ function render(){
           <div class="alt-table"><table><tr><th>km</th><th>Waypoint</th><th style="text-align:right">Alt.</th><th></th></tr>${rows}</table></div>
           <p class="note">${st.notes}</p>
           <div class="fieldnote"><span>Field note</span><p>${FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ")}</p></div>
-          <div class="blk"><h4>Where we sleep</h4><ul>${sleep}</ul></div>
+          <div class="blk"><h4>Where we sleep tonight</h4><ul>${sleep}</ul></div>
+          ${midSleepHtml}
           <div class="blk"><h4>Services along the way</h4><p class="svc">${st.svc}</p></div>
           <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"We pick, it is our route."}</p></div>
           <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Walked, tap to undo":"Mark stage as walked"}</button>
@@ -1529,36 +1590,38 @@ buildPacking();
 
 
 /* big live profile */
-let bigN=null,bigWatch=null,bigG=null;
+let bigN=null,bigWatch=null,bigG=null,bigSel=null;
 function gradeColor(gr){return gr<3?"#4a90b8":gr<6?"#f2c230":"#ef8354";}
 function fmtH(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh>0?hh+"h "+String(mm).padStart(2,"0"):mm+" min";}
 function bigProfileSVG(st,g){
   const W=1200,H=440,padL=54,padR=28,padT=36,padB=80;
-  const maxAlt=Math.max(...st.seg.map(w=>w.alt),20);
+  const det=stageDetail(st,200);
+  const base=det||st.seg.map(w=>[w.km,w.alt]);
+  const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.map(w=>w.alt),20);
   const nice=Math.max(25,Math.ceil(maxAlt/25)*25);
   const X=km=>padL+((km-st.a.km)/st.km)*(W-padL-padR);
   const Y=a=>padT+(1-a/nice)*(H-padT-padB);
-  const pts=st.seg.map(w=>[X(w.km),Y(w.alt)]);
+  const pts=base.map(p=>[X(p[0]),Y(p[1])]);
   const line=smoothPath(pts);
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
   let grid="";
   for(let a=0;a<=nice;a+=25){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#5b6d85">${a}</text>`;}
   let kmticks="";
   for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-14}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#44536a">${k}</text>`;}
-  let stops="";
-  for(let i=0;i<st.seg.length-1;i++){
-    const a=st.seg[i],b=st.seg[i+1];
-    const gr=Math.abs(b.alt-a.alt)/Math.max(0.05,(b.km-a.km))/10;
-    const c=gradeColor(gr);
-    const o0=((pts[i][0]-padL)/(W-padL-padR)).toFixed(4),o1=((pts[i+1][0]-padL)/(W-padL-padR)).toFixed(4);
-    stops+=`<stop offset="${o0}" stop-color="${c}"/><stop offset="${o1}" stop-color="${c}"/>`;
-  }
+  const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
-    const x=pts[i][0],y=pts[i][1];const hi=w.alt===hiAlt;
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="${hi?"#f2c230":"#4a90b8"}" stroke="#0a111c" stroke-width="2"/>
-      <text x="${x.toFixed(1)}" y="${(y-11).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${hi?"#f2c230":"#44536a"}">${w.alt}</text>
-      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="#9fb0c5">${w.name.split(",")[0].split(" (")[0]}</text>`;
+    const x=X(w.km),y=Y(snapAlt(det,w.km,w.alt));const hi=w.alt===hiAlt;const on=i===bigSel;
+    const hasBed=w.sleep&&w.sleep.length&&w.km>st.a.km;
+    const hasPoi=!!w.poi;
+    let glyphs="";const gy=y-26;
+    const bx=hasBed&&hasPoi?x-8:x;
+    if(hasBed)glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
+    if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
+    return `<circle class="big-wp" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?10:7}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}" onclick="selectBigWp(${i});event.stopPropagation()"/>
+      <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
+      ${glyphs}
+      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":"#9fb0c5"}" class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" style="cursor:pointer">${w.name.split(",")[0].split(" (")[0]}</text>`;
   }).join("");
   let walked="",gps="";
   if(g){
@@ -1577,16 +1640,35 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    <g transform="translate(${W-padR-236},18)" font-family="DM Mono, monospace" font-size="10">
+    <g transform="translate(${W-padR-306},18)" font-family="DM Mono, monospace" font-size="10">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
       <rect x="58" y="-8" width="16" height="4" fill="#f2c230"/><text x="79" y="-3" fill="#5b6d85">3-6%</text>
       <rect x="128" y="-8" width="16" height="4" fill="#ef8354"/><text x="149" y="-3" fill="#5b6d85">steep</text>
+      <path d="M 196 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="211" y="-3" fill="#5b6d85">bed</text>
+      <path d="M 246 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="257" y="-3" fill="#5b6d85">sight</text>
+      ${det?`<text x="196" y="-3" fill="#33455f">gpx terrain</text>`:""}
     </g>
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${walked}
     ${dots}${gps}</svg>`;
 }
+function setBigCap(st){
+  const el=document.getElementById("big-cap");if(!el||!st)return;
+  if(bigSel==null){el.innerHTML="Tap a waypoint for details.";return;}
+  const w=st.seg[bigSel];if(!w){el.innerHTML="";return;}
+  const q=encodeURIComponent(w.q);
+  let out=`<b>${w.name}</b> \u00b7 km ${(w.km-st.a.km).toFixed(1)} of the stage \u00b7 ~${w.alt} m \u00b7 K. ${(160.5-w.km).toFixed(1).replace(".0","")} to Vigo \u00b7 <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">Open in Maps</a>`;
+  if(w.poi)out+=`<span class="cap-poi">${w.poi}</span>`;
+  if(w.sleep&&w.sleep.length)out+=`<span class="cap-beds">Beds: ${w.sleep.map(a=>a[0]+" ("+a[2]+")").join(" \u00b7 ")}</span>`;
+  el.innerHTML=out;
+}
+function bigRepaint(){
+  const st=STAGES.find(s=>s.n===bigN);if(!st)return;
+  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
+  setBigCap(st);
+}
+function selectBigWp(i){bigSel=(bigSel===i)?null:i;bigRepaint();}
 function setBigStats(g,st){
   const el=document.getElementById("big-stats");if(!el||!st)return;
   const i=bigN-1;let tiles="";
@@ -1623,7 +1705,7 @@ function bigApply(pos,st){
     return;
   }
   bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km)};
-  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
+  bigRepaint();
   setBigStats(bigG,st);
   document.getElementById("big-hint").textContent="Live \u00b7 updates as we walk.";
 }
@@ -1635,11 +1717,11 @@ function bigStart(st){
 function stopBigWatch(){if(bigWatch!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(bigWatch);}catch(e){}bigWatch=null;}}
 function openBig(n){
   stopBigWatch();
-  bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;
+  bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;bigSel=null;
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("bigview").classList.add("active");
   document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+stageDateLabel(bigN-1)+" \u00b7 K. "+(160.5-st.b.km).toFixed(1).replace(".0","");
-  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,null);
+  bigRepaint();
   setBigStats(null,st);
   let hint="Rotate to landscape for the full ribbon.";
   const wx=store.get("camino-wx-"+st.b.id,null);
