@@ -10,10 +10,14 @@ INSTALL ON IPHONE
   Visit once with internet so it caches for offline (Oia cliffs have no signal).
 
 SHARED SYNC BETWEEN BOTH PHONES (optional, recommended)
-  1. In a Supabase project, run this SQL:
+  1. In a Supabase project, run this SQL (both tables):
        create table camino_shared (id text primary key, data jsonb);
        alter table camino_shared enable row level security;
        create policy "open" on camino_shared for all using (true) with check (true);
+       create table camino_journal (id text primary key, data jsonb);
+       alter table camino_journal enable row level security;
+       create policy "open_j" on camino_journal for all using (true) with check (true);
+     (If camino_shared already exists, just run the camino_journal lines.)
   2. Open config.js and paste your values:
        window.SUPA_URL = "";   <- your project URL (https://xxxx.supabase.co)
        window.SUPA_KEY = "";   <- the anon public key

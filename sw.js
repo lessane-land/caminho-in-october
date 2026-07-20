@@ -1,4 +1,4 @@
-const CACHE = "camino-v14";
+const CACHE = "camino-v16";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./config.js", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
 self.addEventListener("install", e => {

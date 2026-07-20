@@ -465,6 +465,21 @@
   .stamp{animation:stampin .5s cubic-bezier(.16,1,.3,1) both}
   @media (prefers-reduced-motion:reduce){.stamp{animation:none}}
 
+
+  /* v15 boosts */
+  .food-links{display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:10px}
+  .food-links .food-link{margin-top:0}
+  .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  @media(max-width:560px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+  .stat-tile{background:var(--night-soft);border:1px solid var(--night-border);border-radius:8px;padding:12px 8px;text-align:center;transition:all .3s ease}
+  .stat-tile:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .stat-tile b{display:block;font-family:'Fraunces',serif;font-size:1.3rem;color:var(--gold-bright);font-weight:500;line-height:1.15}
+  .stat-tile span{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+  .bar .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:rgba(232,238,245,.22);border-radius:1px}
+  .share-mini{margin-left:8px;background:transparent;border:1px solid var(--sea-glow);color:var(--sea-shallow);border-radius:50px;padding:3px 10px;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+  .share-mini:hover{background:var(--sea-deep);color:var(--paper)}
+  .wx-ico{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--sea-shallow)}
+
 </style>
 </head>
 <body>
@@ -638,6 +653,32 @@
       <a href="https://www.xacobeotransfer.com" target="_blank" rel="noopener" class="book-btn terra">Book the crossing<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
     </div>
 
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Good to know &middot; <em>both sides of the boat</em></h3>
+      <div class="log-grid">
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.79.65 2.63a2 2 0 0 1-.45 2.11L8 9.75a16 16 0 0 0 6.25 6.25l1.29-1.31a2 2 0 0 1 2.11-.45c.84.31 1.73.53 2.63.65A2 2 0 0 1 22 16.92z"/></svg>Emergencies</div>
+          <div class="log-value">112</div>
+          <div class="log-note">Same number in Portugal and Spain, works without coverage from our own carrier.</div>
+        </div>
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Cash</div>
+          <div class="log-value">Small notes</div>
+          <div class="log-note">Albergues and donativos love 5s and 10s. Last reliable ATM before the lonely stretch: A Guarda.</div>
+        </div>
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Pharmacies</div>
+          <div class="log-value">Green cross</div>
+          <div class="log-note">Every town has one; the farmacia de guardia sign on the door says which one is open late.</div>
+        </div>
+        <div class="log-card">
+          <div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18s2-2 6-2 6 2 10 2 4-2 4-2M2 12s2-2 6-2 6 2 10 2 4-2 4-2"/></svg>Tides</div>
+          <div class="log-value">Boat depends on them</div>
+          <div class="log-note">The Caminha crossing shifts with the tide; check the day before at <a href="https://tabuademares.com" target="_blank" rel="noopener" style="color:var(--sea-shallow)">tabuademares.com</a>.</div>
+        </div>
+      </div>
+    </div>
+
     
   </div>
 </section>
@@ -661,6 +702,7 @@
         <div class="custom-warn" id="custom-warn"></div>
       </div>
     </div>
+    <div class="stats-strip" id="stats-strip"></div>
     <div class="progress" id="progress">
       <div class="progress-top"><span>Walked</span><b id="km-done">0 km</b><span id="km-left"></span></div>
       <div class="bar"><i id="bar-fill"></i><span class="walker" id="shell-walker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5c-5 0-8.5-3.4-8.5-8C3.5 8 7 3.5 12 2.5c5 1 8.5 5.5 8.5 11 0 4.6-3.5 8-8.5 8z"/><path d="M12 21.5v-19M6.7 19.8 9.2 3.6M17.3 19.8 14.8 3.6M4.1 16.2 12 2.5l7.9 13.7"/></svg></span></div>
@@ -692,15 +734,15 @@
       <div class="food-list">
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Day 1 &middot; land early, live fully</div>
-          <p class="food-desc">Bags at Almada Downtown 101, pastel de nata around the corner. <strong>S&atilde;o Bento azulejos</strong>, Ribeira lanes, lunch at Mercado do Bolh&atilde;o. Cross the Dom Lu&iacute;s I upper deck to Gaia for a <strong>port lodge tasting</strong> (book Ferreira or C&aacute;lem, last slot). Sunset at Jardim do Morro.</p>
+          <p class="food-desc">Bags at Almada Downtown 101, pastel de nata around the corner. <strong>S&atilde;o Bento azulejos</strong>, Ribeira lanes, lunch at Mercado do Bolh&atilde;o. Cross the Dom Lu&iacute;s I upper deck to Gaia for a <strong>port lodge tasting</strong> (book Ferreira or C&aacute;lem, last slot). Sunset at Jardim do Morro.</p><div class="food-links"><a href="https://maps.apple.com/?q=S%C3%A3o%20Bento%20Station%20Porto" target="_blank" rel="noopener" class="food-link">S&atilde;o Bento<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a><a href="https://maps.apple.com/?q=Mercado%20do%20Bolh%C3%A3o%20Porto" target="_blank" rel="noopener" class="food-link">Bolh&atilde;o<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a><a href="https://maps.apple.com/?q=Jardim%20do%20Morro%20Gaia" target="_blank" rel="noopener" class="food-link">Jardim do Morro<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M2 12s4-8 10-8 10 8 10 8M2 12s4 8 10 8 10-8 10-8"/></svg>Day 2 &middot; save the legs</div>
-          <p class="food-desc">Livraria Lello only pre-booked, otherwise the Igreja do Carmo fa&ccedil;ade is free and photographs better. <strong>Historic tram 1 to Foz</strong> for an ocean-front coffee, a preview of the whole next week. Early night: stamp no. 1 waits at the Cathedral at 08:00.</p>
+          <p class="food-desc">Livraria Lello only pre-booked, otherwise the Igreja do Carmo fa&ccedil;ade is free and photographs better. <strong>Historic tram 1 to Foz</strong> for an ocean-front coffee, a preview of the whole next week. Early night: stamp no. 1 waits at the Cathedral at 08:00.</p><div class="food-links"><a href="https://maps.apple.com/?q=Livraria%20Lello%20Porto" target="_blank" rel="noopener" class="food-link">Lello<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a><a href="https://maps.apple.com/?q=Igreja%20do%20Carmo%20Porto" target="_blank" rel="noopener" class="food-link">Carmo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a><a href="https://maps.apple.com/?q=Passeio%20Alegre%20Foz%20Porto" target="_blank" rel="noopener" class="food-link">Foz, tram 1<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a><a href="https://maps.apple.com/?q=Porto%20Cathedral" target="_blank" rel="noopener" class="food-link">S&eacute;, stamp no. 1<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M5 8h14v7a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8zM7 8V6a5 5 0 0 1 10 0v2"/></svg>Port wine in 60 seconds</div>
-          <p class="food-desc">All port is fortified mid-ferment, that's why it's sweet and 20%. <strong>Ruby</strong>: vat-aged, fruity. <strong>Tawny</strong>: barrel-aged, caramel and walnut ("10-year" = average age, not vintage). <strong>Vintage</strong>: one great year, decades of patience. Order: white port + tonic, then a 10-year tawny. Now we out-order the sommelier.</p>
+          <p class="food-desc">All port is fortified mid-ferment, that's why it's sweet and 20%. <strong>Ruby</strong>: vat-aged, fruity. <strong>Tawny</strong>: barrel-aged, caramel and walnut ("10-year" = average age, not vintage). <strong>Vintage</strong>: one great year, decades of patience. Order: white port + tonic, then a 10-year tawny. Now we out-order the sommelier.</p><div class="food-links"><a href="https://maps.apple.com/?q=Cais%20de%20Gaia" target="_blank" rel="noopener" class="food-link">Gaia lodges<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>Caf&eacute; Santiago &middot; the francesinha ruling</div>
@@ -725,11 +767,11 @@
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l4-7 4 4 6-10 4 13"/></svg>Monte do Castro</div>
-          <p class="food-desc">The panorama over the r&iacute;a and the C&iacute;es. A 20-minute climb our legs will find <strong>hilarious</strong>, but worth every complaint.</p>
+          <p class="food-desc">The panorama over the r&iacute;a and the C&iacute;es. A 20-minute climb our legs will find <strong>hilarious</strong>, but worth every complaint.</p><div class="food-links"><a href="https://maps.apple.com/?q=Monte%20do%20Castro%20Vigo" target="_blank" rel="noopener" class="food-link">Monte do Castro<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18s2-2 6-2 6 2 10 2 4-2 4-2M2 14s2-2 6-2 6 2 10 2 4-2 4-2"/></svg>C&iacute;es islands &middot; if the stars align</div>
-          <p class="food-desc">October ferries run mostly weekends and holidays, and you need the <strong>free Xunta permit + ferry booking</strong>. Check both a few days ahead. If it works: the best beach in the Atlantic, says everyone who has seen it.</p>
+          <p class="food-desc">October ferries run mostly weekends and holidays, and you need the <strong>free Xunta permit + ferry booking</strong>. Check both a few days ahead. If it works: the best beach in the Atlantic, says everyone who has seen it.</p><div class="food-links"><a href="https://autorizacionillasatlanticas.xunta.gal" target="_blank" rel="noopener" class="food-link">Free permit<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a><a href="https://maps.apple.com/?q=Estaci%C3%B3n%20Mar%C3%ADtima%20de%20Vigo" target="_blank" rel="noopener" class="food-link">Ferry terminal<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
       </div>
     </div>
@@ -773,7 +815,7 @@
     <div class="panel-header">
       <div class="panel-eyebrow">05 &middot; O que levamos</div>
       <h2>What we <em>carry</em>.</h2>
-      <p class="panel-intro">Ten percent of body weight, and everything earns its grams.</p>
+      <p class="panel-intro">Ten percent of body weight, and everything earns its grams. Plus a shared diary that writes itself on both phones.</p>
     </div>
 
     <div class="sub-section">
@@ -792,11 +834,50 @@
       <div class="we-grid" id="packing-grid"></div>
     </div>
 
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Journal &middot; <em>our shared diary</em></h3>
+      <p class="sub-sub">Photos and notes, flowing between both phones through the same magic as the stages.</p>
+      <div class="journal-stats">
+        <div class="journal-stat-grp">
+          <div><div class="journal-stat-num" id="journal-count">0</div><div class="journal-stat-label">Memories</div></div>
+          <div><div class="journal-stat-num" id="journal-photos">0</div><div class="journal-stat-label">With photo</div></div>
+          <div><div class="journal-stat-num" style="font-size:.95rem;padding-top:6px" id="journal-sync"></div><div class="journal-stat-label">Sync</div></div>
+        </div>
+        <button class="journal-add" id="journal-add-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add memory</button>
+      </div>
+      <div class="journal-grid" id="journal-grid"></div>
+    </div>
+
     
 
     
   </div>
 </section>
+
+<div class="modal-bg" id="journal-modal">
+  <div class="modal">
+    <h3 class="modal-title">Add a memory</h3>
+    <input type="text" class="modal-input" id="memory-title" placeholder="Title. What happened?">
+    <textarea class="modal-input" id="memory-note" placeholder="Tell future-us about it..."></textarea>
+    <div class="phrase-cats" id="mem-by" style="margin-bottom:12px">
+      <button class="phrase-cat-btn" data-by="Manal">Manal</button>
+      <button class="phrase-cat-btn" data-by="Vane">Vane</button>
+      <button class="phrase-cat-btn active" data-by="Us">Us</button>
+    </div>
+    <div class="photo-area" id="photo-area">
+      <input type="file" id="photo-input" accept="image/*" style="display:none;">
+      <div id="photo-empty" class="photo-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <div class="photo-empty-text">Tap to add photo (optional)</div>
+      </div>
+      <img id="photo-preview" class="photo-preview" style="display:none;" alt="">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="modal-cancel">Cancel</button>
+      <button class="modal-btn primary" id="modal-save">Save</button>
+    </div>
+  </div>
+</div>
 
 <div class="bigview" id="bigview">
   <div class="bigview-top">
@@ -1009,6 +1090,14 @@ function profileSVG(st){
 
 /* weather */
 function wxCode(c){if(c<=1)return"clear";if(c<=3)return"clouds";if(c<=48)return"fog";if(c<=67)return"rain";if(c<=77)return"snow";if(c<=82)return"showers";return"storm";}
+function wxIcon(c){
+  const s='<svg class="wx-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">';
+  if(c<=1)return s+'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  if(c<=3)return s+'<path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.6A4 4 0 0 0 7 19z"/></svg>';
+  if(c<=48)return s+'<path d="M4 10h16M2 14h20M6 18h12"/></svg>';
+  if(c<=82)return s+'<path d="M17.5 15a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.6A4 4 0 0 0 7 15z"/><path d="M8 18v2M12 19v2M16 18v2"/></svg>';
+  return s+'<path d="M17.5 14a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.6A4 4 0 0 0 7 14z"/><path d="M13 14l-3 5h4l-3 5"/></svg>';
+}
 async function loadWeather(n){
   const st=STAGES.find(x=>x.n===n);const el=document.getElementById("wx-"+n);if(!el||!st)return;
   const key="camino-wx-"+st.b.id;const cached=store.get(key,null);
@@ -1027,7 +1116,7 @@ function paintWeather(n,d,ts){
   const names=["Today","Tomorrow"];
   el.querySelector(".wx-body").innerHTML=d.daily.time.map((_,i)=>`
     <div class="wx-day"><b>${names[i]||d.daily.time[i]}</b>
-      <span class="t">${Math.round(d.daily.temperature_2m_min[i])}\u2013${Math.round(d.daily.temperature_2m_max[i])}\u00b0C</span> \u00b7 ${wxCode(d.daily.weather_code[i])}<br>
+      ${wxIcon(d.daily.weather_code[i])}<span class="t">${Math.round(d.daily.temperature_2m_min[i])}\u2013${Math.round(d.daily.temperature_2m_max[i])}\u00b0C</span> \u00b7 ${wxCode(d.daily.weather_code[i])}<br>
       <span class="rain">rain ${d.daily.precipitation_probability_max[i]}%</span> \u00b7 wind ${Math.round(d.daily.wind_speed_10m_max[i])} km/h
     </div>`).join("");
   const age=Math.round((Date.now()-ts)/60000);
@@ -1077,7 +1166,8 @@ function showGps(){
     else txt=`We are at <b>~km ${kmIn}</b> of stage ${st.n} (\u2248${Math.round(b.alt)} m)`+(next?` \u00b7 next: ${next.name} in ${(next.km-b.km).toFixed(1)} km`:` \u00b7 the end is near`);
     const msg=document.getElementById("gpsmsg-"+st.n);
     document.querySelectorAll(".gps-msg").forEach(e=>e.classList.remove("show"));
-    if(msg){msg.innerHTML=txt;msg.classList.add("show");}
+    window.LASTPOS=txt.replace(/<[^>]+>/g,"")+" (Porto\u2192Vigo camino, via our app)";
+    if(msg){msg.innerHTML=txt+' <button class="share-mini" onclick="sharePos()">Share</button>';msg.classList.add("show");}
     art&&art.scrollIntoView({behavior:"smooth",block:"start"});
   },err=>{
     btn.classList.remove("busy");
@@ -1178,7 +1268,7 @@ function render(){
       </div>
     </article>`;
   }).join("");
-  updateProgress();updateTrip();
+  updateProgress();updateTrip();updateStats();
 }
 function selectWp(n,i){
   sel[n]=(sel[n]===i)?null:i;
@@ -1206,6 +1296,17 @@ function markDone(n){
   render();
   open.forEach(x=>{const el=document.querySelector(`.stage[data-n="${x}"]`);if(el){el.classList.add("open");loadWeather(x);}});
 }
+function updateStats(){
+  const el=document.getElementById("stats-strip");if(!el)return;
+  const km=STAGES.reduce((a,s)=>a+s.km,0);
+  const up=STAGES.reduce((a,s)=>a+s.up,0);
+  const hi=Math.max(...STAGES.map(s=>Math.max(...s.seg.map(w=>w.alt))));
+  el.innerHTML=`
+    <div class="stat-tile"><b>${Math.round(km)} km</b><span>ocean-side</span></div>
+    <div class="stat-tile"><b>+${up} m</b><span>of climbing</span></div>
+    <div class="stat-tile"><b>${STAGES.length} days</b><span>2 countries \u00b7 1 boat</span></div>
+    <div class="stat-tile"><b>${hi} m</b><span>high point</span></div>`;
+}
 function updateProgress(){
   const done=store.get(doneKey(),[]);
   const total=STAGES.reduce((a,s)=>a+s.km,0);
@@ -1214,6 +1315,10 @@ function updateProgress(){
   document.getElementById("km-left").textContent=Math.round(total-km)+" km to go";
   document.getElementById("bar-fill").style.width=Math.min(100,Math.round(km/total*100))+"%";
   const wk=document.getElementById("shell-walker");if(wk)wk.style.left=Math.min(100,Math.round(km/total*100))+"%";
+  const bar=document.getElementById("bar-fill").parentElement;
+  bar.querySelectorAll(".tick").forEach(t=>t.remove());
+  let acc=0;
+  STAGES.slice(0,-1).forEach(s=>{acc+=s.km;const t=document.createElement("span");t.className="tick";t.style.left=(acc/total*100)+"%";bar.appendChild(t);});
   const fin=done.length===STAGES.length&&STAGES.length>0;
   document.getElementById("progress").classList.toggle("fin",fin);
   const sub=document.getElementById("progress-sub");
@@ -1571,6 +1676,8 @@ function setTrackChip(){
   const c=document.getElementById("track-chip");if(!c)return;
   const g=store.get("camino-gpx",null);
   c.textContent=g&&g.P?("Track: GPX \u00b7 "+g.P.length+" pts"):"Track: waypoints \u00b7 \u00b10.5 km";
+  const b=document.getElementById("gpx-btn");
+  if(b)b.style.display=(g&&g.P)?"none":"";
 }
 
 /* sunset (approx, \u00b115 min) */
@@ -1697,6 +1804,124 @@ function mapLocate(){
   });
 }
 
+function sharePos(){
+  const t=window.LASTPOS||"";if(!t)return;
+  if(navigator.share)navigator.share({text:t}).catch(()=>{});
+  else if(navigator.clipboard){navigator.clipboard.writeText(t);alert("Copied. Paste it anywhere.");}
+}
+
+
+/* shared journal */
+let journal=store.get("camino-journal",[]);
+let currentPhotoData=null,memBy="Us";
+function cacheJournal(){
+  try{store.set("camino-journal",journal);}
+  catch(e){try{store.set("camino-journal",journal.map(m=>({id:m.id,date:m.date,title:m.title,note:m.note,by:m.by,photo:null})));}catch(e2){}}
+}
+async function pullJournal(){
+  if(SUPA_URL){
+    try{
+      const r=await fetch(SUPA_URL+"/rest/v1/camino_journal?select=id,data",{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+      const rows=await r.json();
+      if(Array.isArray(rows)){
+        const map={};journal.forEach(m=>{if(m&&m.id)map[m.id]=m;});
+        rows.forEach(x=>{if(x&&x.data&&x.data.id)map[x.data.id]=x.data;});
+        journal=Object.values(map).sort((a,b)=>a.id-b.id);
+        cacheJournal();
+      }
+    }catch(e){}
+  }
+  renderJournal();
+}
+async function pushJournalEntry(m){
+  if(!SUPA_URL)return;
+  try{await fetch(SUPA_URL+"/rest/v1/camino_journal",{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:String(m.id),data:m}])});}catch(e){}
+}
+async function deleteJournalRemote(id){
+  if(!SUPA_URL)return;
+  try{await fetch(SUPA_URL+"/rest/v1/camino_journal?id=eq."+id,{method:"DELETE",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});}catch(e){}
+}
+function renderJournal(){
+  const grid=document.getElementById("journal-grid");if(!grid)return;
+  document.getElementById("journal-count").textContent=journal.length;
+  document.getElementById("journal-photos").textContent=journal.filter(m=>m.photo).length;
+  document.getElementById("journal-sync").textContent=SUPA_URL?"Both phones":"This phone only";
+  if(journal.length===0){grid.innerHTML='<div class="journal-empty-card">Empty for now. First entry writes itself: stamp no. 1, Porto Cathedral, October 2nd.</div>';return;}
+  grid.innerHTML="";
+  [...journal].reverse().forEach(mem=>{
+    const entry=document.createElement("div");entry.className="journal-entry";
+    entry.innerHTML=`
+      ${mem.photo?`<img class="journal-entry-img" src="${mem.photo}" alt="">`:'<div class="journal-entry-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'}
+      <button class="journal-entry-del" data-id="${mem.id}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="journal-entry-body">
+        <div class="journal-entry-date">${mem.date}${mem.by&&mem.by!=="Us"?" \u00b7 "+escapeHtml(mem.by):""}</div>
+        <div class="journal-entry-title">${escapeHtml(mem.title||"")}</div>
+        ${mem.note?`<div class="journal-entry-note">${escapeHtml(mem.note)}</div>`:""}
+      </div>`;
+    grid.appendChild(entry);
+  });
+  grid.querySelectorAll(".journal-entry-del").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      if(!confirm("Delete this memory on both phones?"))return;
+      const id=parseInt(btn.dataset.id);
+      journal=journal.filter(m=>m.id!==id);
+      cacheJournal();deleteJournalRemote(id);renderJournal();
+    });
+  });
+}
+function initJournal(){
+  const modal=document.getElementById("journal-modal");if(!modal)return;
+  const photoInput=document.getElementById("photo-input");
+  const photoArea=document.getElementById("photo-area");
+  const photoEmpty=document.getElementById("photo-empty");
+  const photoPreview=document.getElementById("photo-preview");
+  document.querySelectorAll("#mem-by .phrase-cat-btn").forEach(b=>{
+    b.addEventListener("click",()=>{
+      document.querySelectorAll("#mem-by .phrase-cat-btn").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");memBy=b.dataset.by;
+    });
+  });
+  document.getElementById("journal-add-btn").addEventListener("click",()=>{
+    document.getElementById("memory-title").value="";
+    document.getElementById("memory-note").value="";
+    currentPhotoData=null;
+    photoEmpty.style.display="block";photoPreview.style.display="none";
+    photoArea.classList.remove("has-photo");
+    modal.classList.add("active");
+    document.getElementById("memory-title").focus();
+  });
+  document.getElementById("modal-cancel").addEventListener("click",()=>modal.classList.remove("active"));
+  modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("active");});
+  photoArea.addEventListener("click",()=>photoInput.click());
+  photoInput.addEventListener("change",e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement("canvas");
+        let w=img.width,h=img.height;const max=800;
+        if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext("2d").drawImage(img,0,0,w,h);
+        currentPhotoData=canvas.toDataURL("image/jpeg",0.7);
+        photoPreview.src=currentPhotoData;
+        photoPreview.style.display="block";photoEmpty.style.display="none";
+        photoArea.classList.add("has-photo");
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById("modal-save").addEventListener("click",()=>{
+    const title=document.getElementById("memory-title").value.trim();
+    if(!title)return;
+    const m={id:Date.now(),date:new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}),title,note:document.getElementById("memory-note").value.trim(),photo:currentPhotoData,by:memBy};
+    journal.push(m);cacheJournal();pushJournalEntry(m);
+    renderJournal();modal.classList.remove("active");
+  });
+}
+
 /* boot */
 const dateInput=document.getElementById('start-date');
 dateInput.value=startDate;
@@ -1706,6 +1931,7 @@ document.getElementById('gps-btn').addEventListener('click',showGps);
 renderPlans();render();updateCountdown();setInterval(updateCountdown,60000);
 initBoat();setChip();setTrackChip();
 autoLoadBundled();
+initJournal();pullJournal();
 pullShared().then(()=>{render();});
 openToday();
 document.getElementById("gpx-btn").addEventListener("click",()=>document.getElementById("gpx-input").click());
