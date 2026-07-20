@@ -480,6 +480,11 @@
   .share-mini:hover{background:var(--sea-deep);color:var(--paper)}
   .wx-ico{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--sea-shallow)}
 
+
+  .big-stats{display:flex;flex-wrap:wrap;gap:12px 24px;margin-left:auto}
+  .big-stats>div{min-width:74px}
+  .big-actions button{min-width:42px}
+
 </style>
 </head>
 <body>
@@ -882,12 +887,8 @@
 <div class="bigview" id="bigview">
   <div class="bigview-top">
     <div id="big-title"></div>
-    <div class="big-stats">
-      <div><b id="big-km">&ndash;</b><span>km into stage</span></div>
-      <div><b id="big-alt">&ndash;</b><span>altitude</span></div>
-      <div><b id="big-next">&ndash;</b><span>next stop</span></div>
-    </div>
-    <div class="big-actions"><button id="big-locate">Locate us</button><button id="big-close">Close</button></div>
+    <div class="big-stats" id="big-stats"></div>
+    <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
   <div class="bigview-svg" id="big-svg"></div>
   <div class="big-hint" id="big-hint">Rotate to landscape for the full ribbon.</div>
@@ -1528,9 +1529,11 @@ buildPacking();
 
 
 /* big live profile */
-let bigN=null;
+let bigN=null,bigWatch=null,bigG=null;
+function gradeColor(gr){return gr<3?"#4a90b8":gr<6?"#f2c230":"#ef8354";}
+function fmtH(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh>0?hh+"h "+String(mm).padStart(2,"0"):mm+" min";}
 function bigProfileSVG(st,g){
-  const W=1200,H=430,padL=48,padR=26,padT=30,padB=66;
+  const W=1200,H=440,padL=54,padR=28,padT=36,padB=80;
   const maxAlt=Math.max(...st.seg.map(w=>w.alt),20);
   const nice=Math.max(25,Math.ceil(maxAlt/25)*25);
   const X=km=>padL+((km-st.a.km)/st.km)*(W-padL-padR);
@@ -1538,53 +1541,117 @@ function bigProfileSVG(st,g){
   const pts=st.seg.map(w=>[X(w.km),Y(w.alt)]);
   const line=smoothPath(pts);
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
-  let grid="";for(let a=0;a<=nice;a+=25){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#182842"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#5b6d85">${a}</text>`;}
+  let grid="";
+  for(let a=0;a<=nice;a+=25){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#5b6d85">${a}</text>`;}
+  let kmticks="";
+  for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-14}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#44536a">${k}</text>`;}
+  let stops="";
+  for(let i=0;i<st.seg.length-1;i++){
+    const a=st.seg[i],b=st.seg[i+1];
+    const gr=Math.abs(b.alt-a.alt)/Math.max(0.05,(b.km-a.km))/10;
+    const c=gradeColor(gr);
+    const o0=((pts[i][0]-padL)/(W-padL-padR)).toFixed(4),o1=((pts[i+1][0]-padL)/(W-padL-padR)).toFixed(4);
+    stops+=`<stop offset="${o0}" stop-color="${c}"/><stop offset="${o1}" stop-color="${c}"/>`;
+  }
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
-    const x=X(w.km),y=Y(w.alt);
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="${w.alt===hiAlt?"#f2c230":"#4a90b8"}" stroke="#0a111c" stroke-width="2"/>
-      <text x="${x.toFixed(1)}" y="${H-padB+18+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="#9fb0c5">${w.name.split(",")[0].split(" (")[0]}</text>`+
-      (w.alt===hiAlt?`<text x="${x.toFixed(1)}" y="${(y-12).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f2c230">${w.alt} m</text>`:"");
+    const x=pts[i][0],y=pts[i][1];const hi=w.alt===hiAlt;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="${hi?"#f2c230":"#4a90b8"}" stroke="#0a111c" stroke-width="2"/>
+      <text x="${x.toFixed(1)}" y="${(y-11).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${hi?"#f2c230":"#44536a"}">${w.alt}</text>
+      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="#9fb0c5">${w.name.split(",")[0].split(" (")[0]}</text>`;
   }).join("");
-  const gps=g?`<line x1="${X(g.km).toFixed(1)}" y1="${padT}" x2="${X(g.km).toFixed(1)}" y2="${H-padB}" stroke="#f2c230" stroke-dasharray="5 5" opacity=".55"/><circle cx="${X(g.km).toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>`:"";
+  let walked="",gps="";
+  if(g){
+    const gx=X(Math.min(Math.max(g.km,st.a.km),st.b.km));
+    walked=`<clipPath id="wclip"><rect x="0" y="0" width="${gx.toFixed(1)}" height="${H}"/></clipPath>
+      <path d="${area}" fill="url(#goldfill)" clip-path="url(#wclip)"/>
+      <path d="${line}" fill="none" stroke="#f2c230" stroke-width="4" stroke-linecap="round" clip-path="url(#wclip)" opacity=".85"/>`;
+    gps=`<line x1="${gx.toFixed(1)}" y1="${padT}" x2="${gx.toFixed(1)}" y2="${H-padB}" stroke="#f2c230" stroke-dasharray="5 5" opacity=".5"/>
+      <circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>
+      <text x="${gx.toFixed(1)}" y="${padT-12}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f6d35f">US \u00b7 km ${(g.km-st.a.km).toFixed(1)}</text>`;
+  }
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-    <defs><linearGradient id="bigfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a90b8" stop-opacity=".35"/><stop offset="1" stop-color="#4a90b8" stop-opacity="0"/></linearGradient></defs>
-    ${grid}
+    <defs>
+      <linearGradient id="bigfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a90b8" stop-opacity=".28"/><stop offset="1" stop-color="#4a90b8" stop-opacity="0"/></linearGradient>
+      <linearGradient id="goldfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c230" stop-opacity=".3"/><stop offset="1" stop-color="#f2c230" stop-opacity="0"/></linearGradient>
+      <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
+    </defs>
+    ${grid}${kmticks}
+    <g transform="translate(${W-padR-236},18)" font-family="DM Mono, monospace" font-size="10">
+      <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
+      <rect x="58" y="-8" width="16" height="4" fill="#f2c230"/><text x="79" y="-3" fill="#5b6d85">3-6%</text>
+      <rect x="128" y="-8" width="16" height="4" fill="#ef8354"/><text x="149" y="-3" fill="#5b6d85">steep</text>
+    </g>
     <path d="${area}" fill="url(#bigfill)"/>
-    <path d="${line}" fill="none" stroke="#4a90b8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${walked}
     ${dots}${gps}</svg>`;
 }
-function setBigStats(g){
-  document.getElementById("big-km").textContent=g?g.kmIn.toFixed(1):"\u2013";
-  document.getElementById("big-alt").textContent=g?Math.round(g.alt)+" m":"\u2013";
-  document.getElementById("big-next").textContent=g&&g.next?g.next.name.split(",")[0]+" \u00b7 "+(g.next.km-g.km).toFixed(1)+" km":"\u2013";
+function setBigStats(g,st){
+  const el=document.getElementById("big-stats");if(!el||!st)return;
+  const i=bigN-1;let tiles="";
+  if(g){
+    const left=st.b.km-g.km;
+    tiles+=`<div><b>${(g.km-st.a.km).toFixed(1)} km</b><span>walked</span></div>
+      <div><b>${left.toFixed(1)} km</b><span>to ${st.b.name.split(",")[0]}</span></div>
+      <div><b>${Math.round(g.alt)} m</b><span>altitude</span></div>
+      <div><b>~${fmtH(left/4.2)}</b><span>at camino pace</span></div>`;
+    if(g.next)tiles+=`<div><b>${(g.next.km-g.km).toFixed(1)} km</b><span>${g.next.name.split(",")[0]}</span></div>`;
+  }else{
+    tiles+=`<div><b>${st.km} km</b><span>stage</span></div>
+      <div><b>+${st.up} m</b><span>climb</span></div>
+      <div><b>~${fmtH(st.km/4.2)}</b><span>walking time</span></div>`;
+  }
+  const ss=sunsetLabel(i,st);
+  if(ss){
+    const now=new Date();
+    const iso=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    if(stageISO(i)===iso){
+      const p=ss.split(":");
+      const mins=(+p[0]*60+ +p[1])-(now.getHours()*60+now.getMinutes());
+      tiles+=`<div><b>${mins>0?fmtH(mins/60):"dark"}</b><span>daylight left</span></div>`;
+    }else tiles+=`<div><b>~${ss}</b><span>sunset</span></div>`;
+  }
+  el.innerHTML=tiles;
 }
+function bigApply(pos,st){
+  const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude);if(!b)return;
+  if(b.distKm>3){document.getElementById("big-hint").textContent="We are "+b.distKm.toFixed(1)+" km off the route right now.";return;}
+  if(b.km<st.a.km||b.km>st.b.km){
+    const cur=STAGES.find(s=>b.km>=s.a.km&&b.km<=s.b.km);
+    document.getElementById("big-hint").textContent=cur?("We are on stage "+cur.n+" right now; use the arrows to jump."):"";
+    return;
+  }
+  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km)};
+  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
+  setBigStats(bigG,st);
+  document.getElementById("big-hint").textContent="Live \u00b7 updates as we walk.";
+}
+function bigStart(st){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
+  try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,maximumAge:15000});}catch(e){}
+}
+function stopBigWatch(){if(bigWatch!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(bigWatch);}catch(e){}bigWatch=null;}}
 function openBig(n){
-  bigN=n;const st=STAGES.find(s=>s.n===n);if(!st)return;
+  stopBigWatch();
+  bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;
+  const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("bigview").classList.add("active");
-  document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+st.km+" km";
+  document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+stageDateLabel(bigN-1)+" \u00b7 K. "+(160.5-st.b.km).toFixed(1).replace(".0","");
   document.getElementById("big-svg").innerHTML=bigProfileSVG(st,null);
-  document.getElementById("big-hint").textContent="Rotate to landscape for the full ribbon.";
-  setBigStats(null);bigLocate();
+  setBigStats(null,st);
+  let hint="Rotate to landscape for the full ribbon.";
+  const wx=store.get("camino-wx-"+st.b.id,null);
+  if(wx&&wx.d&&wx.d.daily)hint+="  \u00b7 today at "+st.b.name.split(",")[0]+": rain "+wx.d.daily.precipitation_probability_max[0]+"% \u00b7 wind "+Math.round(wx.d.daily.wind_speed_10m_max[0])+" km/h";
+  document.getElementById("big-hint").textContent=hint;
+  bigStart(st);
 }
-function bigLocate(){
-  if(bigN==null||!navigator.geolocation)return;
-  const st=STAGES.find(s=>s.n===bigN);
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude);if(!b)return;
-    if(b.distKm>3){document.getElementById("big-hint").textContent="We are "+b.distKm.toFixed(1)+" km off the route right now.";return;}
-    if(b.km<st.a.km||b.km>st.b.km){
-      const cur=STAGES.find(s=>b.km>=s.a.km&&b.km<=s.b.km);
-      document.getElementById("big-hint").textContent=cur?("We are on stage "+cur.n+" right now, not this one."):"";return;
-    }
-    const g={km:b.km,alt:b.alt,kmIn:b.km-st.a.km,next:st.seg.find(w=>w.km>b.km)};
-    document.getElementById("big-svg").innerHTML=bigProfileSVG(st,g);
-    setBigStats(g);
-    document.getElementById("big-hint").textContent="Live. Tap Locate us to refresh.";
-  },()=>{},{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
-}
-document.getElementById("big-close").addEventListener("click",()=>document.getElementById("bigview").classList.remove("active"));
+function bigLocate(){const st=STAGES.find(s=>s.n===bigN);if(st){stopBigWatch();bigStart(st);}}
+document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();});
 document.getElementById("big-locate").addEventListener("click",bigLocate);
+document.getElementById("big-prev").addEventListener("click",()=>openBig(bigN-1));
+document.getElementById("big-next-btn").addEventListener("click",()=>openBig(bigN+1));
 
 
 /* haversine + GPX track */
