@@ -1512,33 +1512,60 @@ function locateOnTrack(lat,lon,g){
   }
   return {km:routeKm,alt,distKm:bd};
 }
+function parseGpxText(txt){
+  try{
+    const doc=new DOMParser().parseFromString(txt,"text/xml");
+    let pts=[...doc.querySelectorAll("trkpt")];
+    if(!pts.length)pts=[...doc.querySelectorAll("rtept")];
+    return pts.map(p=>{const ele=p.querySelector("ele");return [+p.getAttribute("lat"),+p.getAttribute("lon"),ele?+ele.textContent:null];});
+  }catch(e){return null;}
+}
+function buildTrack(raw,srcLen){
+  if(!raw||raw.length<10)return false;
+  const stride=Math.max(1,Math.floor(raw.length/600));
+  const P=[];for(let i=0;i<raw.length;i+=stride)P.push(raw[i]);
+  const cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+hav(P[i-1][0],P[i-1][1],P[i][0],P[i][1]));
+  const anchors={};
+  SLEEP_ORDER.forEach(id=>{
+    const w=WPTS[IDX[id]];let b2=0,bd=1e9;
+    P.forEach((p,i)=>{const d=hav(w.lat,w.lon,p[0],p[1]);if(d<bd){bd=d;b2=i;}});
+    anchors[id]=b2;
+  });
+  store.set("camino-gpx",{P,cum,anchors,srcLen:srcLen||0});
+  setTrackChip();if(MAP)drawRoute();
+  return true;
+}
 function loadGpxFile(file){
   file.text().then(txt=>{
-    try{
-      const doc=new DOMParser().parseFromString(txt,"text/xml");
-      let pts=[...doc.querySelectorAll("trkpt")];
-      if(!pts.length)pts=[...doc.querySelectorAll("rtept")];
-      if(pts.length<10){alert("No track points found in that GPX.");return;}
-      const stride=Math.max(1,Math.floor(pts.length/500));
-      const P=[];
-      for(let i=0;i<pts.length;i+=stride){
-        const p=pts[i];const ele=p.querySelector("ele");
-        P.push([+p.getAttribute("lat"),+p.getAttribute("lon"),ele?+ele.textContent:null]);
-      }
-      const cum=[0];
-      for(let i=1;i<P.length;i++)cum.push(cum[i-1]+hav(P[i-1][0],P[i-1][1],P[i][0],P[i][1]));
-      const anchors={};
-      SLEEP_ORDER.forEach(id=>{
-        const w=WPTS[IDX[id]];let b2=0,bd=1e9;
-        P.forEach((p,i)=>{const d=hav(w.lat,w.lon,p[0],p[1]);if(d<bd){bd=d;b2=i;}});
-        anchors[id]=b2;
-      });
-      store.set("camino-gpx",{P,cum,anchors});
-      setTrackChip();
-      if(MAP)drawRoute();
-      alert("Track loaded: "+P.length+" points along "+cum[cum.length-1].toFixed(1)+" km. GPS is now surgical.");
-    }catch(e){alert("Could not read that GPX.");}
+    const raw=parseGpxText(txt);
+    if(!raw||raw.length<10){alert("No track points found in that GPX.");return;}
+    if(buildTrack(raw,txt.length)){
+      const g=store.get("camino-gpx",null);
+      alert("Track loaded: "+g.P.length+" points along "+g.cum[g.cum.length-1].toFixed(1)+" km. GPS is now surgical.");
+    }
   });
+}
+async function autoLoadBundled(){
+  if(!navigator.onLine)return;
+  try{
+    let texts=[];
+    const one=await fetch("track.gpx",{cache:"no-cache"}).then(r=>r.ok?r.text():null).catch(()=>null);
+    if(one&&one.indexOf("<gpx")>=0)texts=[one];
+    else{
+      for(let i=1;i<=9;i++){
+        const t=await fetch("track"+i+".gpx",{cache:"no-cache"}).then(r=>r.ok?r.text():null).catch(()=>null);
+        if(!t||t.indexOf("<gpx")<0){if(i===1)return;break;}
+        texts.push(t);
+      }
+    }
+    if(!texts.length)return;
+    const srcLen=texts.reduce((a,t)=>a+t.length,0);
+    const cur=store.get("camino-gpx",null);
+    if(cur&&cur.srcLen===srcLen)return;
+    let raw=[];
+    texts.forEach(t=>{const p=parseGpxText(t);if(p)raw=raw.concat(p);});
+    buildTrack(raw,srcLen);
+  }catch(e){}
 }
 function setTrackChip(){
   const c=document.getElementById("track-chip");if(!c)return;
@@ -1678,6 +1705,7 @@ document.getElementById('reset').addEventListener('click',()=>{store.set(doneKey
 document.getElementById('gps-btn').addEventListener('click',showGps);
 renderPlans();render();updateCountdown();setInterval(updateCountdown,60000);
 initBoat();setChip();setTrackChip();
+autoLoadBundled();
 pullShared().then(()=>{render();});
 openToday();
 document.getElementById("gpx-btn").addEventListener("click",()=>document.getElementById("gpx-input").click());
