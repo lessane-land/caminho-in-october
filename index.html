@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0e1a">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Camino">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -1870,6 +1871,7 @@ async function pullShared(){
   if(!SUPA_URL)return;
   try{
     const r=await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE+"?id=eq.camino&select=data",{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    if(!r.ok)throw 0;
     const rows=await r.json();
     if(rows&&rows[0]&&rows[0].data)mergeShared(rows[0].data);
     setChip();
@@ -1878,7 +1880,8 @@ async function pullShared(){
 async function pushShared(){
   if(!SUPA_URL)return;
   try{
-    await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:"camino",data:collectShared()}])});
+    const r=await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:"camino",data:collectShared()}])});
+    if(!r.ok)throw 0;
     setChip();
   }catch(e){setChip(true);}
 }
@@ -1962,7 +1965,11 @@ function sharePos(){
 
 /* shared journal */
 let journal=store.get("camino-journal",[]);
+let journalPushed=store.get("camino-journal-pushed",[]);   // ids confirmed written to Supabase
+let journalDeleted=store.get("camino-journal-deleted",[]); // ids deleted here, pending remote delete
 let currentPhotoData=null,memBy="Us";
+function markPushed(id){if(!journalPushed.includes(id)){journalPushed.push(id);store.set("camino-journal-pushed",journalPushed);}}
+function unmarkPushed(id){journalPushed=journalPushed.filter(x=>x!==id);store.set("camino-journal-pushed",journalPushed);}
 function cacheJournal(){
   try{store.set("camino-journal",journal);}
   catch(e){try{store.set("camino-journal",journal.map(m=>({id:m.id,date:m.date,title:m.title,note:m.note,by:m.by,photo:null})));}catch(e2){}}
@@ -1971,12 +1978,23 @@ async function pullJournal(){
   if(SUPA_URL){
     try{
       const r=await fetch(SUPA_URL+"/rest/v1/camino_journal?select=id,data",{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+      if(!r.ok)throw 0;
       const rows=await r.json();
       if(Array.isArray(rows)){
-        const map={};journal.forEach(m=>{if(m&&m.id)map[m.id]=m;});
-        rows.forEach(x=>{if(x&&x.data&&x.data.id)map[x.data.id]=x.data;});
+        const remote={};rows.forEach(x=>{if(x&&x.data&&x.data.id&&!journalDeleted.includes(x.data.id))remote[x.data.id]=x.data;});
+        const map={};
+        journal.forEach(m=>{
+          if(!m||!m.id)return;
+          // confirmed-pushed but gone remotely = deleted on the other phone
+          if(journalPushed.includes(m.id)&&!remote[m.id]){unmarkPushed(m.id);return;}
+          map[m.id]=m;
+        });
+        Object.values(remote).forEach(x=>{map[x.id]=x;markPushed(x.id);});
         journal=Object.values(map).sort((a,b)=>a.id-b.id);
         cacheJournal();
+        // retry entries saved offline and deletes that never reached Supabase
+        journal.filter(m=>!journalPushed.includes(m.id)).forEach(pushJournalEntry);
+        journalDeleted.forEach(deleteJournalRemote);
       }
     }catch(e){}
   }
@@ -1984,11 +2002,17 @@ async function pullJournal(){
 }
 async function pushJournalEntry(m){
   if(!SUPA_URL)return;
-  try{await fetch(SUPA_URL+"/rest/v1/camino_journal",{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:String(m.id),data:m}])});}catch(e){}
+  try{
+    const r=await fetch(SUPA_URL+"/rest/v1/camino_journal",{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:String(m.id),data:m}])});
+    if(r.ok)markPushed(m.id);
+  }catch(e){}
 }
 async function deleteJournalRemote(id){
   if(!SUPA_URL)return;
-  try{await fetch(SUPA_URL+"/rest/v1/camino_journal?id=eq."+id,{method:"DELETE",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});}catch(e){}
+  try{
+    const r=await fetch(SUPA_URL+"/rest/v1/camino_journal?id=eq."+id,{method:"DELETE",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    if(r.ok){journalDeleted=journalDeleted.filter(x=>x!==id);store.set("camino-journal-deleted",journalDeleted);}
+  }catch(e){}
 }
 function renderJournal(){
   const grid=document.getElementById("journal-grid");if(!grid)return;
@@ -2014,6 +2038,8 @@ function renderJournal(){
       if(!confirm("Delete this memory on both phones?"))return;
       const id=parseInt(btn.dataset.id);
       journal=journal.filter(m=>m.id!==id);
+      unmarkPushed(id);
+      if(!journalDeleted.includes(id)){journalDeleted.push(id);store.set("camino-journal-deleted",journalDeleted);}
       cacheJournal();deleteJournalRemote(id);renderJournal();
     });
   });

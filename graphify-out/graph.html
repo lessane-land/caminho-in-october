@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>graphify - graphify-out/graph.html</title>
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"
+        integrity="sha384-Ux6phic9PEHJ38YtrijhkzyJ8yQlH8i/+buBR8s3mAZOJrP1gwyvAcIYl3GWtpX1"
+        crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; display: flex; height: 100vh; overflow: hidden; }
+  #graph { flex: 1; }
+  #sidebar { width: 280px; background: #1a1a2e; border-left: 1px solid #2a2a4e; display: flex; flex-direction: column; overflow: hidden; }
+  #search-wrap { padding: 12px; border-bottom: 1px solid #2a2a4e; }
+  #search { width: 100%; background: #0f0f1a; border: 1px solid #3a3a5e; color: #e0e0e0; padding: 7px 10px; border-radius: 6px; font-size: 13px; outline: none; }
+  #search:focus { border-color: #4E79A7; }
+  #search-results { max-height: 140px; overflow-y: auto; padding: 4px 12px; border-bottom: 1px solid #2a2a4e; display: none; }
+  .search-item { padding: 4px 6px; cursor: pointer; border-radius: 4px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-item:hover { background: #2a2a4e; }
+  #info-panel { padding: 14px; border-bottom: 1px solid #2a2a4e; min-height: 140px; }
+  #info-panel h3 { font-size: 13px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  #info-content { font-size: 13px; color: #ccc; line-height: 1.6; }
+  #info-content .field { margin-bottom: 5px; }
+  #info-content .field b { color: #e0e0e0; }
+  #info-content .empty { color: #555; font-style: italic; }
+  .neighbor-link { display: block; padding: 2px 6px; margin: 2px 0; border-radius: 3px; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid #333; }
+  .neighbor-link:hover { background: #2a2a4e; }
+  #neighbors-list { max-height: 160px; overflow-y: auto; margin-top: 4px; }
+  #legend-wrap { flex: 1; overflow-y: auto; padding: 12px; }
+  #legend-wrap h3 { font-size: 13px; color: #aaa; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; border-radius: 4px; font-size: 12px; }
+  .legend-item:hover { background: #2a2a4e; padding-left: 4px; }
+  .legend-item.dimmed { opacity: 0.35; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend-count { color: #666; font-size: 11px; }
+  #stats { padding: 10px 14px; border-top: 1px solid #2a2a4e; font-size: 11px; color: #555; }
+  #legend-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 4px 0; }
+  #legend-controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #aaa; user-select: none; }
+  #legend-controls label:hover { color: #e0e0e0; }
+  .legend-cb, #select-all-cb { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1.5px solid #3a3a5e; border-radius: 3px; background: #0f0f1a; cursor: pointer; position: relative; flex-shrink: 0; }
+  .legend-cb:checked, #select-all-cb:checked { background: #4E79A7; border-color: #4E79A7; }
+  .legend-cb:checked::after, #select-all-cb:checked::after { content: ''; position: absolute; left: 3.5px; top: 1px; width: 4px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  #select-all-cb:indeterminate { background: #4E79A7; border-color: #4E79A7; }
+  #select-all-cb:indeterminate::after { content: ''; position: absolute; left: 2px; top: 5px; width: 8px; height: 2px; background: #fff; border: none; transform: none; }
+</style>
+</head>
+<body>
+<div id="graph"></div>
+<div id="sidebar">
+  <div id="search-wrap">
+    <input id="search" type="text" placeholder="Search nodes..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="info-panel">
+    <h3>Node Info</h3>
+    <div id="info-content"><span class="empty">Click a node to inspect it</span></div>
+  </div>
+  <div id="legend-wrap">
+    <h3>Communities</h3>
+    <div id="legend-controls">
+      <label><input type="checkbox" id="select-all-cb" checked onchange="toggleAllCommunities(!this.checked)">Select All</label>
+    </div>
+    <div id="legend"></div>
+  </div>
+  <div id="stats">70 nodes &middot; 75 edges &middot; 12 communities</div>
+</div>
+<script>
+const RAW_NODES = [{"id": "config", "label": "config.js", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "config.js", "community": 11, "community_name": "Supabase Config", "source_file": "config.js", "file_type": "code", "degree": 0}, {"id": "manifest", "label": "manifest.json", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 40.0, "font": {"size": 12, "color": "#ffffff"}, "title": "manifest.json", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 9}, {"id": "manifest_name", "label": "name", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "name", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_short_name", "label": "short_name", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "short_name", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_description", "label": "description", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "description", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_start_url", "label": "start_url", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "start_url", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_scope", "label": "scope", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "scope", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_display", "label": "display", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "display", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_background_color", "label": "background_color", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "background_color", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_theme_color", "label": "theme_color", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "theme_color", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "manifest_icons", "label": "icons", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "icons", "community": 1, "community_name": "Web App Manifest", "source_file": "manifest.json", "file_type": "code", "degree": 1}, {"id": "sw", "label": "sw.js", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "sw.js", "community": 10, "community_name": "Service Worker Cache", "source_file": "sw.js", "file_type": "code", "degree": 1}, {"id": "sw_assets", "label": "ASSETS", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "ASSETS", "community": 10, "community_name": "Service Worker Cache", "source_file": "sw.js", "file_type": "code", "degree": 1}, {"id": "readme_deployment_guide", "label": "Deployment Guide (Netlify Drop / GitHub Pages)", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Deployment Guide (Netlify Drop / GitHub Pages)", "community": 7, "community_name": "App Shell & Deployment", "source_file": "README.txt", "file_type": "document", "degree": 1}, {"id": "readme_pwa_install", "label": "iPhone PWA Install & Offline Caching", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "iPhone PWA Install &amp; Offline Caching", "community": 7, "community_name": "App Shell & Deployment", "source_file": "README.txt", "file_type": "document", "degree": 1}, {"id": "readme_supabase_sync_setup", "label": "Supabase Shared Sync Setup (camino_shared / camino_journal)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Supabase Shared Sync Setup (camino_shared / camino_journal)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "README.txt", "file_type": "document", "degree": 3}, {"id": "readme_config_js_convention", "label": "config.js Credential Separation Convention", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "config.js Credential Separation Convention", "community": 7, "community_name": "App Shell & Deployment", "source_file": "README.txt", "file_type": "rationale", "degree": 1}, {"id": "readme_gpx_setup", "label": "Surgical GPS / Bundled GPX Track Setup", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Surgical GPS / Bundled GPX Track Setup", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "README.txt", "file_type": "document", "degree": 2}, {"id": "readme_fixed_facts", "label": "Fixed Trip Facts (flight, base, boots-on, return train)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Fixed Trip Facts (flight, base, boots-on, return train)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "README.txt", "file_type": "document", "degree": 2}, {"id": "index_camino_pwa", "label": "Camino Porto\u2192Vigo Companion PWA (app shell)", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 23.3, "font": {"size": 12, "color": "#ffffff"}, "title": "Camino Porto\u2192Vigo Companion PWA (app shell)", "community": 7, "community_name": "App Shell & Deployment", "source_file": "index.html", "file_type": "code", "degree": 4}, {"id": "index_invitation_anniversary", "label": "Ten-Year Anniversary Arrival (Oct 8, 2026)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Ten-Year Anniversary Arrival (Oct 8, 2026)", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "concept", "degree": 2}, {"id": "index_minho_boat_crossing", "label": "Mi\u00f1o Boat Crossing (Caminha \u2192 A Guarda)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 23.3, "font": {"size": 12, "color": "#ffffff"}, "title": "Mi\u00f1o Boat Crossing (Caminha \u2192 A Guarda)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "concept", "degree": 4}, {"id": "index_costa_brava_system", "label": "Costa Brava Packing/Budget/Expenses/Journal System (reused)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Costa Brava Packing/Budget/Expenses/Journal System (reused)", "community": 6, "community_name": "Journal, Packing & Expenses", "source_file": "index.html", "file_type": "concept", "degree": 2}, {"id": "index_viaxe_logistics", "label": "A Viaxe Logistics Panel (flight, base, AVE return, map, safety)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "A Viaxe Logistics Panel (flight, base, AVE return, map, safety)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "document", "degree": 2}, {"id": "index_store", "label": "store (localStorage JSON wrapper)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "store (localStorage JSON wrapper)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_wpts", "label": "WPTS Master Route Waypoints (160.5 km, km/lat/lon/alt/sleep/poi)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "WPTS Master Route Waypoints (160.5 km, km/lat/lon/alt/sleep/poi)", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_plans", "label": "PLANS Stage Presets + Custom Stop Picker", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "PLANS Stage Presets + Custom Stop Picker", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_buildstages", "label": "buildStages (derive stages from chosen overnight stops)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "buildStages (derive stages from chosen overnight stops)", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_renderplans", "label": "renderPlans (plan chips, totals, late-arrival warning)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "renderPlans (plan chips, totals, late-arrival warning)", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_render", "label": "render (stage cards, done state, anniversary mark)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 26.7, "font": {"size": 12, "color": "#ffffff"}, "title": "render (stage cards, done state, anniversary mark)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 5}, {"id": "index_profilesvg", "label": "profileSVG (mini elevation profile)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "profileSVG (mini elevation profile)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_bigprofilesvg", "label": "bigProfileSVG (big live elevation ribbon)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "bigProfileSVG (big live elevation ribbon)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_stagedetail", "label": "stageDetail (real GPX terrain sampling, waypoint fallback)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "stageDetail (real GPX terrain sampling, waypoint fallback)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_smoothpath", "label": "smoothPath (Catmull-Rom-style SVG smoothing)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "smoothPath (Catmull-Rom-style SVG smoothing)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_loadweather", "label": "loadWeather (Open-Meteo 2-day forecast per stage, cached)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "loadWeather (Open-Meteo 2-day forecast per stage, cached)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_sunsetlabel", "label": "sunsetLabel (analytic sunset approximation, PT/ES timezone aware)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "sunsetLabel (analytic sunset approximation, PT/ES timezone aware)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_showgps", "label": "showGps ('Where are we?' locate-and-open-stage flow)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "showGps (&#x27;Where are we?&#x27; locate-and-open-stage flow)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_locateonroute", "label": "locateOnRoute (GPX track if available, else waypoints)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 23.3, "font": {"size": 12, "color": "#ffffff"}, "title": "locateOnRoute (GPX track if available, else waypoints)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 4}, {"id": "index_locateontrack", "label": "locateOnTrack (nearest GPX point \u2192 route km + altitude)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "locateOnTrack (nearest GPX point \u2192 route km + altitude)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_locateonwaypoints", "label": "locateOnWaypoints (segment projection fallback)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "locateOnWaypoints (segment projection fallback)", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_projseg", "label": "projSeg (point-to-segment projection in lat/lon space)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "projSeg (point-to-segment projection in lat/lon space)", "community": 4, "community_name": "Route Planning & Stage Presets", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_hav", "label": "hav (haversine distance)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "hav (haversine distance)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_parsegpxtext", "label": "parseGpxText (trkpt/rtept extraction)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "parseGpxText (trkpt/rtept extraction)", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_buildtrack", "label": "buildTrack (downsample, cumulative km, anchor overnight stops)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 30.0, "font": {"size": 12, "color": "#ffffff"}, "title": "buildTrack (downsample, cumulative km, anchor overnight stops)", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "index.html", "file_type": "code", "degree": 6}, {"id": "index_loadgpxfile", "label": "loadGpxFile (manual GPX load from Files app)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "loadGpxFile (manual GPX load from Files app)", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_autoloadbundled", "label": "autoLoadBundled (fetch track.gpx / track1..9.gpx and stitch)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "autoLoadBundled (fetch track.gpx / track1..9.gpx and stitch)", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_collectshared", "label": "collectShared (harvest camino-done-* + boat booking)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "collectShared (harvest camino-done-* + boat booking)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_mergeshared", "label": "mergeShared (union done sets, last-write-wins boat)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "mergeShared (union done sets, last-write-wins boat)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_pullshared", "label": "pullShared (Supabase REST GET camino_shared)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "pullShared (Supabase REST GET camino_shared)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_pushshared", "label": "pushShared (Supabase REST upsert camino_shared)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "pushShared (Supabase REST upsert camino_shared)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_pulljournal", "label": "pullJournal (merge remote camino_journal rows by id)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "pullJournal (merge remote camino_journal rows by id)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_pushjournalentry", "label": "pushJournalEntry (Supabase upsert single memory)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "pushJournalEntry (Supabase upsert single memory)", "community": 6, "community_name": "Journal, Packing & Expenses", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_renderjournal", "label": "renderJournal (memory grid with photos)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "renderJournal (memory grid with photos)", "community": 6, "community_name": "Journal, Packing & Expenses", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_initjournal", "label": "initJournal (modal, photo resize to 800px JPEG, save)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "initJournal (modal, photo resize to 800px JPEG, save)", "community": 6, "community_name": "Journal, Packing & Expenses", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_initboat", "label": "initBoat (boat booking form, persists camino-boat)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 26.7, "font": {"size": 12, "color": "#ffffff"}, "title": "initBoat (boat booking form, persists camino-boat)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 5}, {"id": "index_ferryhtml", "label": "ferryHTML (ferry aside card with booking state)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "ferryHTML (ferry aside card with booking state)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_initmap", "label": "initMap (Leaflet dark map with locate control, SVG fallback)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "initMap (Leaflet dark map with locate control, SVG fallback)", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_drawroute", "label": "drawRoute (route polyline from GPX or waypoints + boat leg)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "drawRoute (route polyline from GPX or waypoints + boat leg)", "community": 2, "community_name": "GPX Track & Leaflet Map", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "index_updateprogress", "label": "updateProgress (walked km bar, stage ticks, finish state)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "updateProgress (walked km bar, stage ticks, finish state)", "community": 3, "community_name": "Elevation Profiles & Stage Rendering", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_opentoday", "label": "openToday (auto-open today's stage on boot)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "openToday (auto-open today&#x27;s stage on boot)", "community": 5, "community_name": "GPS Location & Weather", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_updatecountdown", "label": "updateCountdown (days to flight / walk-day pill)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "updateCountdown (days to flight / walk-day pill)", "community": 0, "community_name": "Two-Phone Sync & Boat Booking", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_phrasebook", "label": "Bilingual Phrasebook (PT/Galego phrases + Web Speech playback)", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Bilingual Phrasebook (PT/Galego phrases + Web Speech playback)", "community": 7, "community_name": "App Shell & Deployment", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_buildpacking", "label": "buildPacking (checklist grid with per-category progress)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "buildPacking (checklist grid with per-category progress)", "community": 6, "community_name": "Journal, Packing & Expenses", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "icon_180_appicon", "label": "App Icon (180px) - Yellow Arrow Waymark", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "App Icon (180px) - Yellow Arrow Waymark", "community": 9, "community_name": "App Icon Motif", "source_file": "icon-180.png", "file_type": "image", "degree": 2}, {"id": "yellow_arrow_camino_motif", "label": "Yellow Arrow (Camino de Santiago Waymark Motif)", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Yellow Arrow (Camino de Santiago Waymark Motif)", "community": 9, "community_name": "App Icon Motif", "source_file": "icon-180.png", "file_type": "concept", "degree": 2}, {"id": "caminho_in_october_app", "label": "Caminho in October App", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Caminho in October App", "community": 9, "community_name": "App Icon Motif", "source_file": "icon-180.png", "file_type": "concept", "degree": 2}, {"id": "icon_192_appicon", "label": "App Icon 192px (Yellow Camino Arrow)", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "App Icon 192px (Yellow Camino Arrow)", "community": 8, "community_name": "Camino Waymark Iconography", "source_file": "icon-192.png", "file_type": "image", "degree": 2}, {"id": "camino_yellow_arrow", "label": "Camino Yellow Arrow Waymarker", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 16.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Camino Yellow Arrow Waymarker", "community": 8, "community_name": "Camino Waymark Iconography", "source_file": "icon-192.png", "file_type": "concept", "degree": 2}, {"id": "camino_de_santiago", "label": "Camino de Santiago Pilgrimage", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Camino de Santiago Pilgrimage", "community": 8, "community_name": "Camino Waymark Iconography", "source_file": "icon-192.png", "file_type": "concept", "degree": 3}, {"id": "icon_512_appicon", "label": "App Icon (512px) - Camino Waymark", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 13.3, "font": {"size": 0, "color": "#ffffff"}, "title": "App Icon (512px) - Camino Waymark", "community": 8, "community_name": "Camino Waymark Iconography", "source_file": "icon-512.png", "file_type": "image", "degree": 1}];
+const RAW_EDGES = [{"from": "manifest", "to": "manifest_background_color", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_description", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_display", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_icons", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_name", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_scope", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_short_name", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_start_url", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "manifest", "to": "manifest_theme_color", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "sw", "to": "sw_assets", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_deployment_guide", "to": "index_camino_pwa", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_pwa_install", "to": "index_camino_pwa", "label": "conceptually_related_to", "title": "conceptually_related_to [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_supabase_sync_setup", "to": "index_pulljournal", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_supabase_sync_setup", "to": "index_pullshared", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_supabase_sync_setup", "to": "index_minho_boat_crossing", "label": "conceptually_related_to", "title": "conceptually_related_to [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_config_js_convention", "to": "index_camino_pwa", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_gpx_setup", "to": "index_autoloadbundled", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_gpx_setup", "to": "index_loadgpxfile", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_fixed_facts", "to": "index_updatecountdown", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "readme_fixed_facts", "to": "index_viaxe_logistics", "label": "conceptually_related_to", "title": "conceptually_related_to [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_camino_pwa", "to": "index_phrasebook", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "index_invitation_anniversary", "to": "index_plans", "label": "rationale_for", "title": "rationale_for [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "index_invitation_anniversary", "to": "index_render", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_minho_boat_crossing", "to": "index_ferryhtml", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_minho_boat_crossing", "to": "index_initboat", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_minho_boat_crossing", "to": "index_viaxe_logistics", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_costa_brava_system", "to": "index_buildpacking", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_costa_brava_system", "to": "index_initjournal", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_store", "to": "index_render", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_store", "to": "index_updateprogress", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_wpts", "to": "index_buildstages", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_wpts", "to": "index_drawroute", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_wpts", "to": "index_locateonwaypoints", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_plans", "to": "index_renderplans", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_buildstages", "to": "index_renderplans", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_render", "to": "index_collectshared", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_render", "to": "index_profilesvg", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_render", "to": "index_updateprogress", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_profilesvg", "to": "index_smoothpath", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_profilesvg", "to": "index_stagedetail", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_bigprofilesvg", "to": "index_smoothpath", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_bigprofilesvg", "to": "index_stagedetail", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_stagedetail", "to": "index_buildtrack", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_loadweather", "to": "index_opentoday", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_loadweather", "to": "index_showgps", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_loadweather", "to": "index_sunsetlabel", "label": "semantically_similar_to", "title": "semantically_similar_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "index_showgps", "to": "index_locateonroute", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_locateonroute", "to": "index_buildtrack", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_locateonroute", "to": "index_locateontrack", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_locateonroute", "to": "index_locateonwaypoints", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_locateontrack", "to": "index_hav", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_locateonwaypoints", "to": "index_projseg", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_hav", "to": "index_buildtrack", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_parsegpxtext", "to": "index_autoloadbundled", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_parsegpxtext", "to": "index_loadgpxfile", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_buildtrack", "to": "index_autoloadbundled", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_buildtrack", "to": "index_drawroute", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_buildtrack", "to": "index_loadgpxfile", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_collectshared", "to": "index_initboat", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_collectshared", "to": "index_pushshared", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_mergeshared", "to": "index_initboat", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_mergeshared", "to": "index_pullshared", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_pushshared", "to": "index_initboat", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_pulljournal", "to": "index_renderjournal", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_pushjournalentry", "to": "index_initjournal", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_renderjournal", "to": "index_initjournal", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_initboat", "to": "index_ferryhtml", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_initmap", "to": "index_drawroute", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "icon_180_appicon", "to": "caminho_in_october_app", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "icon_180_appicon", "to": "yellow_arrow_camino_motif", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "yellow_arrow_camino_motif", "to": "caminho_in_october_app", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "icon_192_appicon", "to": "camino_de_santiago", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "icon_192_appicon", "to": "camino_yellow_arrow", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "camino_yellow_arrow", "to": "camino_de_santiago", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "camino_de_santiago", "to": "icon_512_appicon", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}];
+const LEGEND = [{"cid": 0, "color": "#4E79A7", "label": "Two-Phone Sync &amp; Boat Booking", "count": 12}, {"cid": 1, "color": "#F28E2B", "label": "Web App Manifest", "count": 10}, {"cid": 2, "color": "#E15759", "label": "GPX Track &amp; Leaflet Map", "count": 7}, {"cid": 3, "color": "#76B7B2", "label": "Elevation Profiles &amp; Stage Rendering", "count": 7}, {"cid": 4, "color": "#59A14F", "label": "Route Planning &amp; Stage Presets", "count": 7}, {"cid": 5, "color": "#EDC948", "label": "GPS Location &amp; Weather", "count": 7}, {"cid": 6, "color": "#B07AA1", "label": "Journal, Packing &amp; Expenses", "count": 5}, {"cid": 7, "color": "#FF9DA7", "label": "App Shell &amp; Deployment", "count": 5}, {"cid": 8, "color": "#9C755F", "label": "Camino Waymark Iconography", "count": 4}, {"cid": 9, "color": "#BAB0AC", "label": "App Icon Motif", "count": 3}, {"cid": 10, "color": "#4E79A7", "label": "Service Worker Cache", "count": 2}, {"cid": 11, "color": "#F28E2B", "label": "Supabase Config", "count": 1}];
+
+// HTML-escape helper — prevents XSS when injecting graph data into innerHTML
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Build vis datasets
+const nodesDS = new vis.DataSet(RAW_NODES.map(n => ({
+  id: n.id, label: n.label, color: n.color, size: n.size,
+  font: n.font, title: n.title,
+  _community: n.community, _community_name: n.community_name,
+  _source_file: n.source_file, _file_type: n.file_type, _degree: n.degree,
+})));
+
+const edgesDS = new vis.DataSet(RAW_EDGES.map((e, i) => ({
+  id: i, from: e.from, to: e.to,
+  label: '',
+  title: e.title,
+  dashes: e.dashes,
+  width: e.width,
+  color: e.color,
+  arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+})));
+
+const container = document.getElementById('graph');
+const network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, {
+  physics: {
+    enabled: true,
+    solver: 'forceAtlas2Based',
+    forceAtlas2Based: {
+      gravitationalConstant: -60,
+      centralGravity: 0.005,
+      springLength: 120,
+      springConstant: 0.08,
+      damping: 0.4,
+      avoidOverlap: 0.8,
+    },
+    stabilization: { iterations: 200, fit: true },
+  },
+  interaction: {
+    hover: true,
+    tooltipDelay: 100,
+    hideEdgesOnDrag: true,
+    navigationButtons: false,
+    keyboard: false,
+  },
+  nodes: { shape: 'dot', borderWidth: 1.5 },
+  edges: { smooth: { type: 'continuous', roundness: 0.2 }, selectionWidth: 3 },
+});
+
+network.once('stabilizationIterationsDone', () => {
+  network.setOptions({ physics: { enabled: false } });
+});
+
+function showInfo(nodeId) {
+  const n = nodesDS.get(nodeId);
+  if (!n) return;
+  const neighborIds = network.getConnectedNodes(nodeId);
+  const neighborItems = neighborIds.map(nid => {
+    const nb = nodesDS.get(nid);
+    const color = nb ? nb.color.background : '#555';
+    return `<span class="neighbor-link" style="border-left-color:${esc(color)}" data-nid="${esc(nid)}">${esc(nb ? nb.label : nid)}</span>`;
+  }).join('');
+  document.getElementById('info-content').innerHTML = `
+    <div class="field"><b>${esc(n.label)}</b></div>
+    <div class="field">Type: ${esc(n._file_type || 'unknown')}</div>
+    <div class="field">Community: ${esc(n._community_name)}</div>
+    <div class="field">Source: ${esc(n._source_file || '-')}</div>
+    <div class="field">Degree: ${n._degree}</div>
+    ${neighborIds.length ? `<div class="field" style="margin-top:8px;color:#aaa;font-size:11px">Neighbors (${neighborIds.length})</div><div id="neighbors-list">${neighborItems}</div>` : ''}
+  `;
+}
+
+function focusNode(nodeId) {
+  network.focus(nodeId, { scale: 1.4, animation: true });
+  network.selectNodes([nodeId]);
+  showInfo(nodeId);
+}
+
+// Neighbor links use a data attribute + one delegated listener rather than an
+// inline onclick. A node id/label sourced from a document or a scraped URL
+// (graphify add) can contain a double-quote; dropping the stringified id
+// unescaped into a quoted onclick both broke every link and allowed a hostile
+// source to inject an event handler into the local report (stored XSS, #1838).
+// esc() on data-nid keeps the value inside the attribute; the listener reads it
+// back verbatim. Bound to document so it survives the innerHTML rebuild that
+// recreates #neighbors-list on each showInfo().
+document.addEventListener('click', e => {
+  const el = e.target.closest('.neighbor-link');
+  if (el && el.dataset.nid !== undefined) focusNode(el.dataset.nid);
+});
+
+// Track hovered node — hover detection is more reliable than click params
+let hoveredNodeId = null;
+network.on('hoverNode', params => {
+  hoveredNodeId = params.node;
+  container.style.cursor = 'pointer';
+});
+network.on('blurNode', () => {
+  hoveredNodeId = null;
+  container.style.cursor = 'default';
+});
+container.addEventListener('click', () => {
+  if (hoveredNodeId !== null) {
+    showInfo(hoveredNodeId);
+    network.selectNodes([hoveredNodeId]);
+  }
+});
+network.on('click', params => {
+  if (params.nodes.length > 0) {
+    showInfo(params.nodes[0]);
+  } else if (hoveredNodeId === null) {
+    document.getElementById('info-content').innerHTML = '<span class="empty">Click a node to inspect it</span>';
+  }
+});
+
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  if (!q) { searchResults.style.display = 'none'; return; }
+  const matches = RAW_NODES.filter(n => n.label.toLowerCase().includes(q)).slice(0, 20);
+  if (!matches.length) { searchResults.style.display = 'none'; return; }
+  searchResults.style.display = 'block';
+  matches.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'search-item';
+    el.textContent = n.label;
+    el.style.borderLeft = `3px solid ${n.color.background}`;
+    el.style.paddingLeft = '8px';
+    el.onclick = () => {
+      network.focus(n.id, { scale: 1.5, animation: true });
+      network.selectNodes([n.id]);
+      showInfo(n.id);
+      searchResults.style.display = 'none';
+      searchInput.value = '';
+    };
+    searchResults.appendChild(el);
+  });
+});
+document.addEventListener('click', e => {
+  if (!searchResults.contains(e.target) && e.target !== searchInput)
+    searchResults.style.display = 'none';
+});
+
+const hiddenCommunities = new Set();
+
+const selectAllCb = document.getElementById('select-all-cb');
+
+function updateSelectAllState() {
+  const total = LEGEND.length;
+  const hidden = hiddenCommunities.size;
+  selectAllCb.checked = hidden === 0;
+  selectAllCb.indeterminate = hidden > 0 && hidden < total;
+}
+
+function toggleAllCommunities(hide) {
+  document.querySelectorAll('.legend-item').forEach(item => {
+    hide ? item.classList.add('dimmed') : item.classList.remove('dimmed');
+  });
+  document.querySelectorAll('.legend-cb').forEach(cb => {
+    cb.checked = !hide;
+  });
+  LEGEND.forEach(c => {
+    if (hide) hiddenCommunities.add(c.cid); else hiddenCommunities.delete(c.cid);
+  });
+  const updates = RAW_NODES.map(n => ({ id: n.id, hidden: hide }));
+  nodesDS.update(updates);
+  updateSelectAllState();
+}
+
+const legendEl = document.getElementById('legend');
+LEGEND.forEach(c => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.className = 'legend-cb';
+  cb.checked = true;
+  cb.addEventListener('change', (e) => {
+    e.stopPropagation();
+    if (cb.checked) {
+      hiddenCommunities.delete(c.cid);
+      item.classList.remove('dimmed');
+    } else {
+      hiddenCommunities.add(c.cid);
+      item.classList.add('dimmed');
+    }
+    const updates = RAW_NODES
+      .filter(n => n.community === c.cid)
+      .map(n => ({ id: n.id, hidden: !cb.checked }));
+    nodesDS.update(updates);
+    updateSelectAllState();
+  });
+  item.innerHTML = `<div class="legend-dot" style="background:${c.color}"></div>
+    <span class="legend-label">${c.label}</span>
+    <span class="legend-count">${c.count}</span>`;
+  item.prepend(cb);
+  item.onclick = (e) => {
+    if (e.target === cb) return;
+    cb.checked = !cb.checked;
+    cb.dispatchEvent(new Event('change'));
+  };
+  legendEl.appendChild(item);
+});
+</script>
+<script>
+// Render hyperedges as shaded regions
+const hyperedges = [{"id": "gpx_track_pipeline", "label": "GPX Track Pipeline (load \u2192 parse \u2192 build \u2192 consume via camino-gpx)", "nodes": ["index_autoloadbundled", "index_loadgpxfile", "index_parsegpxtext", "index_buildtrack", "index_stagedetail", "index_locateontrack", "index_drawroute"], "relation": "participate_in", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "index.html"}, {"id": "supabase_two_phone_sync", "label": "Two-Phone Supabase Sync (progress, boat booking, journal)", "nodes": ["readme_supabase_sync_setup", "index_collectshared", "index_mergeshared", "index_pullshared", "index_pushshared", "index_pulljournal", "index_pushjournalentry"], "relation": "participate_in", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "index.html"}, {"id": "dynamic_stage_planner", "label": "Dynamic Stage Planning System (presets/custom stops rebuild every card)", "nodes": ["index_plans", "index_buildstages", "index_wpts", "index_render", "index_updateprogress"], "relation": "form", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "index.html"}];
+// afterDrawing passes ctx already transformed to network coordinate space.
+// Draw node positions raw — no manual pan/zoom/DPR math needed.
+network.on('afterDrawing', function(ctx) {
+    hyperedges.forEach(h => {
+        const positions = h.nodes
+            .map(nid => network.getPositions([nid])[nid])
+            .filter(p => p !== undefined);
+        if (positions.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#6366f1';
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        // Centroid and expanded hull in network coordinates
+        const cx = positions.reduce((s, p) => s + p.x, 0) / positions.length;
+        const cy = positions.reduce((s, p) => s + p.y, 0) / positions.length;
+        const expanded = positions.map(p => ({
+            x: cx + (p.x - cx) * 1.15,
+            y: cy + (p.y - cy) * 1.15
+        }));
+        ctx.moveTo(expanded[0].x, expanded[0].y);
+        expanded.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 0.4;
+        ctx.stroke();
+        // Label
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = '#4f46e5';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(h.label, cx, cy - 5);
+        ctx.restore();
+    });
+});
+</script>
+</body>
+</html>
