@@ -465,6 +465,23 @@
   .leaflet-control-attribution a{color:#5b6d85 !important}
   .map-note{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
   .map-note i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .map-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .map-btn{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--sea-glow);color:var(--sea-shallow);padding:9px 15px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .map-btn:hover{background:var(--sea-deep);color:var(--paper)}
+  .map-btn svg{width:14px;height:14px}
+  .map-btn.on{background:var(--terracotta);border-color:var(--terracotta);color:var(--night-deep);font-weight:700}
+  .map-btn.busy{opacity:.55;pointer-events:none}
+  .map-btn.ghost{border-color:var(--night-border);color:var(--mute)}
+  .map-btn.ghost:hover{border-color:var(--danger);color:var(--danger);background:transparent}
+  .dl-wrap{margin-top:10px;background:var(--night-soft);border:1px solid var(--night-border);border-radius:8px;padding:12px 15px;display:none}
+  .dl-wrap.show{display:block}
+  .dl-top{display:flex;justify-content:space-between;align-items:baseline;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+  .dl-top b{color:var(--gold-bright);font-family:'Fraunces',serif;font-size:1.05rem;letter-spacing:0;text-transform:none}
+  .dl-bar{height:7px;background:var(--night-deep);border-radius:99px;overflow:hidden}
+  .dl-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sea-glow),var(--sea-shallow));border-radius:99px;transition:width .3s ease}
+  .dl-sub{font-family:'Fraunces',serif;font-style:italic;font-size:.8rem;color:var(--ink-soft);margin-top:8px}
+  .map-status{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--mute)}
+  .map-status b{color:var(--sea-shallow)}
   /* progress bar shores */
   .bar-ends{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.2em;color:var(--mute-dim);margin-top:6px}
   /* stamp slams in */
@@ -625,6 +642,17 @@
       <div class="map-wrap">
         <div id="route-map" class="route-map"></div>
         <div class="map-note"><span><i style="background:#f2c230"></i>Our route</span><span><i style="background:#5fc2bb"></i>The boat</span><span><i style="background:#3fa7a0;height:8px;width:8px;border-radius:50%"></i>Overnight stops</span></div>
+        <div class="map-tools">
+          <button class="map-btn" id="follow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Follow me</button>
+          <button class="map-btn" id="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Save maps offline</button>
+          <button class="map-btn ghost" id="dl-clear" title="Free up space" style="display:none">Clear</button>
+          <span class="map-status" id="map-status"></span>
+        </div>
+        <div class="dl-wrap" id="dl-wrap">
+          <div class="dl-top"><span>Downloading map for the whole route</span><b id="dl-pct">0%</b></div>
+          <div class="dl-bar"><i id="dl-fill"></i></div>
+          <div class="dl-sub" id="dl-sub">Preparing tiles…</div>
+        </div>
         <div id="map-fallback" style="display:none">
         <svg class="map-svg" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -1983,13 +2011,16 @@ function initMap(){
   if(typeof L==="undefined"){if(fb&&rm){fb.style.display="";rm.style.display="none";}return;}
   if(MAP)return;
   MAP=L.map("route-map",{scrollWheelZoom:false});
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(MAP);
+  // {r}="" so tile URLs match exactly what downloadOfflineMaps() pre-caches; maxNativeZoom 16
+  // caps requests to the zooms we store offline, upscaling z17+ from cached z16 tiles.
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",subdomains:"abcd",maxZoom:18,maxNativeZoom:15}).addTo(MAP);
   const Ctl=L.Control.extend({onAdd:function(){
     const d=L.DomUtil.create("div","leaflet-bar");
     d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
     d.onclick=e=>{e.preventDefault();mapLocate();};return d;}});
   new Ctl({position:"topleft"}).addTo(MAP);
   drawRoute();
+  refreshMapStatus();
 }
 function drawRoute(){
   if(!MAP)return;
@@ -2014,8 +2045,123 @@ function mapLocate(){
     const ll=[pos.coords.latitude,pos.coords.longitude];
     if(MAPME)MAPME.remove();
     MAPME=L.circleMarker(ll,{radius:9,color:"#fff",weight:3,fillColor:"#f2c230",fillOpacity:1}).addTo(MAP).bindPopup("Us, right now").openPopup();
-    MAP.setView(ll,13);
+    MAP.setView(ll,14);
   });
+}
+
+/* ---- live follow-me on the map ---- */
+let mapWatch=null,MAPACC=null;
+function nearestWaypointText(lat,lon){
+  let best=null;
+  WPTS.forEach(w=>{const d=hav(lat,lon,w.lat,w.lon);if(!best||d<best.d)best={d,w};});
+  if(!best)return "";
+  const b=locateOnRoute(lat,lon);
+  const km=b?` · ~km ${b.km.toFixed(1)} of 160.5`:"";
+  return `${best.d<0.15?"At":best.d.toFixed(1)+" km from"} <b>${best.w.name.split(",")[0]}</b>${km}`;
+}
+function followTick(pos){
+  const lat=pos.coords.latitude,lon=pos.coords.longitude,acc=pos.coords.accuracy||0;
+  const ll=[lat,lon];
+  if(MAPME)MAPME.remove();if(MAPACC)MAPACC.remove();
+  if(acc&&acc<1000)MAPACC=L.circle(ll,{radius:acc,color:"#f2c230",weight:1,opacity:.4,fillColor:"#f2c230",fillOpacity:.08}).addTo(MAP);
+  MAPME=L.circleMarker(ll,{radius:9,color:"#fff",weight:3,fillColor:"#f2c230",fillOpacity:1}).addTo(MAP);
+  MAPME.bindPopup(nearestWaypointText(lat,lon));
+  MAP.panTo(ll,{animate:true});
+  const st=document.getElementById("map-status");
+  if(st)st.innerHTML=nearestWaypointText(lat,lon)+(acc?` · ±${Math.round(acc)} m`:"");
+}
+function toggleFollow(){
+  const btn=document.getElementById("follow-btn");
+  if(mapWatch!=null){navigator.geolocation.clearWatch(mapWatch);mapWatch=null;btn.classList.remove("on");btn.lastChild.textContent="Follow me";return;}
+  if(!navigator.geolocation||!MAP){alert("This browser has no geolocation.");return;}
+  btn.classList.add("on");btn.lastChild.textContent="Following…";
+  navigator.geolocation.getCurrentPosition(p=>{followTick(p);MAP.setView([p.coords.latitude,p.coords.longitude],15);},
+    err=>{alert("Could not get position ("+err.message+").");btn.classList.remove("on");btn.lastChild.textContent="Follow me";},
+    {enableHighAccuracy:true,timeout:12000,maximumAge:10000});
+  mapWatch=navigator.geolocation.watchPosition(followTick,()=>{},{enableHighAccuracy:true,maximumAge:8000});
+}
+
+/* ---- offline map tiles (so the map works with zero signal) ---- */
+const TILE_TPL="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png";
+const TILE_ZOOMS=[12,13,14,15];           // z15 ≈ street-level (~1.2 km tiles); whole set ≈ 25 MB, iOS-safe
+function lon2x(lon,z){return Math.floor((lon+180)/360*Math.pow(2,z));}
+function lat2y(lat,z){const r=lat*Math.PI/180;return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,z));}
+function routePoints(){
+  const g=store.get("camino-gpx",null);
+  const pts=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
+  pts.push([41.876,-8.839],[41.895,-8.867]);   // the boat leg
+  // densify to ~400 m so higher-zoom tiles between sparse waypoints aren't skipped
+  const out=[];
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i],b=pts[i+1];out.push(a);
+    const d=hav(a[0],a[1],b[0],b[1]);
+    if(d>0.4){const n=Math.ceil(d/0.4);for(let k=1;k<n;k++)out.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n]);}
+  }
+  out.push(pts[pts.length-1]);
+  return out;
+}
+function routeTiles(){
+  const pts=routePoints();const set=new Set();
+  TILE_ZOOMS.forEach(z=>{
+    const buf=z<=13?2:1;                         // wider corridor at low zoom, ±1 tile up close
+    pts.forEach(p=>{
+      const cx=lon2x(p[1],z),cy=lat2y(p[0],z);
+      for(let dx=-buf;dx<=buf;dx++)for(let dy=-buf;dy<=buf;dy++)set.add(z+"/"+(cx+dx)+"/"+(cy+dy));
+    });
+  });
+  return [...set];
+}
+function tileUrl(key){const[z,x,y]=key.split("/");const s="abcd"[Math.abs(+x+ +y)%4];return TILE_TPL.replace("{s}",s).replace("{z}",z).replace("{x}",x).replace("{y}",y);}
+async function refreshMapStatus(){
+  const el=document.getElementById("map-status");if(!el||mapWatch!=null)return;
+  try{
+    const c=await caches.open("camino-tiles");const n=(await c.keys()).length;
+    el.innerHTML=n>0?`Offline map: <b>${n.toLocaleString()} tiles saved</b>`:"Map needs signal until you save it offline.";
+    const cl=document.getElementById("dl-clear");if(cl)cl.style.display=n>0?"":"none";
+  }catch(e){el.textContent="";}
+}
+let dlRunning=false;
+async function downloadOfflineMaps(){
+  if(dlRunning)return;
+  if(!("caches" in window)){alert("This browser can't store offline maps.");return;}
+  const btn=document.getElementById("dl-btn"),wrap=document.getElementById("dl-wrap");
+  const fill=document.getElementById("dl-fill"),pct=document.getElementById("dl-pct"),sub=document.getElementById("dl-sub");
+  const keys=routeTiles();
+  const mb=Math.round(keys.length*0.018);
+  if(!confirm(`Save the whole Porto→Vigo map for offline use?\n\n${keys.length.toLocaleString()} map tiles · about ${mb} MB.\nDo this on wifi. You can keep walking once it's done — the map will work with no signal.`))return;
+  dlRunning=true;btn.classList.add("busy");wrap.classList.add("show");
+  const cache=await caches.open("camino-tiles");
+  let done=0,failed=0;const total=keys.length;
+  const paint=()=>{const p=Math.round(done/total*100);fill.style.width=p+"%";pct.textContent=p+"%";sub.textContent=`${done.toLocaleString()} of ${total.toLocaleString()} tiles${failed?` · ${failed} skipped`:""}`;};
+  paint();
+  const queue=keys.slice();
+  async function worker(){
+    while(queue.length){
+      const key=queue.pop();const url=tileUrl(key);
+      try{
+        if(!(await cache.match(url))){
+          const res=await fetch(url,{mode:"no-cors"});      // opaque is fine for <img> tiles
+          await cache.put(url,res);
+        }
+      }catch(e){failed++;}
+      done++;if(done%8===0||!queue.length)paint();
+    }
+  }
+  await Promise.all(Array.from({length:6},worker));         // 6 parallel fetchers
+  sub.textContent=`Done · ${(total-failed).toLocaleString()} tiles ready${failed?` (${failed} couldn't load, retry later)`:""}. The map now works offline.`;
+  pct.textContent="100%";fill.style.width="100%";
+  dlRunning=false;btn.classList.remove("busy");
+  store.set("camino-tiles-meta",{count:total-failed,ts:Date.now(),zooms:TILE_ZOOMS});
+  refreshMapStatus();
+  if(MAP)drawRoute();
+}
+async function clearOfflineMaps(){
+  if(!confirm("Delete the saved offline map tiles? You'll need signal to see the map until you save them again."))return;
+  try{await caches.delete("camino-tiles");}catch(e){}
+  if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage("clear-tiles");
+  store.set("camino-tiles-meta",null);
+  refreshMapStatus();
+  alert("Offline map cleared.");
 }
 
 function sharePos(){
@@ -2173,6 +2319,9 @@ pullShared().then(()=>{render();});
 openToday();
 document.getElementById("gpx-btn").addEventListener("click",()=>document.getElementById("gpx-input").click());
 document.getElementById("gpx-input").addEventListener("change",e=>{if(e.target.files[0])loadGpxFile(e.target.files[0]);e.target.value="";});
+document.getElementById("follow-btn").addEventListener("click",toggleFollow);
+document.getElementById("dl-btn").addEventListener("click",downloadOfflineMaps);
+document.getElementById("dl-clear").addEventListener("click",clearOfflineMaps);
 if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js');}catch(e){}}
 </script>
 </body>

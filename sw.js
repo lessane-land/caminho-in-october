@@ -1,11 +1,16 @@
-const CACHE = "camino-v21";
+const CACHE = "camino-v22";
+const TILE_CACHE = "camino-tiles";   // offline map tiles — persists across app updates, only cleared on demand
 const ASSETS = ["./", "./index.html", "./manifest.json", "./config.js", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  // Keep the current app cache AND the downloaded map tiles; drop only stale app caches.
+  // Wiping TILE_CACHE on every version bump would throw away the ~30 MB the user
+  // deliberately saved for the no-signal cliffs.
+  const keep = new Set([CACHE, TILE_CACHE]);
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 // Live data (sync + weather) must never be served from cache: the app has its
@@ -13,11 +18,29 @@ self.addEventListener("activate", e => {
 function isLiveApi(url) {
   return url.hostname.endsWith(".supabase.co") || url.hostname === "api.open-meteo.com";
 }
+function isMapTile(url) {
+  return url.hostname.endsWith(".basemaps.cartocdn.com");
+}
 
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;            // let POST/DELETE (Supabase writes) pass through
   const url = new URL(e.request.url);
   if (isLiveApi(url)) return;                        // network only, no caching
+
+  // Map tiles: cache-first from the persistent tile cache, so a pre-downloaded
+  // route renders with zero signal. New tiles fetched while panning online are
+  // saved too, growing the offline map for free.
+  if (isMapTile(url)) {
+    e.respondWith(
+      caches.open(TILE_CACHE).then(c => c.match(e.request).then(hit =>
+        hit || fetch(e.request).then(res => {
+          if (res.ok || res.type === "opaque") c.put(e.request, res.clone()).catch(() => {});
+          return res;
+        }).catch(() => hit)
+      ))
+    );
+    return;
+  }
 
   // GPX tracks: network-first so replaced/added files are picked up, cache fallback offline
   if (url.pathname.endsWith(".gpx")) {
@@ -45,11 +68,22 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  // Everything else (icons, fonts, Leaflet, map tiles): cache-first; only cache good responses
+  // Everything else (icons, fonts, Leaflet): cache-first; only cache good responses.
+  // On a cache miss that also fails offline, return a clean 504 — NOT index.html,
+  // which would be parsed as JS/CSS for a missing script or stylesheet.
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
       if (res.ok || res.type === "opaque") { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {}); }
       return res;
-    }).catch(() => caches.match("./index.html")))
+    }).catch(() => new Response("", { status: 504, statusText: "offline" })))
   );
+});
+
+// Let the page clear downloaded tiles (Settings → free space) without unregistering the SW.
+self.addEventListener("message", e => {
+  if (e.data === "clear-tiles") {
+    e.waitUntil(caches.delete(TILE_CACHE).then(ok => {
+      if (e.source) e.source.postMessage({ tilesCleared: ok });
+    }));
+  }
 });
