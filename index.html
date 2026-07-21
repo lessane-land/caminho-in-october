@@ -478,10 +478,26 @@
   .leaflet-popup-content .pp-price{color:var(--terracotta-bright)}
   .leaflet-popup-content a[target]{color:var(--sea-shallow);font-weight:600}
   /* fullscreen "grande" map */
-  .map-wrap.fullscreen{position:fixed;inset:0;z-index:260;margin:0;border-radius:0;padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 8px);display:flex;flex-direction:column;gap:8px}
-  .map-wrap.fullscreen #route-map{flex:1;height:auto;min-height:0}
-  .map-wrap.fullscreen .map-tools{margin-top:0}
-  .map-wrap.fullscreen .dl-wrap{margin-top:0}
+  .map-wrap.fullscreen{position:fixed;inset:0;z-index:260;margin:0;border-radius:0;padding:calc(env(safe-area-inset-top) + 6px) 8px calc(env(safe-area-inset-bottom) + 6px);display:flex;flex-direction:column;gap:6px;overflow:hidden;background:var(--night-deep)}
+  /* map fills all remaining space; the control bar is a FIXED-height slim row,
+     so the map never grows/shrinks with the legend or status text underneath */
+  .map-wrap.fullscreen #route-map{flex:1 1 auto;height:auto;min-height:0}
+  .map-wrap.fullscreen .map-note{display:none}
+  .map-wrap.fullscreen .map-status{display:none}
+  .map-wrap.fullscreen .map-tools{flex:0 0 auto;margin-top:0;flex-wrap:nowrap;overflow-x:auto;gap:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .map-wrap.fullscreen .map-tools::-webkit-scrollbar{display:none}
+  .map-wrap.fullscreen .map-btn{flex:none;padding:8px 12px;font-size:.56rem}
+  .map-wrap.fullscreen .dl-wrap{flex:0 0 auto;margin-top:0}
+  @media (orientation:landscape){
+    .map-wrap.fullscreen{padding-top:calc(env(safe-area-inset-top) + 3px);padding-bottom:calc(env(safe-area-inset-bottom) + 3px);gap:4px}
+    .map-wrap.fullscreen .map-btn{padding:6px 11px}
+  }
+  /* smaller, tidier map buttons on phones (the bottom row was too big) */
+  @media (max-width:560px){
+    .map-btn{padding:8px 11px;font-size:.57rem;gap:6px}
+    .map-btn svg{width:12px;height:12px}
+    .map-note{font-size:.53rem;gap:9px 12px}
+  }
   /* numbered stage badges on the map */
   .stage-badge{display:flex;align-items:center;justify-content:center}
   .stage-badge span{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;border:2px solid var(--night-deep);box-shadow:0 0 8px rgba(242,194,48,.6)}
@@ -492,6 +508,7 @@
   #route-map.labels-far .leaflet-tooltip.map-tt.boat{display:none}
   .found-pin{font-size:15px;line-height:24px;text-align:center;color:#ffb37a;filter:drop-shadow(0 0 5px rgba(224,120,86,.95))}
   .leaflet-popup-content .pp-when{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-bright)}
+  .leaflet-popup-content .pp-when2{display:inline-block;margin-top:3px;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.04em;text-transform:none;color:var(--ink-soft)}
   /* live "beds near" results panel */
   .beds-panel{position:absolute;left:0;right:0;bottom:0;z-index:500;background:var(--night-soft);border-top:1px solid var(--gold);border-radius:14px 14px 0 0;box-shadow:0 -14px 40px -12px rgba(0,0,0,.7);max-height:56%;display:none;flex-direction:column}
   .beds-panel.show{display:flex;animation:fadeIn .25s ease}
@@ -2145,7 +2162,13 @@ function drawRoute(fit){
     const label=w.name.split(",")[0].split(" (")[0];
     if(k!==undefined){
       const badge=k===0?"▶":String(k);
-      const when=k===0?"Start of the walk":("End of stage "+k+" · "+stageDateLabel(k-1));
+      let when;
+      if(k===0){when="▶ Start of the walk · "+stageDateLabel(0).replace(/,.*/,"");}
+      else{
+        const st=STAGES[k-1];
+        when="End of stage "+k+" · "+stageDateLabel(k-1);
+        if(st)when+="<br><span class='pp-when2'>"+st.a.name.split(",")[0]+" → "+st.b.name.split(",")[0]+" · "+st.km+" km · ▲ "+st.up+" m · ▼ "+st.down+" m</span>";
+      }
       L.marker([w.lat,w.lon],{icon:L.divIcon({className:"stage-badge"+(k===0||k===stops.length-1?" end":""),html:"<span>"+badge+"</span>",iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:600}).addTo(grp)
         .bindTooltip(label,{permanent:mapLabels,direction:"right",className:"map-tt town stage",offset:[11,0]})
         .bindPopup(wpPopup(w)+"<br><span class='pp-when'>"+when+"</span>");
