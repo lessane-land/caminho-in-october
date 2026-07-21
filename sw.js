@@ -1,9 +1,12 @@
-const CACHE = "camino-v22";
+const CACHE = "camino-v23";
 const TILE_CACHE = "camino-tiles";   // offline map tiles — persists across app updates, only cleared on demand
 const ASSETS = ["./", "./index.html", "./manifest.json", "./config.js", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // No skipWaiting here: a new version waits until the user taps "Refresh" in the
+  // in-app banner (page posts "skip-waiting"), so updates never swap assets mid-use.
+  // A first-ever install still activates immediately (nothing is controlling the page yet).
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
 });
 self.addEventListener("activate", e => {
   // Keep the current app cache AND the downloaded map tiles; drop only stale app caches.
@@ -53,17 +56,15 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  // App shell navigations: serve cached instantly, refresh cache in the background
-  // so the next open gets a new index.html without needing a cache-version bump
+  // App shell navigations: NETWORK-FIRST. Every online open gets the freshest
+  // index.html (so a redeploy shows up immediately, no "one version behind"),
+  // and falls back to the cached page only when the network is unreachable.
   if (e.request.mode === "navigate") {
     e.respondWith(
-      caches.match("./index.html").then(hit => {
-        const net = fetch(e.request).then(res => {
-          if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put("./index.html", copy)).catch(() => {}); }
-          return res;
-        }).catch(() => hit);
-        return hit || net;
-      })
+      fetch(e.request).then(res => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put("./index.html", copy)).catch(() => {}); }
+        return res;
+      }).catch(() => caches.match("./index.html").then(hit => hit || caches.match("./")))
     );
     return;
   }
@@ -79,8 +80,11 @@ self.addEventListener("fetch", e => {
   );
 });
 
-// Let the page clear downloaded tiles (Settings → free space) without unregistering the SW.
 self.addEventListener("message", e => {
+  // "Refresh" in the update banner: activate this waiting SW now, which fires
+  // controllerchange in the page and reloads it into the new version.
+  if (e.data === "skip-waiting") self.skipWaiting();
+  // Let the page clear downloaded tiles (Settings → free space) without unregistering the SW.
   if (e.data === "clear-tiles") {
     e.waitUntil(caches.delete(TILE_CACHE).then(ok => {
       if (e.source) e.source.postMessage({ tilesCleared: ok });

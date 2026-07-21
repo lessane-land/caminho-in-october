@@ -463,6 +463,17 @@
   .leaflet-bar a:hover{background:var(--night-card)}
   .leaflet-control-attribution{background:rgba(10,17,28,.75) !important;color:#5b6d85 !important}
   .leaflet-control-attribution a{color:#5b6d85 !important}
+  /* map labels: town names + boat, always legible on the dark map */
+  .leaflet-tooltip.map-tt{background:rgba(10,17,28,.85);border:1px solid var(--night-border);color:#d4e6e4;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.5);white-space:nowrap}
+  .leaflet-tooltip.map-tt::before{display:none}
+  .leaflet-tooltip.map-tt.town.end{color:var(--gold-bright);border-color:rgba(242,194,48,.5);font-weight:700}
+  .leaflet-tooltip.map-tt.boat{color:var(--sea-shallow);border-color:var(--sea-deep);background:rgba(11,26,44,.92)}
+  .boat-pin{font-size:18px;line-height:26px;text-align:center;filter:drop-shadow(0 0 4px rgba(95,194,187,.8))}
+  /* new-version banner */
+  .update-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:400;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:9px 9px 9px 18px;display:none;align-items:center;gap:14px;box-shadow:0 14px 44px -10px rgba(0,0,0,.7);max-width:calc(100vw - 28px)}
+  .update-toast.show{display:flex;animation:fadeIn .3s ease}
+  .update-toast span{font-family:'Fraunces',serif;font-style:italic;color:var(--paper);font-size:.94rem}
+  .update-toast button{background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);border:none;border-radius:50px;padding:9px 18px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap}
   .map-note{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
   .map-note i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
   .map-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
@@ -645,6 +656,7 @@
         <div class="map-tools">
           <button class="map-btn" id="follow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Follow me</button>
           <button class="map-btn" id="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Save maps offline</button>
+          <button class="map-btn on" id="labels-btn" title="Show/hide town names"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2M9 20h6M12 4v16"/></svg>Names</button>
           <button class="map-btn ghost" id="dl-clear" title="Free up space" style="display:none">Clear</button>
           <span class="map-status" id="map-status"></span>
         </div>
@@ -947,6 +959,7 @@
     <button class="reset" id="reset">Reset stage progress for this plan</button>
   </div>
 </footer>
+<div class="update-toast" id="update-toast"><span>New version ready ✨</span><button id="update-refresh">Refresh</button></div>
 <script src="config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
@@ -2022,22 +2035,35 @@ function initMap(){
   drawRoute();
   refreshMapStatus();
 }
-function drawRoute(){
+let mapLabels=store.get("camino-map-labels",true);   // town names on/off
+function drawRoute(fit){
   if(!MAP)return;
   if(MAPLAYER)MAPLAYER.remove();
   const g=store.get("camino-gpx",null);
   const latlngs=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
   const grp=L.layerGroup();
-  L.polyline(latlngs,{color:"#f2c230",weight:3,dashArray:"7 6",opacity:.9}).addTo(grp);
-  L.polyline([[41.876,-8.839],[41.895,-8.867]],{color:"#5fc2bb",weight:3,dashArray:"2 7",opacity:.95}).addTo(grp);
+  L.polyline(latlngs,{color:"#f2c230",weight:4,opacity:.95}).addTo(grp);
+  // The boat: a short but IMPORTANT teal crossing of the Mi\u00f1o \u2014 draw it thick,
+  // with a permanent labelled marker so it's never lost at route zoom.
+  const boatA=[41.876,-8.839],boatB=[41.895,-8.867],boatMid=[(boatA[0]+boatB[0])/2,(boatA[1]+boatB[1])/2];
+  L.polyline([boatA,boatB],{color:"#5fc2bb",weight:5,dashArray:"3 6",opacity:1}).addTo(grp);
+  L.marker(boatMid,{icon:L.divIcon({className:"boat-pin",html:"\u26f4",iconSize:[26,26],iconAnchor:[13,13]})})
+    .bindTooltip("Boat: Caminha \u2192 A Guarda",{permanent:mapLabels,direction:"top",className:"map-tt boat",offset:[0,-10]})
+    .bindPopup("<b>\u26f4 The boat</b><br>Caminha \u2192 A Guarda across the Mi\u00f1o<br>6\u20138 \u20ac \u00b7 book 2\u20133 days ahead<br>Spain begins: clocks +1 h").addTo(grp);
   WPTS.filter(w=>w.id).forEach(w=>{
     const end=(w.id==="porto"||w.id==="vigo");
-    const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#3fa7a0",weight:2,fillColor:end?"#f2c230":"#0a111c",fillOpacity:end?1:.9}).addTo(grp);
+    const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#5fc2bb",weight:2,fillColor:end?"#f2c230":"#3fa7a0",fillOpacity:1}).addTo(grp);
+    m.bindTooltip(w.name.split(",")[0].split(" (")[0],{permanent:mapLabels,direction:"right",className:"map-tt town"+(end?" end":""),offset:[8,0]});
     const alb=(w.sleep&&w.sleep[0])?("<br><span style=\'opacity:.7\'>"+w.sleep[0][0]+"</span>"):"";
     m.bindPopup("<b>"+w.name.split(",")[0]+"</b><br>km "+w.km+" \u00b7 K. "+(160.5-w.km).toFixed(1).replace(".0","")+" to Vigo"+alb);
   });
   grp.addTo(MAP);MAPLAYER=grp;
-  MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+  if(fit!==false)MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+}
+function toggleLabels(){
+  mapLabels=!mapLabels;store.set("camino-map-labels",mapLabels);
+  const b=document.getElementById("labels-btn");if(b)b.classList.toggle("on",mapLabels);
+  drawRoute(false);
 }
 function mapLocate(){
   if(!navigator.geolocation||!MAP)return;
@@ -2153,7 +2179,7 @@ async function downloadOfflineMaps(){
   dlRunning=false;btn.classList.remove("busy");
   store.set("camino-tiles-meta",{count:total-failed,ts:Date.now(),zooms:TILE_ZOOMS});
   refreshMapStatus();
-  if(MAP)drawRoute();
+  if(MAP)drawRoute(false);
 }
 async function clearOfflineMaps(){
   if(!confirm("Delete the saved offline map tiles? You'll need signal to see the map until you save them again."))return;
@@ -2322,7 +2348,37 @@ document.getElementById("gpx-input").addEventListener("change",e=>{if(e.target.f
 document.getElementById("follow-btn").addEventListener("click",toggleFollow);
 document.getElementById("dl-btn").addEventListener("click",downloadOfflineMaps);
 document.getElementById("dl-clear").addEventListener("click",clearOfflineMaps);
-if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js');}catch(e){}}
+document.getElementById("labels-btn").addEventListener("click",toggleLabels);
+document.getElementById("labels-btn").classList.toggle("on",mapLabels);
+
+/* service worker + one-tap update banner */
+function showUpdateBanner(reg){
+  const t=document.getElementById("update-toast");if(!t)return;
+  t.classList.add("show");
+  document.getElementById("update-refresh").onclick=()=>{
+    if(reg.waiting)reg.waiting.postMessage("skip-waiting");
+    t.classList.remove("show");
+  };
+}
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    if(reg.waiting&&navigator.serviceWorker.controller)showUpdateBanner(reg);
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;if(!nw)return;
+      nw.addEventListener('statechange',()=>{
+        if(nw.state==='installed'&&navigator.serviceWorker.controller)showUpdateBanner(reg);
+      });
+    });
+    setInterval(()=>reg.update().catch(()=>{}),60*60*1000);   // re-check hourly while open
+  }).catch(()=>{});
+  let reloaded;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloaded)return;reloaded=true;location.reload();          // the new SW took over -> show fresh app
+  });
+  document.addEventListener('visibilitychange',()=>{             // check the moment the app is reopened
+    if(!document.hidden){navigator.serviceWorker.getRegistration().then(r=>{if(r)r.update();}).catch(()=>{});}
+  });
+}
 </script>
 </body>
 </html>
