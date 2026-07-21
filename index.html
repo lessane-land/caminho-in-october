@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0e1a">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Camino">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -437,6 +438,12 @@
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
   .bigview-svg svg{max-height:100%;width:100%}
   .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px}
+  .hint-jump{background:transparent;border:1px solid var(--gold);color:var(--gold-bright);border-radius:50px;padding:2px 10px;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
+  .hint-jump:hover{background:var(--gold);color:var(--night-deep)}
+  .book-mini{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:2px 9px;text-decoration:none;margin-left:8px;white-space:nowrap;transition:all .2s}
+  .book-mini:hover{background:var(--sea-deep);color:var(--paper)}
+  .book-mini.town{display:inline-block;margin:12px 0 0;padding:7px 14px;font-size:.6rem;letter-spacing:.12em}
+  .cap-beds a{color:var(--sea-shallow);text-decoration:none;border-bottom:1px dotted var(--sea-shallow)}
 
 
   /* toolbar chips, boat form, sunset */
@@ -456,8 +463,36 @@
   .leaflet-bar a:hover{background:var(--night-card)}
   .leaflet-control-attribution{background:rgba(10,17,28,.75) !important;color:#5b6d85 !important}
   .leaflet-control-attribution a{color:#5b6d85 !important}
+  /* map labels: town names + boat, always legible on the dark map */
+  .leaflet-tooltip.map-tt{background:rgba(10,17,28,.85);border:1px solid var(--night-border);color:#d4e6e4;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.5);white-space:nowrap}
+  .leaflet-tooltip.map-tt::before{display:none}
+  .leaflet-tooltip.map-tt.town.end{color:var(--gold-bright);border-color:rgba(242,194,48,.5);font-weight:700}
+  .leaflet-tooltip.map-tt.boat{color:var(--sea-shallow);border-color:var(--sea-deep);background:rgba(11,26,44,.92)}
+  .boat-pin{font-size:18px;line-height:26px;text-align:center;filter:drop-shadow(0 0 4px rgba(95,194,187,.8))}
+  /* new-version banner */
+  .update-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:400;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:9px 9px 9px 18px;display:none;align-items:center;gap:14px;box-shadow:0 14px 44px -10px rgba(0,0,0,.7);max-width:calc(100vw - 28px)}
+  .update-toast.show{display:flex;animation:fadeIn .3s ease}
+  .update-toast span{font-family:'Fraunces',serif;font-style:italic;color:var(--paper);font-size:.94rem}
+  .update-toast button{background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);border:none;border-radius:50px;padding:9px 18px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap}
   .map-note{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
   .map-note i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .map-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .map-btn{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--sea-glow);color:var(--sea-shallow);padding:9px 15px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .map-btn:hover{background:var(--sea-deep);color:var(--paper)}
+  .map-btn svg{width:14px;height:14px}
+  .map-btn.on{background:var(--terracotta);border-color:var(--terracotta);color:var(--night-deep);font-weight:700}
+  .map-btn.busy{opacity:.55;pointer-events:none}
+  .map-btn.ghost{border-color:var(--night-border);color:var(--mute)}
+  .map-btn.ghost:hover{border-color:var(--danger);color:var(--danger);background:transparent}
+  .dl-wrap{margin-top:10px;background:var(--night-soft);border:1px solid var(--night-border);border-radius:8px;padding:12px 15px;display:none}
+  .dl-wrap.show{display:block}
+  .dl-top{display:flex;justify-content:space-between;align-items:baseline;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+  .dl-top b{color:var(--gold-bright);font-family:'Fraunces',serif;font-size:1.05rem;letter-spacing:0;text-transform:none}
+  .dl-bar{height:7px;background:var(--night-deep);border-radius:99px;overflow:hidden}
+  .dl-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sea-glow),var(--sea-shallow));border-radius:99px;transition:width .3s ease}
+  .dl-sub{font-family:'Fraunces',serif;font-style:italic;font-size:.8rem;color:var(--ink-soft);margin-top:8px}
+  .map-status{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--mute)}
+  .map-status b{color:var(--sea-shallow)}
   /* progress bar shores */
   .bar-ends{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.2em;color:var(--mute-dim);margin-top:6px}
   /* stamp slams in */
@@ -618,6 +653,18 @@
       <div class="map-wrap">
         <div id="route-map" class="route-map"></div>
         <div class="map-note"><span><i style="background:#f2c230"></i>Our route</span><span><i style="background:#5fc2bb"></i>The boat</span><span><i style="background:#3fa7a0;height:8px;width:8px;border-radius:50%"></i>Overnight stops</span></div>
+        <div class="map-tools">
+          <button class="map-btn" id="follow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Follow me</button>
+          <button class="map-btn" id="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Save maps offline</button>
+          <button class="map-btn on" id="labels-btn" title="Show/hide town names"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2M9 20h6M12 4v16"/></svg>Names</button>
+          <button class="map-btn ghost" id="dl-clear" title="Free up space" style="display:none">Clear</button>
+          <span class="map-status" id="map-status"></span>
+        </div>
+        <div class="dl-wrap" id="dl-wrap">
+          <div class="dl-top"><span>Downloading map for the whole route</span><b id="dl-pct">0%</b></div>
+          <div class="dl-bar"><i id="dl-fill"></i></div>
+          <div class="dl-sub" id="dl-sub">Preparing tiles…</div>
+        </div>
         <div id="map-fallback" style="display:none">
         <svg class="map-svg" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -912,6 +959,7 @@
     <button class="reset" id="reset">Reset stage progress for this plan</button>
   </div>
 </footer>
+<div class="update-toast" id="update-toast"><span>New version ready ✨</span><button id="update-refresh">Refresh</button></div>
 <script src="config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
@@ -1062,6 +1110,16 @@ function doneKey(){return "camino-done-"+(planId==="X"?"X-"+currentStops().join(
 function stageDateObj(i){const d=new Date(startDate+"T12:00:00");d.setDate(d.getDate()+i);return d;}
 function stageDateLabel(i){return stageDateObj(i).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});}
 function stageISO(i){const d=stageDateObj(i);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function stageISOPlus(i,plus){const d=stageDateObj(i);d.setDate(d.getDate()+plus);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+/* booking links: private beds get Booking.com with the night's dates prefilled;
+   municipal/parish/donation albergues can't be booked online, they get an info search */
+function bookingUrl(ss,iso,isoNext){return "https://www.booking.com/searchresults.html?ss="+encodeURIComponent(ss)+"&checkin="+iso+"&checkout="+isoNext+"&group_adults=2&no_rooms=1";}
+function bedLink(a,townQ,iso,isoNext){
+  const town=townQ.split(",")[0];
+  if(/municipal|parish|public|xunta|monaster|donation/i.test(a[1]+" "+a[2]))
+    return `<a class="book-mini" href="https://www.google.com/search?q=${encodeURIComponent(a[0]+" "+town+" albergue telefone")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">info</a>`;
+  return `<a class="book-mini" href="${bookingUrl(a[0]+", "+town,iso,isoNext)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">book</a>`;
+}
 
 /* profile svg */
 function smoothPath(pts){
@@ -1289,9 +1347,11 @@ function render(){
         <td>${(w.km-st.a.km).toFixed(1).replace(".0","")}</td><td>${w.name}</td><td class="alt">~${w.alt} m</td>
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
+    const nightIso=stageISO(i),nightIsoNext=stageISOPlus(i,1);
     const midStops=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
-    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 km ${(w.km-st.a.km).toFixed(1).replace(".0","")} of the stage</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
-    const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
+    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 km ${(w.km-st.a.km).toFixed(1).replace(".0","")} of the stage</span>${bedLink(a,w.q,nightIso,nightIsoNext)}</span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
+    const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span>${bedLink(a,st.b.q,nightIso,nightIsoNext)}</span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
+    const bookAll=st.b.sleep&&st.b.sleep.length?`<a class="book-mini town" href="${bookingUrl(st.b.q,nightIso,nightIsoNext)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">All beds in ${st.b.name.split(",")[0]} for ${stageDateLabel(i)} \u00b7 Booking.com</a>`:"";
     return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
       <div class="node">${isDone?"\u2713":st.n}</div>
@@ -1321,7 +1381,7 @@ function render(){
           <div class="alt-table"><table><tr><th>km</th><th>Waypoint</th><th style="text-align:right">Alt.</th><th></th></tr>${rows}</table></div>
           <p class="note">${st.notes}</p>
           <div class="fieldnote"><span>Field note</span><p>${FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ")}</p></div>
-          <div class="blk"><h4>Where we sleep tonight</h4><ul>${sleep}</ul></div>
+          <div class="blk"><h4>Where we sleep tonight</h4><ul>${sleep}</ul>${bookAll}</div>
           ${midSleepHtml}
           <div class="blk"><h4>Services along the way</h4><p class="svc">${st.svc}</p></div>
           <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"We pick, it is our route."}</p></div>
@@ -1590,7 +1650,34 @@ buildPacking();
 
 
 /* big live profile */
-let bigN=null,bigWatch=null,bigG=null,bigSel=null;
+let bigN=null,bigWatch=null,bigG=null,bigSel=null,bigPace=[];
+/* remaining ascent/descent from route-km to stage end, using GPX terrain when available */
+function remainingUpDown(st,km){
+  const det=stageDetail(st,200)||st.seg.map(w=>[w.km,w.alt]);
+  let up=0,down=0;
+  for(let i=1;i<det.length;i++){
+    const a=det[i-1],b=det[i];
+    if(b[0]<=km)continue;
+    const aAlt=a[0]<km?a[1]+(b[1]-a[1])*((km-a[0])/((b[0]-a[0])||1)):a[1];
+    const d=b[1]-aAlt;
+    if(d>0)up+=d;else down-=d;
+  }
+  return {up:Math.round(up),down:Math.round(down)};
+}
+/* live pace over the last 20 min of GPS fixes (route km, so detours off-path don't inflate it) */
+function notePace(km){
+  const now=Date.now();
+  bigPace.push({t:now,km});
+  bigPace=bigPace.filter(p=>now-p.t<20*60*1000);
+}
+function livePace(){
+  if(bigPace.length<2)return null;
+  const a=bigPace[0],b=bigPace[bigPace.length-1];
+  const h=(b.t-a.t)/3600000;
+  if(h<1/12)return null;               // need at least 5 min of data
+  const v=(b.km-a.km)/h;
+  return (v>=0.5&&v<=7)?v:null;        // walking speeds only
+}
 function gradeColor(gr){return gr<3?"#4a90b8":gr<6?"#f2c230":"#ef8354";}
 function fmtH(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh>0?hh+"h "+String(mm).padStart(2,"0"):mm+" min";}
 function bigProfileSVG(st,g){
@@ -1660,7 +1747,7 @@ function setBigCap(st){
   const q=encodeURIComponent(w.q);
   let out=`<b>${w.name}</b> \u00b7 km ${(w.km-st.a.km).toFixed(1)} of the stage \u00b7 ~${w.alt} m \u00b7 K. ${(160.5-w.km).toFixed(1).replace(".0","")} to Vigo \u00b7 <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">Open in Maps</a>`;
   if(w.poi)out+=`<span class="cap-poi">${w.poi}</span>`;
-  if(w.sleep&&w.sleep.length)out+=`<span class="cap-beds">Beds: ${w.sleep.map(a=>a[0]+" ("+a[2]+")").join(" \u00b7 ")}</span>`;
+  if(w.sleep&&w.sleep.length)out+=`<span class="cap-beds">Beds: ${w.sleep.map(a=>a[0]+" ("+a[2]+")").join(" \u00b7 ")} \u00b7 <a href="${bookingUrl(w.q,stageISO(bigN-1),stageISOPlus(bigN-1,1))}" target="_blank" rel="noopener">book</a></span>`;
   el.innerHTML=out;
 }
 function bigRepaint(){
@@ -1674,15 +1761,26 @@ function setBigStats(g,st){
   const i=bigN-1;let tiles="";
   if(g){
     const left=st.b.km-g.km;
+    const rem=remainingUpDown(st,g.km);
+    const pace=livePace();
+    // Naismith when estimating: pace already paid for the terrain if it's measured live
+    const hrs=pace?left/pace:left/4.2+rem.up/600;
+    const eta=new Date(Date.now()+hrs*3600000);
+    const etaTxt=eta.getHours()+":"+String(eta.getMinutes()).padStart(2,"0");
+    const ss=sunsetLabel(i,st);
+    let warn=hrs>18;
+    if(ss&&!warn){const sp=ss.split(":");warn=(eta.getHours()*60+eta.getMinutes())>(+sp[0]*60+ +sp[1]-40);}
     tiles+=`<div><b>${(g.km-st.a.km).toFixed(1)} km</b><span>walked</span></div>
       <div><b>${left.toFixed(1)} km</b><span>to ${st.b.name.split(",")[0]}</span></div>
+      <div><b>+${rem.up} m</b><span>climb left</span></div>
       <div><b>${Math.round(g.alt)} m</b><span>altitude</span></div>
-      <div><b>~${fmtH(left/4.2)}</b><span>at camino pace</span></div>`;
+      <div><b${warn?' style="color:var(--warn)"':''}>~${etaTxt}</b><span>${warn?"arrive · near dark":"arrive"}${pace?"":" · est."}</span></div>`;
+    if(pace)tiles+=`<div><b>${pace.toFixed(1)} km/h</b><span>our pace · live</span></div>`;
     if(g.next)tiles+=`<div><b>${(g.next.km-g.km).toFixed(1)} km</b><span>${g.next.name.split(",")[0]}</span></div>`;
   }else{
     tiles+=`<div><b>${st.km} km</b><span>stage</span></div>
       <div><b>+${st.up} m</b><span>climb</span></div>
-      <div><b>~${fmtH(st.km/4.2)}</b><span>walking time</span></div>`;
+      <div><b>~${fmtH(st.km/4.2+st.up/600)}</b><span>walking time</span></div>`;
   }
   const ss=sunsetLabel(i,st);
   if(ss){
@@ -1699,9 +1797,12 @@ function setBigStats(g,st){
 function bigApply(pos,st){
   const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude);if(!b)return;
   if(b.distKm>3){document.getElementById("big-hint").textContent="We are "+b.distKm.toFixed(1)+" km off the route right now.";return;}
+  notePace(b.km);
   if(b.km<st.a.km||b.km>st.b.km){
     const cur=STAGES.find(s=>b.km>=s.a.km&&b.km<=s.b.km);
-    document.getElementById("big-hint").textContent=cur?("We are on stage "+cur.n+" right now; use the arrows to jump."):"";
+    const h=document.getElementById("big-hint");
+    if(cur)h.innerHTML=`We are on stage ${cur.n} right now · <button class="hint-jump" onclick="openBig(${cur.n})">open stage ${cur.n}</button>`;
+    else h.textContent="";
     return;
   }
   bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km)};
@@ -1711,7 +1812,10 @@ function bigApply(pos,st){
 }
 function bigStart(st){
   if(!navigator.geolocation)return;
-  navigator.geolocation.getCurrentPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
+  navigator.geolocation.getCurrentPosition(p=>bigApply(p,st),err=>{
+    const h=document.getElementById("big-hint");
+    if(h&&!bigG)h.textContent="No GPS fix ("+err.message+"). Tap Refresh to retry.";
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
   try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,maximumAge:15000});}catch(e){}
 }
 function stopBigWatch(){if(bigWatch!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(bigWatch);}catch(e){}bigWatch=null;}}
@@ -1870,6 +1974,7 @@ async function pullShared(){
   if(!SUPA_URL)return;
   try{
     const r=await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE+"?id=eq.camino&select=data",{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    if(!r.ok)throw 0;
     const rows=await r.json();
     if(rows&&rows[0]&&rows[0].data)mergeShared(rows[0].data);
     setChip();
@@ -1878,7 +1983,8 @@ async function pullShared(){
 async function pushShared(){
   if(!SUPA_URL)return;
   try{
-    await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:"camino",data:collectShared()}])});
+    const r=await fetch(SUPA_URL+"/rest/v1/"+SYNC_TABLE,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:"camino",data:collectShared()}])});
+    if(!r.ok)throw 0;
     setChip();
   }catch(e){setChip(true);}
 }
@@ -1918,30 +2024,46 @@ function initMap(){
   if(typeof L==="undefined"){if(fb&&rm){fb.style.display="";rm.style.display="none";}return;}
   if(MAP)return;
   MAP=L.map("route-map",{scrollWheelZoom:false});
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(MAP);
+  // {r}="" so tile URLs match exactly what downloadOfflineMaps() pre-caches; maxNativeZoom 16
+  // caps requests to the zooms we store offline, upscaling z17+ from cached z16 tiles.
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",subdomains:"abcd",maxZoom:18,maxNativeZoom:15}).addTo(MAP);
   const Ctl=L.Control.extend({onAdd:function(){
     const d=L.DomUtil.create("div","leaflet-bar");
     d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
     d.onclick=e=>{e.preventDefault();mapLocate();};return d;}});
   new Ctl({position:"topleft"}).addTo(MAP);
   drawRoute();
+  refreshMapStatus();
 }
-function drawRoute(){
+let mapLabels=store.get("camino-map-labels",true);   // town names on/off
+function drawRoute(fit){
   if(!MAP)return;
   if(MAPLAYER)MAPLAYER.remove();
   const g=store.get("camino-gpx",null);
   const latlngs=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
   const grp=L.layerGroup();
-  L.polyline(latlngs,{color:"#f2c230",weight:3,dashArray:"7 6",opacity:.9}).addTo(grp);
-  L.polyline([[41.876,-8.839],[41.895,-8.867]],{color:"#5fc2bb",weight:3,dashArray:"2 7",opacity:.95}).addTo(grp);
+  L.polyline(latlngs,{color:"#f2c230",weight:4,opacity:.95}).addTo(grp);
+  // The boat: a short but IMPORTANT teal crossing of the Mi\u00f1o \u2014 draw it thick,
+  // with a permanent labelled marker so it's never lost at route zoom.
+  const boatA=[41.876,-8.839],boatB=[41.895,-8.867],boatMid=[(boatA[0]+boatB[0])/2,(boatA[1]+boatB[1])/2];
+  L.polyline([boatA,boatB],{color:"#5fc2bb",weight:5,dashArray:"3 6",opacity:1}).addTo(grp);
+  L.marker(boatMid,{icon:L.divIcon({className:"boat-pin",html:"\u26f4",iconSize:[26,26],iconAnchor:[13,13]})})
+    .bindTooltip("Boat: Caminha \u2192 A Guarda",{permanent:mapLabels,direction:"top",className:"map-tt boat",offset:[0,-10]})
+    .bindPopup("<b>\u26f4 The boat</b><br>Caminha \u2192 A Guarda across the Mi\u00f1o<br>6\u20138 \u20ac \u00b7 book 2\u20133 days ahead<br>Spain begins: clocks +1 h").addTo(grp);
   WPTS.filter(w=>w.id).forEach(w=>{
     const end=(w.id==="porto"||w.id==="vigo");
-    const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#3fa7a0",weight:2,fillColor:end?"#f2c230":"#0a111c",fillOpacity:end?1:.9}).addTo(grp);
+    const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#5fc2bb",weight:2,fillColor:end?"#f2c230":"#3fa7a0",fillOpacity:1}).addTo(grp);
+    m.bindTooltip(w.name.split(",")[0].split(" (")[0],{permanent:mapLabels,direction:"right",className:"map-tt town"+(end?" end":""),offset:[8,0]});
     const alb=(w.sleep&&w.sleep[0])?("<br><span style=\'opacity:.7\'>"+w.sleep[0][0]+"</span>"):"";
     m.bindPopup("<b>"+w.name.split(",")[0]+"</b><br>km "+w.km+" \u00b7 K. "+(160.5-w.km).toFixed(1).replace(".0","")+" to Vigo"+alb);
   });
   grp.addTo(MAP);MAPLAYER=grp;
-  MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+  if(fit!==false)MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+}
+function toggleLabels(){
+  mapLabels=!mapLabels;store.set("camino-map-labels",mapLabels);
+  const b=document.getElementById("labels-btn");if(b)b.classList.toggle("on",mapLabels);
+  drawRoute(false);
 }
 function mapLocate(){
   if(!navigator.geolocation||!MAP)return;
@@ -1949,8 +2071,123 @@ function mapLocate(){
     const ll=[pos.coords.latitude,pos.coords.longitude];
     if(MAPME)MAPME.remove();
     MAPME=L.circleMarker(ll,{radius:9,color:"#fff",weight:3,fillColor:"#f2c230",fillOpacity:1}).addTo(MAP).bindPopup("Us, right now").openPopup();
-    MAP.setView(ll,13);
+    MAP.setView(ll,14);
   });
+}
+
+/* ---- live follow-me on the map ---- */
+let mapWatch=null,MAPACC=null;
+function nearestWaypointText(lat,lon){
+  let best=null;
+  WPTS.forEach(w=>{const d=hav(lat,lon,w.lat,w.lon);if(!best||d<best.d)best={d,w};});
+  if(!best)return "";
+  const b=locateOnRoute(lat,lon);
+  const km=b?` · ~km ${b.km.toFixed(1)} of 160.5`:"";
+  return `${best.d<0.15?"At":best.d.toFixed(1)+" km from"} <b>${best.w.name.split(",")[0]}</b>${km}`;
+}
+function followTick(pos){
+  const lat=pos.coords.latitude,lon=pos.coords.longitude,acc=pos.coords.accuracy||0;
+  const ll=[lat,lon];
+  if(MAPME)MAPME.remove();if(MAPACC)MAPACC.remove();
+  if(acc&&acc<1000)MAPACC=L.circle(ll,{radius:acc,color:"#f2c230",weight:1,opacity:.4,fillColor:"#f2c230",fillOpacity:.08}).addTo(MAP);
+  MAPME=L.circleMarker(ll,{radius:9,color:"#fff",weight:3,fillColor:"#f2c230",fillOpacity:1}).addTo(MAP);
+  MAPME.bindPopup(nearestWaypointText(lat,lon));
+  MAP.panTo(ll,{animate:true});
+  const st=document.getElementById("map-status");
+  if(st)st.innerHTML=nearestWaypointText(lat,lon)+(acc?` · ±${Math.round(acc)} m`:"");
+}
+function toggleFollow(){
+  const btn=document.getElementById("follow-btn");
+  if(mapWatch!=null){navigator.geolocation.clearWatch(mapWatch);mapWatch=null;btn.classList.remove("on");btn.lastChild.textContent="Follow me";return;}
+  if(!navigator.geolocation||!MAP){alert("This browser has no geolocation.");return;}
+  btn.classList.add("on");btn.lastChild.textContent="Following…";
+  navigator.geolocation.getCurrentPosition(p=>{followTick(p);MAP.setView([p.coords.latitude,p.coords.longitude],15);},
+    err=>{alert("Could not get position ("+err.message+").");btn.classList.remove("on");btn.lastChild.textContent="Follow me";},
+    {enableHighAccuracy:true,timeout:12000,maximumAge:10000});
+  mapWatch=navigator.geolocation.watchPosition(followTick,()=>{},{enableHighAccuracy:true,maximumAge:8000});
+}
+
+/* ---- offline map tiles (so the map works with zero signal) ---- */
+const TILE_TPL="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png";
+const TILE_ZOOMS=[12,13,14,15];           // z15 ≈ street-level (~1.2 km tiles); whole set ≈ 25 MB, iOS-safe
+function lon2x(lon,z){return Math.floor((lon+180)/360*Math.pow(2,z));}
+function lat2y(lat,z){const r=lat*Math.PI/180;return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,z));}
+function routePoints(){
+  const g=store.get("camino-gpx",null);
+  const pts=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
+  pts.push([41.876,-8.839],[41.895,-8.867]);   // the boat leg
+  // densify to ~400 m so higher-zoom tiles between sparse waypoints aren't skipped
+  const out=[];
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i],b=pts[i+1];out.push(a);
+    const d=hav(a[0],a[1],b[0],b[1]);
+    if(d>0.4){const n=Math.ceil(d/0.4);for(let k=1;k<n;k++)out.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n]);}
+  }
+  out.push(pts[pts.length-1]);
+  return out;
+}
+function routeTiles(){
+  const pts=routePoints();const set=new Set();
+  TILE_ZOOMS.forEach(z=>{
+    const buf=z<=13?2:1;                         // wider corridor at low zoom, ±1 tile up close
+    pts.forEach(p=>{
+      const cx=lon2x(p[1],z),cy=lat2y(p[0],z);
+      for(let dx=-buf;dx<=buf;dx++)for(let dy=-buf;dy<=buf;dy++)set.add(z+"/"+(cx+dx)+"/"+(cy+dy));
+    });
+  });
+  return [...set];
+}
+function tileUrl(key){const[z,x,y]=key.split("/");const s="abcd"[Math.abs(+x+ +y)%4];return TILE_TPL.replace("{s}",s).replace("{z}",z).replace("{x}",x).replace("{y}",y);}
+async function refreshMapStatus(){
+  const el=document.getElementById("map-status");if(!el||mapWatch!=null)return;
+  try{
+    const c=await caches.open("camino-tiles");const n=(await c.keys()).length;
+    el.innerHTML=n>0?`Offline map: <b>${n.toLocaleString()} tiles saved</b>`:"Map needs signal until you save it offline.";
+    const cl=document.getElementById("dl-clear");if(cl)cl.style.display=n>0?"":"none";
+  }catch(e){el.textContent="";}
+}
+let dlRunning=false;
+async function downloadOfflineMaps(){
+  if(dlRunning)return;
+  if(!("caches" in window)){alert("This browser can't store offline maps.");return;}
+  const btn=document.getElementById("dl-btn"),wrap=document.getElementById("dl-wrap");
+  const fill=document.getElementById("dl-fill"),pct=document.getElementById("dl-pct"),sub=document.getElementById("dl-sub");
+  const keys=routeTiles();
+  const mb=Math.round(keys.length*0.018);
+  if(!confirm(`Save the whole Porto→Vigo map for offline use?\n\n${keys.length.toLocaleString()} map tiles · about ${mb} MB.\nDo this on wifi. You can keep walking once it's done — the map will work with no signal.`))return;
+  dlRunning=true;btn.classList.add("busy");wrap.classList.add("show");
+  const cache=await caches.open("camino-tiles");
+  let done=0,failed=0;const total=keys.length;
+  const paint=()=>{const p=Math.round(done/total*100);fill.style.width=p+"%";pct.textContent=p+"%";sub.textContent=`${done.toLocaleString()} of ${total.toLocaleString()} tiles${failed?` · ${failed} skipped`:""}`;};
+  paint();
+  const queue=keys.slice();
+  async function worker(){
+    while(queue.length){
+      const key=queue.pop();const url=tileUrl(key);
+      try{
+        if(!(await cache.match(url))){
+          const res=await fetch(url,{mode:"no-cors"});      // opaque is fine for <img> tiles
+          await cache.put(url,res);
+        }
+      }catch(e){failed++;}
+      done++;if(done%8===0||!queue.length)paint();
+    }
+  }
+  await Promise.all(Array.from({length:6},worker));         // 6 parallel fetchers
+  sub.textContent=`Done · ${(total-failed).toLocaleString()} tiles ready${failed?` (${failed} couldn't load, retry later)`:""}. The map now works offline.`;
+  pct.textContent="100%";fill.style.width="100%";
+  dlRunning=false;btn.classList.remove("busy");
+  store.set("camino-tiles-meta",{count:total-failed,ts:Date.now(),zooms:TILE_ZOOMS});
+  refreshMapStatus();
+  if(MAP)drawRoute(false);
+}
+async function clearOfflineMaps(){
+  if(!confirm("Delete the saved offline map tiles? You'll need signal to see the map until you save them again."))return;
+  try{await caches.delete("camino-tiles");}catch(e){}
+  if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage("clear-tiles");
+  store.set("camino-tiles-meta",null);
+  refreshMapStatus();
+  alert("Offline map cleared.");
 }
 
 function sharePos(){
@@ -1962,7 +2199,11 @@ function sharePos(){
 
 /* shared journal */
 let journal=store.get("camino-journal",[]);
+let journalPushed=store.get("camino-journal-pushed",[]);   // ids confirmed written to Supabase
+let journalDeleted=store.get("camino-journal-deleted",[]); // ids deleted here, pending remote delete
 let currentPhotoData=null,memBy="Us";
+function markPushed(id){if(!journalPushed.includes(id)){journalPushed.push(id);store.set("camino-journal-pushed",journalPushed);}}
+function unmarkPushed(id){journalPushed=journalPushed.filter(x=>x!==id);store.set("camino-journal-pushed",journalPushed);}
 function cacheJournal(){
   try{store.set("camino-journal",journal);}
   catch(e){try{store.set("camino-journal",journal.map(m=>({id:m.id,date:m.date,title:m.title,note:m.note,by:m.by,photo:null})));}catch(e2){}}
@@ -1971,12 +2212,23 @@ async function pullJournal(){
   if(SUPA_URL){
     try{
       const r=await fetch(SUPA_URL+"/rest/v1/camino_journal?select=id,data",{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+      if(!r.ok)throw 0;
       const rows=await r.json();
       if(Array.isArray(rows)){
-        const map={};journal.forEach(m=>{if(m&&m.id)map[m.id]=m;});
-        rows.forEach(x=>{if(x&&x.data&&x.data.id)map[x.data.id]=x.data;});
+        const remote={};rows.forEach(x=>{if(x&&x.data&&x.data.id&&!journalDeleted.includes(x.data.id))remote[x.data.id]=x.data;});
+        const map={};
+        journal.forEach(m=>{
+          if(!m||!m.id)return;
+          // confirmed-pushed but gone remotely = deleted on the other phone
+          if(journalPushed.includes(m.id)&&!remote[m.id]){unmarkPushed(m.id);return;}
+          map[m.id]=m;
+        });
+        Object.values(remote).forEach(x=>{map[x.id]=x;markPushed(x.id);});
         journal=Object.values(map).sort((a,b)=>a.id-b.id);
         cacheJournal();
+        // retry entries saved offline and deletes that never reached Supabase
+        journal.filter(m=>!journalPushed.includes(m.id)).forEach(pushJournalEntry);
+        journalDeleted.forEach(deleteJournalRemote);
       }
     }catch(e){}
   }
@@ -1984,11 +2236,17 @@ async function pullJournal(){
 }
 async function pushJournalEntry(m){
   if(!SUPA_URL)return;
-  try{await fetch(SUPA_URL+"/rest/v1/camino_journal",{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:String(m.id),data:m}])});}catch(e){}
+  try{
+    const r=await fetch(SUPA_URL+"/rest/v1/camino_journal",{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify([{id:String(m.id),data:m}])});
+    if(r.ok)markPushed(m.id);
+  }catch(e){}
 }
 async function deleteJournalRemote(id){
   if(!SUPA_URL)return;
-  try{await fetch(SUPA_URL+"/rest/v1/camino_journal?id=eq."+id,{method:"DELETE",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});}catch(e){}
+  try{
+    const r=await fetch(SUPA_URL+"/rest/v1/camino_journal?id=eq."+id,{method:"DELETE",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    if(r.ok){journalDeleted=journalDeleted.filter(x=>x!==id);store.set("camino-journal-deleted",journalDeleted);}
+  }catch(e){}
 }
 function renderJournal(){
   const grid=document.getElementById("journal-grid");if(!grid)return;
@@ -2014,6 +2272,8 @@ function renderJournal(){
       if(!confirm("Delete this memory on both phones?"))return;
       const id=parseInt(btn.dataset.id);
       journal=journal.filter(m=>m.id!==id);
+      unmarkPushed(id);
+      if(!journalDeleted.includes(id)){journalDeleted.push(id);store.set("camino-journal-deleted",journalDeleted);}
       cacheJournal();deleteJournalRemote(id);renderJournal();
     });
   });
@@ -2085,7 +2345,40 @@ pullShared().then(()=>{render();});
 openToday();
 document.getElementById("gpx-btn").addEventListener("click",()=>document.getElementById("gpx-input").click());
 document.getElementById("gpx-input").addEventListener("change",e=>{if(e.target.files[0])loadGpxFile(e.target.files[0]);e.target.value="";});
-if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js');}catch(e){}}
+document.getElementById("follow-btn").addEventListener("click",toggleFollow);
+document.getElementById("dl-btn").addEventListener("click",downloadOfflineMaps);
+document.getElementById("dl-clear").addEventListener("click",clearOfflineMaps);
+document.getElementById("labels-btn").addEventListener("click",toggleLabels);
+document.getElementById("labels-btn").classList.toggle("on",mapLabels);
+
+/* service worker + one-tap update banner */
+function showUpdateBanner(reg){
+  const t=document.getElementById("update-toast");if(!t)return;
+  t.classList.add("show");
+  document.getElementById("update-refresh").onclick=()=>{
+    if(reg.waiting)reg.waiting.postMessage("skip-waiting");
+    t.classList.remove("show");
+  };
+}
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    if(reg.waiting&&navigator.serviceWorker.controller)showUpdateBanner(reg);
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;if(!nw)return;
+      nw.addEventListener('statechange',()=>{
+        if(nw.state==='installed'&&navigator.serviceWorker.controller)showUpdateBanner(reg);
+      });
+    });
+    setInterval(()=>reg.update().catch(()=>{}),60*60*1000);   // re-check hourly while open
+  }).catch(()=>{});
+  let reloaded;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloaded)return;reloaded=true;location.reload();          // the new SW took over -> show fresh app
+  });
+  document.addEventListener('visibilitychange',()=>{             // check the moment the app is reopened
+    if(!document.hidden){navigator.serviceWorker.getRegistration().then(r=>{if(r)r.update();}).catch(()=>{});}
+  });
+}
 </script>
 </body>
 </html>

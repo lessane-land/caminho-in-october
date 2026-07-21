@@ -9,6 +9,13 @@ INSTALL ON IPHONE
   Open the URL in Safari > Share > Add to Home Screen.
   Visit once with internet so it caches for offline (Oia cliffs have no signal).
 
+OFFLINE MAPS (do this on wifi before you leave)
+  A viaxe tab > "Save maps offline" downloads the whole Porto->Vigo map
+  (~1400 tiles, ~25 MB) so the map works with zero signal on the cliffs.
+  "Follow me" then tracks us live on that map, recentering as we walk and
+  naming the nearest waypoint. "Clear" frees the space afterwards.
+  Tiles survive app updates - you only download them once.
+
 SHARED SYNC BETWEEN BOTH PHONES (optional, recommended)
   1. In a Supabase project, run this SQL (both tables):
        create table camino_shared (id text primary key, data jsonb);

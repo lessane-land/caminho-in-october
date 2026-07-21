@@ -1,0 +1,42 @@
+{
+  "config.js": {
+    "mtime": 1784549116.0918126,
+    "ast_hash": "64054be7881b6f08796630231393f372",
+    "semantic_hash": "64054be7881b6f08796630231393f372"
+  },
+  "manifest.json": {
+    "mtime": 1784549655.4553533,
+    "ast_hash": "5fee6817976bf06e87a9764fc72b9e67",
+    "semantic_hash": "5fee6817976bf06e87a9764fc72b9e67"
+  },
+  "sw.js": {
+    "mtime": 1784549523.9313452,
+    "ast_hash": "7d34768a525c206034a70e4337d68bae",
+    "semantic_hash": "7d34768a525c206034a70e4337d68bae"
+  },
+  "README.txt": {
+    "mtime": 1784549116.0918126,
+    "ast_hash": "96ed3407abb626e7395b0bff34fe1c65",
+    "semantic_hash": "96ed3407abb626e7395b0bff34fe1c65"
+  },
+  "index.html": {
+    "mtime": 1784551768.4866128,
+    "ast_hash": "ba2e27f289af202d031ea227e944dcc7",
+    "semantic_hash": "ba2e27f289af202d031ea227e944dcc7"
+  },
+  "icon-180.png": {
+    "mtime": 1784549116.0918126,
+    "ast_hash": "2f8be8b1c76b3b71e1bec4ec0cf2abac",
+    "semantic_hash": "2f8be8b1c76b3b71e1bec4ec0cf2abac"
+  },
+  "icon-192.png": {
+    "mtime": 1784549116.0918126,
+    "ast_hash": "a491273a9c9f975829da4a914e794bc7",
+    "semantic_hash": "a491273a9c9f975829da4a914e794bc7"
+  },
+  "icon-512.png": {
+    "mtime": 1784549116.0918126,
+    "ast_hash": "b7fb75111e71687ca28683207ada5d40",
+    "semantic_hash": "b7fb75111e71687ca28683207ada5d40"
+  }
+}
