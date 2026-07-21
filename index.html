@@ -469,6 +469,19 @@
   .leaflet-tooltip.map-tt.town.end{color:var(--gold-bright);border-color:rgba(242,194,48,.5);font-weight:700}
   .leaflet-tooltip.map-tt.boat{color:var(--sea-shallow);border-color:var(--sea-deep);background:rgba(11,26,44,.92)}
   .boat-pin{font-size:18px;line-height:26px;text-align:center;filter:drop-shadow(0 0 4px rgba(95,194,187,.8))}
+  .poi-pin{font-size:14px;line-height:22px;text-align:center;color:var(--gold-bright);filter:drop-shadow(0 0 3px rgba(242,194,48,.9))}
+  .bed-pin{font-size:15px;line-height:22px;text-align:center;color:var(--sea-shallow);filter:drop-shadow(0 0 3px rgba(95,194,187,.85))}
+  .leaflet-popup-content .pp-km{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--mute)}
+  .leaflet-popup-content .pp-km a{color:var(--sea-shallow)}
+  .leaflet-popup-content .pp-sight{color:var(--gold-bright);font-style:italic;font-family:'Fraunces',serif}
+  .leaflet-popup-content .pp-beds{color:var(--sea-shallow);font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em}
+  .leaflet-popup-content .pp-price{color:var(--terracotta-bright)}
+  .leaflet-popup-content a[target]{color:var(--sea-shallow);font-weight:600}
+  /* fullscreen "grande" map */
+  .map-wrap.fullscreen{position:fixed;inset:0;z-index:260;margin:0;border-radius:0;padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 8px);display:flex;flex-direction:column;gap:8px}
+  .map-wrap.fullscreen #route-map{flex:1;height:auto;min-height:0}
+  .map-wrap.fullscreen .map-tools{margin-top:0}
+  .map-wrap.fullscreen .dl-wrap{margin-top:0}
   /* new-version banner */
   .update-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:400;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:9px 9px 9px 18px;display:none;align-items:center;gap:14px;box-shadow:0 14px 44px -10px rgba(0,0,0,.7);max-width:calc(100vw - 28px)}
   .update-toast.show{display:flex;animation:fadeIn .3s ease}
@@ -652,8 +665,10 @@
       <p class="sub-sub">Two countries, one ocean, one boat.</p>
       <div class="map-wrap">
         <div id="route-map" class="route-map"></div>
-        <div class="map-note"><span><i style="background:#f2c230"></i>Our route</span><span><i style="background:#5fc2bb"></i>The boat</span><span><i style="background:#3fa7a0;height:8px;width:8px;border-radius:50%"></i>Overnight stops</span></div>
+        <div class="map-note"><span><i style="background:#f2c230"></i>Our route</span><span><i style="background:#5fc2bb"></i>The boat</span><span><i style="background:#3fa7a0;height:8px;width:8px;border-radius:50%"></i>Overnight stops</span><span><i style="background:none;color:#f6d35f;width:auto;height:auto">◆</i>Sights</span><span><i style="background:none;color:#6fd0c9;width:auto;height:auto">⌂</i>Albergues</span></div>
         <div class="map-tools">
+          <button class="map-btn" id="full-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>Grande</button>
+          <button class="map-btn on" id="points-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Places</button>
           <button class="map-btn" id="follow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Follow me</button>
           <button class="map-btn" id="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Save maps offline</button>
           <button class="map-btn on" id="labels-btn" title="Show/hide town names"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2M9 20h6M12 4v16"/></svg>Names</button>
@@ -2036,6 +2051,29 @@ function initMap(){
   refreshMapStatus();
 }
 let mapLabels=store.get("camino-map-labels",true);   // town names on/off
+let mapPoints=store.get("camino-map-points",true);   // albergues + sights on/off
+// booking / info link for an albergue shown on the map; prefills the night's dates
+// when this waypoint is a planned overnight stop, otherwise a plain town search
+function mapNightISO(w){
+  const idx=STAGES.findIndex(s=>s.b.id&&s.b.id===w.id);
+  return idx>=0?[stageISO(idx),stageISOPlus(idx,1)]:[null,null];
+}
+function mapBedLink(a,w){
+  const town=w.q.split(",")[0];
+  if(/municipal|parish|public|xunta|monaster|donation/i.test(a[1]+" "+a[2]))
+    return `<a href="https://www.google.com/search?q=${encodeURIComponent(a[0]+" "+town+" albergue telefone")}" target="_blank" rel="noopener">info</a>`;
+  const[iso,isoNext]=mapNightISO(w);
+  const url=iso?bookingUrl(a[0]+", "+town,iso,isoNext):("https://www.booking.com/searchresults.html?ss="+encodeURIComponent(a[0]+", "+town)+"&group_adults=2&no_rooms=1");
+  return `<a href="${url}" target="_blank" rel="noopener">book</a>`;
+}
+function poiHtml(w){return w.poi?("<br><span class=\'pp-sight\'>\u25c6 "+w.poi+"</span>"):"";}
+function bedsHtml(w){
+  if(!w.sleep||!w.sleep.length)return "";
+  return "<br><span class='pp-beds'>Beds:</span> "+w.sleep.map(a=>a[0]+" <span class='pp-price'>("+a[2]+")</span> "+mapBedLink(a,w)).join("<br>");
+}
+function wpPopup(w){
+  return "<b>"+w.name.split(",")[0]+"</b><br><span class='pp-km'>km "+w.km+" \u00b7 K. "+(160.5-w.km).toFixed(1).replace(".0","")+" to Vigo \u00b7 <a href=\"https://maps.apple.com/?q="+encodeURIComponent(w.q)+"\" target=\"_blank\" rel=\"noopener\">Maps</a></span>"+poiHtml(w)+bedsHtml(w);
+}
 function drawRoute(fit){
   if(!MAP)return;
   if(MAPLAYER)MAPLAYER.remove();
@@ -2050,12 +2088,19 @@ function drawRoute(fit){
   L.marker(boatMid,{icon:L.divIcon({className:"boat-pin",html:"\u26f4",iconSize:[26,26],iconAnchor:[13,13]})})
     .bindTooltip("Boat: Caminha \u2192 A Guarda",{permanent:mapLabels,direction:"top",className:"map-tt boat",offset:[0,-10]})
     .bindPopup("<b>\u26f4 The boat</b><br>Caminha \u2192 A Guarda across the Mi\u00f1o<br>6\u20138 \u20ac \u00b7 book 2\u20133 days ahead<br>Spain begins: clocks +1 h").addTo(grp);
+  // Albergues + sights along the whole route (mid-stage windmills, bridges, beds
+  // "in case legs vote differently"). Toggle with the Places button.
+  if(mapPoints)WPTS.filter(w=>!w.id&&(w.poi||(w.sleep&&w.sleep.length))).forEach(w=>{
+    const sight=!!w.poi;
+    const m=L.marker([w.lat,w.lon],{icon:L.divIcon({className:sight?"poi-pin":"bed-pin",html:sight?"\u25c6":"\u2302",iconSize:[22,22],iconAnchor:[11,11]}),zIndexOffset:sight?200:100}).addTo(grp);
+    m.bindPopup(wpPopup(w));
+  });
+  // The overnight-stop towns: always shown, with permanent name labels.
   WPTS.filter(w=>w.id).forEach(w=>{
     const end=(w.id==="porto"||w.id==="vigo");
     const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#5fc2bb",weight:2,fillColor:end?"#f2c230":"#3fa7a0",fillOpacity:1}).addTo(grp);
     m.bindTooltip(w.name.split(",")[0].split(" (")[0],{permanent:mapLabels,direction:"right",className:"map-tt town"+(end?" end":""),offset:[8,0]});
-    const alb=(w.sleep&&w.sleep[0])?("<br><span style=\'opacity:.7\'>"+w.sleep[0][0]+"</span>"):"";
-    m.bindPopup("<b>"+w.name.split(",")[0]+"</b><br>km "+w.km+" \u00b7 K. "+(160.5-w.km).toFixed(1).replace(".0","")+" to Vigo"+alb);
+    m.bindPopup(wpPopup(w));
   });
   grp.addTo(MAP);MAPLAYER=grp;
   if(fit!==false)MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
@@ -2064,6 +2109,24 @@ function toggleLabels(){
   mapLabels=!mapLabels;store.set("camino-map-labels",mapLabels);
   const b=document.getElementById("labels-btn");if(b)b.classList.toggle("on",mapLabels);
   drawRoute(false);
+}
+function togglePoints(){
+  mapPoints=!mapPoints;store.set("camino-map-points",mapPoints);
+  const b=document.getElementById("points-btn");if(b)b.classList.toggle("on",mapPoints);
+  drawRoute(false);
+}
+function toggleFullscreen(){
+  const wrap=document.querySelector(".map-wrap");if(!wrap)return;
+  const full=wrap.classList.toggle("fullscreen");
+  document.body.style.overflow=full?"hidden":"";
+  const b=document.getElementById("full-btn");if(b){b.classList.toggle("on",full);b.lastChild.textContent=full?"Exit":"Grande";}
+  setTimeout(()=>{
+    if(!MAP)return;
+    MAP.invalidateSize();drawRoute(false);
+    const g=store.get("camino-gpx",null);
+    const ll=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
+    MAP.fitBounds(L.latLngBounds(ll).pad(full?0.05:0.08));
+  },60);
 }
 function mapLocate(){
   if(!navigator.geolocation||!MAP)return;
@@ -2350,6 +2413,10 @@ document.getElementById("dl-btn").addEventListener("click",downloadOfflineMaps);
 document.getElementById("dl-clear").addEventListener("click",clearOfflineMaps);
 document.getElementById("labels-btn").addEventListener("click",toggleLabels);
 document.getElementById("labels-btn").classList.toggle("on",mapLabels);
+document.getElementById("full-btn").addEventListener("click",toggleFullscreen);
+document.getElementById("points-btn").addEventListener("click",togglePoints);
+document.getElementById("points-btn").classList.toggle("on",mapPoints);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".map-wrap.fullscreen"))toggleFullscreen();});
 
 /* service worker + one-tap update banner */
 function showUpdateBanner(reg){
