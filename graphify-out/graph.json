@@ -4,52 +4,32 @@
   "graph": {
     "hyperedges": [
       {
-        "id": "gpx_track_pipeline",
-        "label": "GPX Track Pipeline (load \u2192 parse \u2192 build \u2192 consume via camino-gpx)",
+        "id": "booking_link_system",
+        "label": "Booking.com deep-link generation with prefilled stage dates",
         "nodes": [
-          "index_autoloadbundled",
-          "index_loadgpxfile",
-          "index_parsegpxtext",
-          "index_buildtrack",
-          "index_stagedetail",
-          "index_locateontrack",
-          "index_drawroute"
+          "index_bookingurl",
+          "index_bedlink",
+          "index_bookall",
+          "index_stageisoplus",
+          "index_render"
         ],
         "relation": "participate_in",
-        "confidence": "EXTRACTED",
-        "confidence_score": 1.0,
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
         "source_file": "index.html"
       },
       {
-        "id": "supabase_two_phone_sync",
-        "label": "Two-Phone Supabase Sync (progress, boat booking, journal)",
+        "id": "live_hiking_dashboard",
+        "label": "Live hiking dashboard: climb-left, ETA and measured pace",
         "nodes": [
-          "readme_supabase_sync_setup",
-          "index_collectshared",
-          "index_mergeshared",
-          "index_pullshared",
-          "index_pushshared",
-          "index_pulljournal",
-          "index_pushjournalentry"
+          "index_remainingupdown",
+          "index_notepace",
+          "index_livepace",
+          "index_setbigstats"
         ],
         "relation": "participate_in",
-        "confidence": "EXTRACTED",
-        "confidence_score": 1.0,
-        "source_file": "index.html"
-      },
-      {
-        "id": "dynamic_stage_planner",
-        "label": "Dynamic Stage Planning System (presets/custom stops rebuild every card)",
-        "nodes": [
-          "index_plans",
-          "index_buildstages",
-          "index_wpts",
-          "index_render",
-          "index_updateprogress"
-        ],
-        "relation": "form",
-        "confidence": "EXTRACTED",
-        "confidence_score": 1.0,
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
         "source_file": "index.html"
       }
     ]
@@ -61,109 +41,9 @@
       "source_file": "config.js",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "config",
-      "community": 11,
-      "norm_label": "config.js"
-    },
-    {
-      "label": "manifest.json",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "manifest",
-      "community": 1,
-      "norm_label": "manifest.json"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "id": "manifest_name",
-      "community": 1,
-      "norm_label": "name"
-    },
-    {
-      "label": "short_name",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "id": "manifest_short_name",
-      "community": 1,
-      "norm_label": "short_name"
-    },
-    {
-      "label": "description",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "id": "manifest_description",
-      "community": 1,
-      "norm_label": "description"
-    },
-    {
-      "label": "start_url",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "manifest_start_url",
-      "community": 1,
-      "norm_label": "start_url"
-    },
-    {
-      "label": "scope",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "id": "manifest_scope",
-      "community": 1,
-      "norm_label": "scope"
-    },
-    {
-      "label": "display",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "manifest_display",
-      "community": 1,
-      "norm_label": "display"
-    },
-    {
-      "label": "background_color",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "id": "manifest_background_color",
-      "community": 1,
-      "norm_label": "background_color"
-    },
-    {
-      "label": "theme_color",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "manifest_theme_color",
-      "community": 1,
-      "norm_label": "theme_color"
-    },
-    {
-      "label": "icons",
-      "file_type": "code",
-      "source_file": "manifest.json",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "manifest_icons",
-      "community": 1,
-      "norm_label": "icons"
+      "community": 12,
+      "norm_label": "config.js",
+      "id": "config"
     },
     {
       "label": "sw.js",
@@ -171,9 +51,9 @@
       "source_file": "sw.js",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "sw",
-      "community": 10,
-      "norm_label": "sw.js"
+      "community": 11,
+      "norm_label": "sw.js",
+      "id": "sw"
     },
     {
       "label": "ASSETS",
@@ -181,9 +61,9 @@
       "source_file": "sw.js",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "sw_assets",
-      "community": 10,
-      "norm_label": "assets"
+      "community": 11,
+      "norm_label": "assets",
+      "id": "sw_assets"
     },
     {
       "label": "Deployment Guide (Netlify Drop / GitHub Pages)",
@@ -194,9 +74,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_deployment_guide",
       "community": 7,
-      "norm_label": "deployment guide (netlify drop / github pages)"
+      "norm_label": "deployment guide (netlify drop / github pages)",
+      "id": "readme_deployment_guide"
     },
     {
       "label": "iPhone PWA Install & Offline Caching",
@@ -208,9 +88,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Visit once with internet so the service worker caches everything for offline use, because the Oia cliffs stretch has no signal.",
-      "id": "readme_pwa_install",
       "community": 7,
-      "norm_label": "iphone pwa install & offline caching"
+      "norm_label": "iphone pwa install & offline caching",
+      "id": "readme_pwa_install"
     },
     {
       "label": "Supabase Shared Sync Setup (camino_shared / camino_journal)",
@@ -222,9 +102,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Deliberately open RLS policy (for all using true): anyone with both the app URL and the anon key could write, but for a two-person trip app this trade-off is accepted; mitigation is keeping the app URL private.",
-      "id": "readme_supabase_sync_setup",
       "community": 0,
-      "norm_label": "supabase shared sync setup (camino_shared / camino_journal)"
+      "norm_label": "supabase shared sync setup (camino_shared / camino_journal)",
+      "id": "readme_supabase_sync_setup"
     },
     {
       "label": "config.js Credential Separation Convention",
@@ -236,9 +116,9 @@
       "author": null,
       "contributor": null,
       "rationale": "SUPA_URL/SUPA_KEY live in config.js, which app updates never touch: when a new version arrives only index.html and sw.js are replaced, so credentials survive upgrades.",
-      "id": "readme_config_js_convention",
       "community": 7,
-      "norm_label": "config.js credential separation convention"
+      "norm_label": "config.js credential separation convention",
+      "id": "readme_config_js_convention"
     },
     {
       "label": "Surgical GPS / Bundled GPX Track Setup",
@@ -250,9 +130,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Easy way (recommended): drop track.gpx or track1..N.gpx next to index.html and redeploy; both phones pick the track up automatically on next open, and stage files are stitched in walking order. Manual way loads per phone via the Files app.",
-      "id": "readme_gpx_setup",
-      "community": 2,
-      "norm_label": "surgical gps / bundled gpx track setup"
+      "community": 3,
+      "norm_label": "surgical gps / bundled gpx track setup",
+      "id": "readme_gpx_setup"
     },
     {
       "label": "Fixed Trip Facts (flight, base, boots-on, return train)",
@@ -263,9 +143,100 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_fixed_facts",
       "community": 0,
-      "norm_label": "fixed trip facts (flight, base, boots-on, return train)"
+      "norm_label": "fixed trip facts (flight, base, boots-on, return train)",
+      "id": "readme_fixed_facts"
+    },
+    {
+      "label": "App Icon (180px) - Yellow Arrow Waymark",
+      "file_type": "image",
+      "source_file": "icon-180.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 10,
+      "norm_label": "app icon (180px) - yellow arrow waymark",
+      "id": "icon_180_appicon"
+    },
+    {
+      "label": "Yellow Arrow (Camino de Santiago Waymark Motif)",
+      "file_type": "concept",
+      "source_file": "icon-180.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 10,
+      "norm_label": "yellow arrow (camino de santiago waymark motif)",
+      "id": "yellow_arrow_camino_motif"
+    },
+    {
+      "label": "Caminho in October App",
+      "file_type": "concept",
+      "source_file": "icon-180.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 10,
+      "norm_label": "caminho in october app",
+      "id": "caminho_in_october_app"
+    },
+    {
+      "label": "App Icon 192px (Yellow Camino Arrow)",
+      "file_type": "image",
+      "source_file": "icon-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 8,
+      "norm_label": "app icon 192px (yellow camino arrow)",
+      "id": "icon_192_appicon"
+    },
+    {
+      "label": "Camino Yellow Arrow Waymarker",
+      "file_type": "concept",
+      "source_file": "icon-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 8,
+      "norm_label": "camino yellow arrow waymarker",
+      "id": "camino_yellow_arrow"
+    },
+    {
+      "label": "Camino de Santiago Pilgrimage",
+      "file_type": "concept",
+      "source_file": "icon-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 8,
+      "norm_label": "camino de santiago pilgrimage",
+      "id": "camino_de_santiago"
+    },
+    {
+      "label": "App Icon (512px) - Camino Waymark",
+      "file_type": "image",
+      "source_file": "icon-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "community": 8,
+      "norm_label": "app icon (512px) - camino waymark",
+      "id": "icon_512_appicon"
     },
     {
       "label": "Camino Porto\u2192Vigo Companion PWA (app shell)",
@@ -291,7 +262,7 @@
       "contributor": null,
       "rationale": "The classic seven stages land in Vigo on 2026-10-08, exactly ten years after Miami, October 2016 ('May I kiss you'). The itinerary is anchored to that date: the plan picker warns if a custom plan arrives later than Oct 8, and the stage falling on ANNIV=2026-10-08 gets special anniversary styling.",
       "id": "index_invitation_anniversary",
-      "community": 4,
+      "community": 2,
       "norm_label": "ten-year anniversary arrival (oct 8, 2026)"
     },
     {
@@ -345,7 +316,7 @@
       "author": null,
       "contributor": null,
       "id": "index_store",
-      "community": 3,
+      "community": 5,
       "norm_label": "store (localstorage json wrapper)"
     },
     {
@@ -358,7 +329,7 @@
       "author": null,
       "contributor": null,
       "id": "index_wpts",
-      "community": 4,
+      "community": 2,
       "norm_label": "wpts master route waypoints (160.5 km, km/lat/lon/alt/sleep/poi)"
     },
     {
@@ -371,7 +342,7 @@
       "author": null,
       "contributor": null,
       "id": "index_plans",
-      "community": 4,
+      "community": 2,
       "norm_label": "plans stage presets + custom stop picker"
     },
     {
@@ -384,7 +355,7 @@
       "author": null,
       "contributor": null,
       "id": "index_buildstages",
-      "community": 4,
+      "community": 2,
       "norm_label": "buildstages (derive stages from chosen overnight stops)"
     },
     {
@@ -397,7 +368,7 @@
       "author": null,
       "contributor": null,
       "id": "index_renderplans",
-      "community": 4,
+      "community": 2,
       "norm_label": "renderplans (plan chips, totals, late-arrival warning)"
     },
     {
@@ -410,7 +381,7 @@
       "author": null,
       "contributor": null,
       "id": "index_render",
-      "community": 3,
+      "community": 5,
       "norm_label": "render (stage cards, done state, anniversary mark)"
     },
     {
@@ -423,7 +394,7 @@
       "author": null,
       "contributor": null,
       "id": "index_profilesvg",
-      "community": 3,
+      "community": 9,
       "norm_label": "profilesvg (mini elevation profile)"
     },
     {
@@ -436,7 +407,7 @@
       "author": null,
       "contributor": null,
       "id": "index_bigprofilesvg",
-      "community": 3,
+      "community": 9,
       "norm_label": "bigprofilesvg (big live elevation ribbon)"
     },
     {
@@ -449,7 +420,7 @@
       "author": null,
       "contributor": null,
       "id": "index_stagedetail",
-      "community": 3,
+      "community": 9,
       "norm_label": "stagedetail (real gpx terrain sampling, waypoint fallback)"
     },
     {
@@ -462,7 +433,7 @@
       "author": null,
       "contributor": null,
       "id": "index_smoothpath",
-      "community": 3,
+      "community": 9,
       "norm_label": "smoothpath (catmull-rom-style svg smoothing)"
     },
     {
@@ -475,7 +446,7 @@
       "author": null,
       "contributor": null,
       "id": "index_loadweather",
-      "community": 5,
+      "community": 4,
       "norm_label": "loadweather (open-meteo 2-day forecast per stage, cached)"
     },
     {
@@ -488,7 +459,7 @@
       "author": null,
       "contributor": null,
       "id": "index_sunsetlabel",
-      "community": 5,
+      "community": 4,
       "norm_label": "sunsetlabel (analytic sunset approximation, pt/es timezone aware)"
     },
     {
@@ -501,7 +472,7 @@
       "author": null,
       "contributor": null,
       "id": "index_showgps",
-      "community": 5,
+      "community": 4,
       "norm_label": "showgps ('where are we?' locate-and-open-stage flow)"
     },
     {
@@ -514,7 +485,7 @@
       "author": null,
       "contributor": null,
       "id": "index_locateonroute",
-      "community": 5,
+      "community": 3,
       "norm_label": "locateonroute (gpx track if available, else waypoints)"
     },
     {
@@ -527,7 +498,7 @@
       "author": null,
       "contributor": null,
       "id": "index_locateontrack",
-      "community": 5,
+      "community": 3,
       "norm_label": "locateontrack (nearest gpx point \u2192 route km + altitude)"
     },
     {
@@ -540,7 +511,7 @@
       "author": null,
       "contributor": null,
       "id": "index_locateonwaypoints",
-      "community": 4,
+      "community": 2,
       "norm_label": "locateonwaypoints (segment projection fallback)"
     },
     {
@@ -553,7 +524,7 @@
       "author": null,
       "contributor": null,
       "id": "index_projseg",
-      "community": 4,
+      "community": 2,
       "norm_label": "projseg (point-to-segment projection in lat/lon space)"
     },
     {
@@ -566,7 +537,7 @@
       "author": null,
       "contributor": null,
       "id": "index_hav",
-      "community": 5,
+      "community": 3,
       "norm_label": "hav (haversine distance)"
     },
     {
@@ -579,7 +550,7 @@
       "author": null,
       "contributor": null,
       "id": "index_parsegpxtext",
-      "community": 2,
+      "community": 3,
       "norm_label": "parsegpxtext (trkpt/rtept extraction)"
     },
     {
@@ -592,7 +563,7 @@
       "author": null,
       "contributor": null,
       "id": "index_buildtrack",
-      "community": 2,
+      "community": 3,
       "norm_label": "buildtrack (downsample, cumulative km, anchor overnight stops)"
     },
     {
@@ -605,7 +576,7 @@
       "author": null,
       "contributor": null,
       "id": "index_loadgpxfile",
-      "community": 2,
+      "community": 3,
       "norm_label": "loadgpxfile (manual gpx load from files app)"
     },
     {
@@ -618,7 +589,7 @@
       "author": null,
       "contributor": null,
       "id": "index_autoloadbundled",
-      "community": 2,
+      "community": 3,
       "norm_label": "autoloadbundled (fetch track.gpx / track1..9.gpx and stitch)"
     },
     {
@@ -787,7 +758,7 @@
       "author": null,
       "contributor": null,
       "id": "index_updateprogress",
-      "community": 3,
+      "community": 5,
       "norm_label": "updateprogress (walked km bar, stage ticks, finish state)"
     },
     {
@@ -800,7 +771,7 @@
       "author": null,
       "contributor": null,
       "id": "index_opentoday",
-      "community": 5,
+      "community": 4,
       "norm_label": "opentoday (auto-open today's stage on boot)"
     },
     {
@@ -843,197 +814,221 @@
       "norm_label": "buildpacking (checklist grid with per-category progress)"
     },
     {
-      "label": "App Icon (180px) - Yellow Arrow Waymark",
-      "file_type": "image",
-      "source_file": "icon-180.png",
-      "source_location": null,
+      "label": "bookingUrl (Booking.com deep-link builder)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1075",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_180_appicon",
-      "community": 9,
-      "norm_label": "app icon (180px) - yellow arrow waymark"
+      "id": "index_bookingurl",
+      "community": 5,
+      "norm_label": "bookingurl (booking.com deep-link builder)"
     },
     {
-      "label": "Yellow Arrow (Camino de Santiago Waymark Motif)",
-      "file_type": "concept",
-      "source_file": "icon-180.png",
-      "source_location": null,
+      "label": "bedLink (per-bed book/info link)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1076-L1081",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "yellow_arrow_camino_motif",
-      "community": 9,
-      "norm_label": "yellow arrow (camino de santiago waymark motif)"
+      "id": "index_bedlink",
+      "community": 5,
+      "norm_label": "bedlink (per-bed book/info link)"
     },
     {
-      "label": "Caminho in October App",
-      "file_type": "concept",
-      "source_file": "icon-180.png",
-      "source_location": null,
+      "label": "bookAll (all-beds-in-town booking link)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1313",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "caminho_in_october_app",
-      "community": 9,
-      "norm_label": "caminho in october app"
+      "id": "index_bookall",
+      "community": 5,
+      "norm_label": "bookall (all-beds-in-town booking link)"
     },
     {
-      "label": "App Icon 192px (Yellow Camino Arrow)",
-      "file_type": "image",
-      "source_file": "icon-192.png",
-      "source_location": null,
+      "label": "stageISOPlus (stage date + N days ISO)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1072",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_192_appicon",
-      "community": 8,
-      "norm_label": "app icon 192px (yellow camino arrow)"
+      "id": "index_stageisoplus",
+      "community": 5,
+      "norm_label": "stageisoplus (stage date + n days iso)"
     },
     {
-      "label": "Camino Yellow Arrow Waymarker",
-      "file_type": "concept",
-      "source_file": "icon-192.png",
-      "source_location": null,
+      "label": "remainingUpDown (remaining ascent/descent from km)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1614-L1625",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camino_yellow_arrow",
-      "community": 8,
-      "norm_label": "camino yellow arrow waymarker"
+      "id": "index_remainingupdown",
+      "community": 4,
+      "norm_label": "remainingupdown (remaining ascent/descent from km)"
     },
     {
-      "label": "Camino de Santiago Pilgrimage",
-      "file_type": "concept",
-      "source_file": "icon-192.png",
-      "source_location": null,
+      "label": "notePace (record GPS fix into pace buffer)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1627-L1631",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camino_de_santiago",
-      "community": 8,
-      "norm_label": "camino de santiago pilgrimage"
+      "id": "index_notepace",
+      "community": 4,
+      "norm_label": "notepace (record gps fix into pace buffer)"
     },
     {
-      "label": "App Icon (512px) - Camino Waymark",
-      "file_type": "image",
-      "source_file": "icon-512.png",
-      "source_location": null,
+      "label": "livePace (measured speed over last 20 min)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1632-L1639",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_512_appicon",
-      "community": 8,
-      "norm_label": "app icon (512px) - camino waymark"
+      "id": "index_livepace",
+      "community": 4,
+      "norm_label": "livepace (measured speed over last 20 min)"
+    },
+    {
+      "label": "setBigStats (live dashboard stat tiles)",
+      "file_type": "code",
+      "source_file": "index.html",
+      "source_location": "L1718-L1755",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "index_setbigstats",
+      "community": 4,
+      "norm_label": "setbigstats (live dashboard stat tiles)"
+    },
+    {
+      "label": "manifest.json",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "manifest",
+      "community": 1,
+      "norm_label": "manifest.json"
+    },
+    {
+      "label": "id",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "manifest_id",
+      "community": 1,
+      "norm_label": "id"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "manifest_name",
+      "community": 1,
+      "norm_label": "name"
+    },
+    {
+      "label": "short_name",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "manifest_short_name",
+      "community": 1,
+      "norm_label": "short_name"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "manifest_description",
+      "community": 1,
+      "norm_label": "description"
+    },
+    {
+      "label": "start_url",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "manifest_start_url",
+      "community": 1,
+      "norm_label": "start_url"
+    },
+    {
+      "label": "scope",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "manifest_scope",
+      "community": 1,
+      "norm_label": "scope"
+    },
+    {
+      "label": "display",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "manifest_display",
+      "community": 1,
+      "norm_label": "display"
+    },
+    {
+      "label": "background_color",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "manifest_background_color",
+      "community": 1,
+      "norm_label": "background_color"
+    },
+    {
+      "label": "theme_color",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "manifest_theme_color",
+      "community": 1,
+      "norm_label": "theme_color"
+    },
+    {
+      "label": "icons",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "manifest_icons",
+      "community": 1,
+      "norm_label": "icons"
     }
   ],
   "links": [
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_background_color",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_description",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_display",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_icons",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_name",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_scope",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_short_name",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_start_url",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "manifest.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "manifest",
-      "target": "manifest_theme_color",
-      "confidence_score": 1.0
-    },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
@@ -1041,9 +1036,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "sw",
-      "target": "sw_assets",
-      "confidence_score": 1.0
+      "target": "sw_assets"
     },
     {
       "relation": "references",
@@ -1144,6 +1139,76 @@
       "weight": 1.0,
       "source": "readme_fixed_facts",
       "target": "index_viaxe_logistics"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "icon-180.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon_180_appicon",
+      "target": "caminho_in_october_app"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "icon-180.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon_180_appicon",
+      "target": "yellow_arrow_camino_motif"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "icon-180.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "caminho_in_october_app",
+      "target": "yellow_arrow_camino_motif"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "icon-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon_192_appicon",
+      "target": "camino_de_santiago"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "icon-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon_192_appicon",
+      "target": "camino_yellow_arrow"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "icon-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "camino_yellow_arrow",
+      "target": "camino_de_santiago"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "icon-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon_512_appicon",
+      "target": "camino_de_santiago"
     },
     {
       "relation": "conceptually_related_to",
@@ -1310,10 +1375,50 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "index.html",
+      "source_location": "L1312",
+      "weight": 1.0,
+      "source": "index_render",
+      "target": "index_bedlink"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "L1313",
+      "weight": 1.0,
+      "source": "index_render",
+      "target": "index_bookall"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1313",
+      "weight": 1.0,
+      "source": "index_render",
+      "target": "index_bookingurl"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
       "source_location": "L1315",
       "weight": 1.0,
       "source": "index_render",
       "target": "index_profilesvg"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1309",
+      "weight": 1.0,
+      "source": "index_render",
+      "target": "index_stageisoplus"
     },
     {
       "relation": "calls",
@@ -1380,6 +1485,16 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "index.html",
+      "source_location": "L1615",
+      "weight": 1.0,
+      "source": "index_remainingupdown",
+      "target": "index_stagedetail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
       "source_location": "L1906",
       "weight": 1.0,
       "source": "index_opentoday",
@@ -1404,6 +1519,16 @@
       "weight": 1.0,
       "source": "index_sunsetlabel",
       "target": "index_loadweather"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1729",
+      "weight": 1.0,
+      "source": "index_setbigstats",
+      "target": "index_sunsetlabel"
     },
     {
       "relation": "calls",
@@ -1626,126 +1751,206 @@
       "target": "index_drawroute"
     },
     {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "icon-180.png",
-      "source_location": null,
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1080",
       "weight": 1.0,
-      "source": "icon_180_appicon",
-      "target": "caminho_in_october_app"
+      "source": "index_bedlink",
+      "target": "index_bookingurl"
     },
     {
       "relation": "references",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "icon-180.png",
-      "source_location": null,
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1313",
       "weight": 1.0,
-      "source": "icon_180_appicon",
-      "target": "yellow_arrow_camino_motif"
+      "source": "index_bookall",
+      "target": "index_bookingurl"
     },
     {
-      "relation": "conceptually_related_to",
+      "relation": "semantically_similar_to",
       "confidence": "INFERRED",
-      "confidence_score": 0.75,
-      "source_file": "icon-180.png",
-      "source_location": null,
+      "confidence_score": 0.7,
+      "source_file": "index.html",
+      "source_location": "L1076-L1313",
       "weight": 1.0,
-      "source": "caminho_in_october_app",
-      "target": "yellow_arrow_camino_motif"
+      "source": "index_bedlink",
+      "target": "index_bookall"
     },
     {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.75,
-      "source_file": "icon-192.png",
-      "source_location": null,
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1723",
       "weight": 1.0,
-      "source": "icon_192_appicon",
-      "target": "camino_de_santiago"
+      "source": "index_setbigstats",
+      "target": "index_remainingupdown"
     },
     {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "icon-192.png",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "icon_192_appicon",
-      "target": "camino_yellow_arrow"
-    },
-    {
-      "relation": "conceptually_related_to",
+      "relation": "shares_data_with",
       "confidence": "INFERRED",
       "confidence_score": 0.95,
-      "source_file": "icon-192.png",
-      "source_location": null,
+      "source_file": "index.html",
+      "source_location": "L1629-L1634",
       "weight": 1.0,
-      "source": "camino_yellow_arrow",
-      "target": "camino_de_santiago"
+      "source": "index_notepace",
+      "target": "index_livepace"
     },
     {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "icon-512.png",
-      "source_location": null,
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L1724",
       "weight": 1.0,
-      "source": "icon_512_appicon",
-      "target": "camino_de_santiago"
+      "source": "index_setbigstats",
+      "target": "index_livepace"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_background_color",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_display",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_icons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_id",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_scope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_short_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_start_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "manifest",
+      "target": "manifest_theme_color",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [
     {
-      "id": "gpx_track_pipeline",
-      "label": "GPX Track Pipeline (load \u2192 parse \u2192 build \u2192 consume via camino-gpx)",
+      "id": "booking_link_system",
+      "label": "Booking.com deep-link generation with prefilled stage dates",
       "nodes": [
-        "index_autoloadbundled",
-        "index_loadgpxfile",
-        "index_parsegpxtext",
-        "index_buildtrack",
-        "index_stagedetail",
-        "index_locateontrack",
-        "index_drawroute"
+        "index_bookingurl",
+        "index_bedlink",
+        "index_bookall",
+        "index_stageisoplus",
+        "index_render"
       ],
       "relation": "participate_in",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
       "source_file": "index.html"
     },
     {
-      "id": "supabase_two_phone_sync",
-      "label": "Two-Phone Supabase Sync (progress, boat booking, journal)",
+      "id": "live_hiking_dashboard",
+      "label": "Live hiking dashboard: climb-left, ETA and measured pace",
       "nodes": [
-        "readme_supabase_sync_setup",
-        "index_collectshared",
-        "index_mergeshared",
-        "index_pullshared",
-        "index_pushshared",
-        "index_pulljournal",
-        "index_pushjournalentry"
+        "index_remainingupdown",
+        "index_notepace",
+        "index_livepace",
+        "index_setbigstats"
       ],
       "relation": "participate_in",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "index.html"
-    },
-    {
-      "id": "dynamic_stage_planner",
-      "label": "Dynamic Stage Planning System (presets/custom stops rebuild every card)",
-      "nodes": [
-        "index_plans",
-        "index_buildstages",
-        "index_wpts",
-        "index_render",
-        "index_updateprogress"
-      ],
-      "relation": "form",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
       "source_file": "index.html"
     }
   ],
-  "built_at_commit": "12f6645425fad93c08a5a878238cf94638a13ac9"
+  "built_at_commit": "207b88903391a193c3e6cb496531e0281fe82718"
 }
