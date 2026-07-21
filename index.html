@@ -487,6 +487,9 @@
   .stage-badge span{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;border:2px solid var(--night-deep);box-shadow:0 0 8px rgba(242,194,48,.6)}
   .stage-badge.end span{background:var(--gold-bright);width:24px;height:24px;font-size:.66rem}
   .map-tt.town.stage{color:var(--gold-bright);border-color:rgba(242,194,48,.45);font-weight:700}
+  /* declutter: at the zoomed-out overview, drop the name labels (badges/dots stay) */
+  #route-map.labels-far .leaflet-tooltip.map-tt.town,
+  #route-map.labels-far .leaflet-tooltip.map-tt.boat{display:none}
   .found-pin{font-size:15px;line-height:24px;text-align:center;color:#ffb37a;filter:drop-shadow(0 0 5px rgba(224,120,86,.95))}
   .leaflet-popup-content .pp-when{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-bright)}
   /* live "beds near" results panel */
@@ -2078,8 +2081,16 @@ function initMap(){
     d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
     d.onclick=e=>{e.preventDefault();mapLocate();};return d;}});
   new Ctl({position:"topleft"}).addTo(MAP);
+  MAP.on("zoomend",updateLabelZoom);
   drawRoute();
   refreshMapStatus();
+}
+// Town-name labels collide at the full-route overview. Hide them below this zoom
+// (numbered stage badges + dots still show); reveal names as you zoom in.
+const LABEL_MIN_ZOOM=11;
+function updateLabelZoom(){
+  const rm=document.getElementById("route-map");if(!rm||!MAP)return;
+  rm.classList.toggle("labels-far",MAP.getZoom()<LABEL_MIN_ZOOM);
 }
 let mapLabels=store.get("camino-map-labels",true);   // town names on/off
 let mapPoints=store.get("camino-map-points",true);   // albergues + sights on/off
@@ -2146,6 +2157,7 @@ function drawRoute(fit){
   });
   grp.addTo(MAP);MAPLAYER=grp;
   if(fit!==false)MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+  updateLabelZoom();
 }
 function toggleLabels(){
   mapLabels=!mapLabels;store.set("camino-map-labels",mapLabels);
