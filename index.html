@@ -884,9 +884,9 @@
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/><circle cx="15" cy="12" r="1.5"/></svg>Vigo &middot; <em>the reward</em></h3>
       <div class="food-list">
         <div class="food-card">
-          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>R&uacute;a da Pedra &middot; the oysters</div>
-          <p class="food-desc">The ostreiras have shucked oysters on this street for generations. From ~11:00. <strong>The contractual finish line</strong>, and with the 17:25 AVE, a whole victory morning for it.</p>
-          <a href="https://maps.apple.com/?q=R%C3%BAa%20da%20Pedra%20Vigo" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>A Pedra &middot; R&uacute;a das Ostras &middot; the oysters</div>
+          <p class="food-desc">The ostreiras have shucked oysters on the <strong>Mercado da Pedra</strong> (R&uacute;a das Ostras / Pescader&iacute;a) for generations. From ~11:00. <strong>The contractual finish line</strong>, and with the 17:25 AVE, a whole victory morning for it.</p>
+          <a href="https://maps.apple.com/?ll=42.2390,-8.7250&q=Mercado%20da%20Pedra%2C%20Vigo" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/></svg>Captain Nemo's harbour</div>
@@ -1092,7 +1092,7 @@ const WPTS=[
  {km:146.5,name:"Priegue",alt:150,q:"Priegue, Nigr\u00e1n, Spain",lat:42.1570,lon:-8.7990},
  {km:149.5,name:"Sai\u00e1ns",alt:90,q:"Sai\u00e1ns, Vigo, Spain",lat:42.1760,lon:-8.8120},
  {km:152.5,name:"Coruxo",alt:60,q:"Coruxo, Vigo, Spain",lat:42.1910,lon:-8.7880},
- {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",poi:"Verne statue on the waterfront, oysters on R\u00faa da Pedra",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
+ {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",poi:"Verne statue on the waterfront, oysters at A Pedra (R\u00faa das Ostras)",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
 ];
 const IDX={};WPTS.forEach((w,i)=>{if(w.id)IDX[w.id]=i;});
 const SEG_ELEV={"porto>vilacha":[75,130],"vilacha>vdc":[30,35],"vdc>apulia":[55,55],"apulia>esposende":[45,45],"esposende>cneiva":[140,80],"cneiva>viana":[190,250],"viana>ancora":[180,185],"ancora>caminha":[60,60],"caminha>aguarda":[40,5],"aguarda>oia":[150,170],"oia>mougas":[40,35],"mougas>baiona":[160,175],"baiona>vigo":[380,360]};
