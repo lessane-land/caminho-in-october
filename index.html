@@ -482,6 +482,31 @@
   .map-wrap.fullscreen #route-map{flex:1;height:auto;min-height:0}
   .map-wrap.fullscreen .map-tools{margin-top:0}
   .map-wrap.fullscreen .dl-wrap{margin-top:0}
+  /* numbered stage badges on the map */
+  .stage-badge{display:flex;align-items:center;justify-content:center}
+  .stage-badge span{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;border:2px solid var(--night-deep);box-shadow:0 0 8px rgba(242,194,48,.6)}
+  .stage-badge.end span{background:var(--gold-bright);width:24px;height:24px;font-size:.66rem}
+  .map-tt.town.stage{color:var(--gold-bright);border-color:rgba(242,194,48,.45);font-weight:700}
+  .found-pin{font-size:15px;line-height:24px;text-align:center;color:#ffb37a;filter:drop-shadow(0 0 5px rgba(224,120,86,.95))}
+  .leaflet-popup-content .pp-when{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-bright)}
+  /* live "beds near" results panel */
+  .beds-panel{position:absolute;left:0;right:0;bottom:0;z-index:500;background:var(--night-soft);border-top:1px solid var(--gold);border-radius:14px 14px 0 0;box-shadow:0 -14px 40px -12px rgba(0,0,0,.7);max-height:56%;display:none;flex-direction:column}
+  .beds-panel.show{display:flex;animation:fadeIn .25s ease}
+  .map-wrap.fullscreen .beds-panel{border-radius:14px 14px 0 0}
+  .beds-panel-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--night-border)}
+  .beds-panel-head b{font-family:'Fraunces',serif;font-size:1rem;color:var(--paper);font-weight:500}
+  .beds-panel-head button{background:none;border:none;color:var(--mute);font-size:1rem;cursor:pointer;padding:4px 8px}
+  .beds-list{overflow-y:auto;padding:4px 8px 8px}
+  .bed-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 10px;border-bottom:1px solid var(--night-border);cursor:pointer;border-radius:6px}
+  .bed-row:hover{background:var(--night-card)}
+  .bed-row-main{min-width:0}
+  .bed-name{display:block;color:var(--paper);font-size:.9rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bed-meta{display:block;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-top:2px}
+  .bed-row-links{display:flex;gap:6px;flex:none}
+  .bed-row-links a{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:4px 9px;text-decoration:none}
+  .bed-row-links a:hover{background:var(--sea-deep);color:var(--paper)}
+  .beds-empty{padding:24px 16px;text-align:center;font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.9rem;line-height:1.5}
+  .beds-foot{padding:9px 16px;font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute-dim);border-top:1px solid var(--night-border)}
   /* new-version banner */
   .update-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:400;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:9px 9px 9px 18px;display:none;align-items:center;gap:14px;box-shadow:0 14px 44px -10px rgba(0,0,0,.7);max-width:calc(100vw - 28px)}
   .update-toast.show{display:flex;animation:fadeIn .3s ease}
@@ -669,6 +694,7 @@
         <div class="map-tools">
           <button class="map-btn" id="full-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>Grande</button>
           <button class="map-btn on" id="points-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Places</button>
+          <button class="map-btn" id="beds-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M7 8V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2"/></svg>Beds near</button>
           <button class="map-btn" id="follow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Follow me</button>
           <button class="map-btn" id="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Save maps offline</button>
           <button class="map-btn on" id="labels-btn" title="Show/hide town names"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2M9 20h6M12 4v16"/></svg>Names</button>
@@ -679,6 +705,11 @@
           <div class="dl-top"><span>Downloading map for the whole route</span><b id="dl-pct">0%</b></div>
           <div class="dl-bar"><i id="dl-fill"></i></div>
           <div class="dl-sub" id="dl-sub">Preparing tiles…</div>
+        </div>
+        <div class="beds-panel" id="beds-panel">
+          <div class="beds-panel-head"><b id="beds-title">Beds nearby</b><button id="beds-close" aria-label="Close">✕</button></div>
+          <div class="beds-list" id="beds-list"></div>
+          <div class="beds-foot">Live from OpenStreetMap · tap a result to find it on the map</div>
         </div>
         <div id="map-fallback" style="display:none">
         <svg class="map-svg" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
@@ -1340,7 +1371,7 @@ function renderPlans(){
   else if(planId==="X"&&longest>32){warn.textContent=`Careful: our longest day is ${longest.toFixed(1)} km. In October daylight that is a headlamp situation.`;warn.classList.add("show");}
   else warn.classList.remove("show");
 }
-function setPlan(id){planId=id;store.set("camino-plan",id);STAGES=buildStages();renderPlans();render();}
+function setPlan(id){planId=id;store.set("camino-plan",id);STAGES=buildStages();renderPlans();render();if(typeof MAP!=="undefined"&&MAP)drawRoute(false);}
 function toggleStop(id){
   customStops=customStops.includes(id)?customStops.filter(x=>x!==id):[...customStops,id];
   store.set("camino-custom",customStops);
@@ -2095,12 +2126,23 @@ function drawRoute(fit){
     const m=L.marker([w.lat,w.lon],{icon:L.divIcon({className:sight?"poi-pin":"bed-pin",html:sight?"\u25c6":"\u2302",iconSize:[22,22],iconAnchor:[11,11]}),zIndexOffset:sight?200:100}).addTo(grp);
     m.bindPopup(wpPopup(w));
   });
-  // The overnight-stop towns: always shown, with permanent name labels.
+  // Towns. Stops in the CURRENT plan get a numbered stage badge (Start, Day 1,
+  // Day 2 …); other named towns stay as small teal dots. Reflects A/D/X live.
+  const stops=currentStops(),stopK={};stops.forEach((id,k)=>stopK[id]=k);
   WPTS.filter(w=>w.id).forEach(w=>{
-    const end=(w.id==="porto"||w.id==="vigo");
-    const m=L.circleMarker([w.lat,w.lon],{radius:end?9:6,color:end?"#f2c230":"#5fc2bb",weight:2,fillColor:end?"#f2c230":"#3fa7a0",fillOpacity:1}).addTo(grp);
-    m.bindTooltip(w.name.split(",")[0].split(" (")[0],{permanent:mapLabels,direction:"right",className:"map-tt town"+(end?" end":""),offset:[8,0]});
-    m.bindPopup(wpPopup(w));
+    const k=stopK[w.id];
+    const label=w.name.split(",")[0].split(" (")[0];
+    if(k!==undefined){
+      const badge=k===0?"▶":String(k);
+      const when=k===0?"Start of the walk":("End of stage "+k+" · "+stageDateLabel(k-1));
+      L.marker([w.lat,w.lon],{icon:L.divIcon({className:"stage-badge"+(k===0||k===stops.length-1?" end":""),html:"<span>"+badge+"</span>",iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:600}).addTo(grp)
+        .bindTooltip(label,{permanent:mapLabels,direction:"right",className:"map-tt town stage",offset:[11,0]})
+        .bindPopup(wpPopup(w)+"<br><span class='pp-when'>"+when+"</span>");
+    }else{
+      const m=L.circleMarker([w.lat,w.lon],{radius:5,color:"#5fc2bb",weight:2,fillColor:"#3fa7a0",fillOpacity:1}).addTo(grp);
+      m.bindTooltip(label,{permanent:mapLabels,direction:"right",className:"map-tt town",offset:[8,0]});
+      m.bindPopup(wpPopup(w));
+    }
   });
   grp.addTo(MAP);MAPLAYER=grp;
   if(fit!==false)MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
@@ -2127,6 +2169,88 @@ function toggleFullscreen(){
     const ll=(g&&g.P&&g.P.length>10)?g.P.map(p=>[p[0],p[1]]):WPTS.map(w=>[w.lat,w.lon]);
     MAP.fitBounds(L.latLngBounds(ll).pad(full?0.05:0.08));
   },60);
+}
+
+/* ---- live bed search: every albergue/hostel near a point, via OpenStreetMap ---- */
+const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+let BEDSFOUND=null,bedsMarkers=[],bedsSearching=false;
+async function overpassLodging(lat,lon,radius){
+  const q=`[out:json][timeout:25];(node["tourism"~"^(hostel|guest_house|hotel|apartment|motel|chalet)$"](around:${radius},${lat},${lon});way["tourism"~"^(hostel|guest_house|hotel|apartment)$"](around:${radius},${lat},${lon}););out center 80;`;
+  let lastErr;
+  for(const url of OVERPASS){
+    try{
+      const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),20000);
+      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q),signal:ctrl.signal});
+      clearTimeout(to);
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      const j=await r.json();return j.elements||[];
+    }catch(e){lastErr=e;}
+  }
+  throw lastErr||new Error("no data");
+}
+function bedTypeLabel(t){return{hostel:"Albergue / hostel",guest_house:"Guesthouse",hotel:"Hotel",apartment:"Apartment",motel:"Motel",chalet:"Chalet"}[t]||"Lodging";}
+function normBeds(els,lat,lon){
+  const seen=new Set(),out=[];
+  els.forEach(el=>{
+    const c=el.type==="node"?{lat:el.lat,lon:el.lon}:el.center;if(!c)return;
+    const t=el.tags||{};const name=t.name||t["name:pt"]||t["name:gl"]||t["name:es"];if(!name)return;
+    const key=name.toLowerCase()+Math.round(c.lat*2000)+Math.round(c.lon*2000);if(seen.has(key))return;seen.add(key);
+    out.push({name,type:t.tourism||"lodging",lat:c.lat,lon:c.lon,phone:t.phone||t["contact:phone"]||null,site:t.website||t["contact:website"]||null,dist:hav(lat,lon,c.lat,c.lon)});
+  });
+  out.sort((a,b)=>a.dist-b.dist);return out;
+}
+function bedFoundPopup(b){
+  const q=encodeURIComponent(b.name);
+  let s="<b>"+escapeHtml(b.name)+"</b><br><span class='pp-km'>"+bedTypeLabel(b.type)+" · "+(b.dist<1?Math.round(b.dist*1000)+" m":b.dist.toFixed(1)+" km")+" away</span>";
+  s+="<br><a href='https://maps.apple.com/?ll="+b.lat+","+b.lon+"&q="+q+"' target='_blank' rel='noopener'>Maps</a> · <a href='https://www.booking.com/searchresults.html?ss="+q+"&group_adults=2&no_rooms=1' target='_blank' rel='noopener'>Booking</a>";
+  if(b.phone)s+=" · <a href='tel:"+b.phone.replace(/[^+\d]/g,"")+"'>Call</a>";
+  return s;
+}
+function renderBedsList(beds,where){
+  const ttl=document.getElementById("beds-title"),list=document.getElementById("beds-list");
+  ttl.textContent=(beds.length?beds.length:"No")+" bed"+(beds.length===1?"":"s")+" within 3 km of "+where;
+  if(!beds.length){list.innerHTML='<div class="beds-empty">Nothing tagged nearby on OpenStreetMap. Try the curated beds in each stage, or move the map and search again.</div>';return;}
+  list.innerHTML=beds.slice(0,40).map((b,i)=>{
+    const q=encodeURIComponent(b.name);
+    const d=b.dist<1?Math.round(b.dist*1000)+" m":b.dist.toFixed(1)+" km";
+    return `<div class="bed-row" data-i="${i}">
+      <div class="bed-row-main"><span class="bed-name">${escapeHtml(b.name)}</span><span class="bed-meta">${bedTypeLabel(b.type)} · ${d}</span></div>
+      <div class="bed-row-links"><a href="https://www.booking.com/searchresults.html?ss=${q}&group_adults=2&no_rooms=1" target="_blank" rel="noopener" onclick="event.stopPropagation()">book</a>${b.phone?`<a href="tel:${b.phone.replace(/[^+\\d]/g,"")}" onclick="event.stopPropagation()">call</a>`:""}<a href="https://maps.apple.com/?ll=${b.lat},${b.lon}&q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()">maps</a></div>
+    </div>`;
+  }).join("");
+  list.querySelectorAll(".bed-row").forEach(row=>{
+    row.addEventListener("click",()=>{
+      const m=bedsMarkers[+row.dataset.i];if(m&&MAP){MAP.panTo(m.getLatLng());m.openPopup();}
+    });
+  });
+}
+async function findBedsNear(){
+  if(!MAP||bedsSearching)return;
+  const panel=document.getElementById("beds-panel"),list=document.getElementById("beds-list"),ttl=document.getElementById("beds-title");
+  let lat,lon,where;
+  if(mapWatch!=null&&MAPME){const c=MAPME.getLatLng();lat=c.lat;lon=c.lng;where="where we are now";}
+  else{const c=MAP.getCenter();lat=c.lat;lon=c.lng;where="here";}
+  panel.classList.add("show");ttl.textContent="Searching beds near "+where+"…";list.innerHTML='<div class="beds-empty">Looking on OpenStreetMap…</div>';
+  bedsSearching=true;
+  try{
+    const beds=normBeds(await overpassLodging(lat,lon,3000),lat,lon);
+    if(BEDSFOUND)BEDSFOUND.remove();
+    BEDSFOUND=L.layerGroup();bedsMarkers=[];
+    beds.slice(0,40).forEach(b=>{
+      const m=L.marker([b.lat,b.lon],{icon:L.divIcon({className:"found-pin",html:"⌂",iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:500}).bindPopup(bedFoundPopup(b));
+      m.addTo(BEDSFOUND);bedsMarkers.push(m);
+    });
+    BEDSFOUND.addTo(MAP);
+    renderBedsList(beds,where);
+  }catch(e){
+    ttl.textContent="Couldn't reach OpenStreetMap";
+    list.innerHTML='<div class="beds-empty">No signal or the map service is busy. The beds baked into each stage still work offline — try this again with a better connection.</div>';
+  }
+  bedsSearching=false;
+}
+function closeBedsPanel(){
+  const p=document.getElementById("beds-panel");if(p)p.classList.remove("show");
+  if(BEDSFOUND){BEDSFOUND.remove();BEDSFOUND=null;bedsMarkers=[];}
 }
 function mapLocate(){
   if(!navigator.geolocation||!MAP)return;
@@ -2416,7 +2540,9 @@ document.getElementById("labels-btn").classList.toggle("on",mapLabels);
 document.getElementById("full-btn").addEventListener("click",toggleFullscreen);
 document.getElementById("points-btn").addEventListener("click",togglePoints);
 document.getElementById("points-btn").classList.toggle("on",mapPoints);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".map-wrap.fullscreen"))toggleFullscreen();});
+document.getElementById("beds-btn").addEventListener("click",findBedsNear);
+document.getElementById("beds-close").addEventListener("click",closeBedsPanel);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(document.getElementById("beds-panel").classList.contains("show"))closeBedsPanel();else if(document.querySelector(".map-wrap.fullscreen"))toggleFullscreen();}});
 
 /* service worker + one-tap update banner */
 function showUpdateBanner(reg){
