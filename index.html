@@ -1123,7 +1123,7 @@
   <div class="big-rotate">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><line x1="11" y1="18.5" x2="13" y2="18.5"/><path d="M2 12a5 5 0 0 1 5-5"/><path d="M22 12a5 5 0 0 0-5-5"/></svg>
     <b>Turn your phone sideways</b>
-    <span>the stage profile is built for landscape — drag along it to read any point</span>
+    <span>the stage profile is built for landscape · drag along it to read any point</span>
   </div>
 </div>
 
@@ -1227,12 +1227,12 @@ const SVCS=[
 /* Plan B per stretch: how to skip ahead or bail WITHOUT walking (verified Jul 2026:
    Metro do Porto line B, Transdev 107 + A28 express, CP Linha do Minho, ATSA coastal) */
 const PLANB=[
- [0,28,"Metro line B runs Porto ↔ Vila do Conde ↔ Póvoa every 20-30 min all day — hop on at Matosinhos or Mindelo if day one bites. Cheap, ~1 h."],
+ [0,28,"Metro line B runs Porto ↔ Vila do Conde ↔ Póvoa every 20-30 min all day. Hop on at Matosinhos or Mindelo if day one bites. Cheap, ~1 h."],
  [28,52,"Metro B still covers Vila do Conde ↔ Póvoa. Póvoa/Apúlia → Esposende has NO train: Transdev bus 107 (Braga–Esposende–Póvoa line) or a ~15 min taxi."],
  [52,77,"No train until Viana. Transdev's A28 express (Viana–Esposende–Porto) or a ~25 min taxi Esposende → Viana; from Darque a city bus crosses into Viana."],
- [77,104,"Easiest bail-out stretch of the walk: CP Linha do Minho hugs this coast — stations at Viana, Vila Praia de Âncora, Moledo and Caminha, regional trains every few hours."],
- [104,122.5,"After the boat: ATSA coastal bus A Guarda–Oia–Baiona–Vigo, sparse (1-2/day) — call 986 610 255 (A Guarda) to confirm times, or taxi A Guarda/Oia → Baiona (~20-30 min)."],
- [122.5,135.5,"Same sparse ATSA coastal line passes Mougás toward Baiona; Baiona taxis 986 355 330. Short stage — a taxi hop costs little if the knees protest."],
+ [77,104,"Easiest bail-out stretch of the walk: CP Linha do Minho hugs this coast: stations at Viana, Vila Praia de Âncora, Moledo and Caminha, regional trains every few hours."],
+ [104,122.5,"After the boat: ATSA coastal bus A Guarda–Oia–Baiona–Vigo, sparse (1-2/day). Call 986 610 255 (A Guarda) to confirm times, or taxi A Guarda/Oia → Baiona (~20-30 min)."],
+ [122.5,135.5,"Same sparse ATSA coastal line passes Mougás toward Baiona; Baiona taxis 986 355 330. Short stage. A taxi hop costs little if the knees protest."],
  [135.5,160.5,"Buses Baiona ↔ Vigo run all day via A Ramallosa and Coruxo (~1 h). Sit down, ride into Vigo like sensible people, zero shame at km 135."]
 ];
 const FIELD=[
@@ -1311,7 +1311,7 @@ function solarTimes(i,st){
   return {rise:(noon-ha/15+0.17)*60,set:(noon+ha/15-0.17)*60};
 }
 /* pilgrim logic, not survival logic: leave early enough to ARRIVE by ~15:30
-   (albergue beds, showers, the evening) — never earlier than first light.
+   (albergue beds, showers, the evening), never earlier than first light.
    Time on feet = Naismith (distance + climb) + ~1 h of stops. */
 function leaveByLabel(i,st){
   const s=solarTimes(i,st);if(!s)return "";
@@ -2023,8 +2023,8 @@ function bigRepaint(){
   document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
   setBigCap(st);
 }
-// The landscape side panel: everything about this day — beds tonight, beds on
-// the way, the sights, and the services — using the space the wide screen gives.
+// The landscape side panel: everything about this day (beds tonight, beds on
+// the way, the sights, the services), using the space the wide screen gives.
 function setBigDetails(st){
   const el=document.getElementById("big-details");if(!el||!st)return;
   const bedRow=(a,w)=>`<div class="bd-bed"><span>${escapeHtml(a[0])} <em>${a[2]}</em></span><span class="bd-links">${bedMapsLink(a,w)}${mapBedLink(a,w)}</span></div>`;
@@ -2032,13 +2032,13 @@ function setBigDetails(st){
   const destIdx=st.seg.length-1;
   h+=`<div class="bd-sec"><h5 class="bd-click" onclick="selectBigWp(${destIdx})">Tonight · ${st.b.name.split(",")[0]} <i>· show</i></h5>`;
   if(st.b.sleep&&st.b.sleep.length)h+=st.b.sleep.map(a=>bedRow(a,st.b)).join("");
-  else h+=`<p class="bd-note">The finish — we pick where to celebrate.</p>`;
+  else h+=`<p class="bd-note">The finish. We pick where to celebrate.</p>`;
   if(EVENINGS[st.b.id])h+=`<p class="bd-note">${EVENINGS[st.b.id]}</p>`;
   h+=`</div>`;
   const midBeds=st.seg.map((w,i)=>[w,i]).filter(([w])=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
   if(midBeds.length)h+=`<div class="bd-sec"><h5>Beds on the way</h5>`+midBeds.map(([w,i])=>`<div class="bd-grp bd-click" onclick="selectBigWp(${i})"><b>${w.name.split(",")[0]}</b> <span>· km ${(w.km-st.a.km).toFixed(1).replace(".0","")} · show</span>${w.sleep.map(a=>bedRow(a,w)).join("")}</div>`).join("")+`</div>`;
   const sights=st.seg.map((w,i)=>[w,i]).filter(([w])=>w.poi);
-  if(sights.length)h+=`<div class="bd-sec"><h5>Sights this stage</h5>`+sights.map(([w,i])=>`<div class="bd-sight bd-click" onclick="selectBigWp(${i})"><b>${w.name.split(",")[0]}</b> — ${w.poi}</div>`).join("")+`</div>`;
+  if(sights.length)h+=`<div class="bd-sec"><h5>Sights this stage</h5>`+sights.map(([w,i])=>`<div class="bd-sight bd-click" onclick="selectBigWp(${i})"><b>${w.name.split(",")[0]}</b> · ${w.poi}</div>`).join("")+`</div>`;
   if(st.svc)h+=`<div class="bd-sec"><h5>Services</h5><p class="bd-note">${st.svc}</p></div>`;
   const fn=FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ");
   if(fn)h+=`<div class="bd-sec"><h5>Field note</h5><p class="bd-note">${fn}</p></div>`;
@@ -2349,7 +2349,7 @@ function mapBedLink(a,w){
   const url=iso?bookingUrl(a[0]+", "+town,iso,isoNext):("https://www.booking.com/searchresults.html?ss="+encodeURIComponent(a[0]+", "+town)+"&group_adults=2&no_rooms=1");
   return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">book</a>`;
 }
-// Apple Maps search for the albergue BY NAME, anchored near its waypoint —
+// Apple Maps search for the albergue BY NAME, anchored near its waypoint;
 // lands on the actual door so directions can start from wherever we are.
 function bedMapsLink(a,w){
   return `<a href="https://maps.apple.com/?q=${encodeURIComponent(a[0]+", "+w.q.split(",")[0])}&sll=${w.lat},${w.lon}&z=15" target="_blank" rel="noopener" onclick="event.stopPropagation()">maps</a>`;
@@ -2509,7 +2509,7 @@ async function findBedsNear(){
     renderBedsList(beds,where);
   }catch(e){
     ttl.textContent="Couldn't reach OpenStreetMap";
-    list.innerHTML='<div class="beds-empty">No signal or the map service is busy. The beds baked into each stage still work offline — try this again with a better connection.</div>';
+    list.innerHTML='<div class="beds-empty">No signal or the map service is busy. The beds baked into each stage still work offline. Try this again with a better connection.</div>';
   }
   bedsSearching=false;
 }
@@ -2582,7 +2582,7 @@ async function findNear(kind){
     });
     BEDSFOUND.addTo(MAP);
     ttl.textContent=(items.length||"No")+" "+K.label.toLowerCase()+(items.length===1?"":"s")+" within 2 km of "+where;
-    if(!items.length){list.innerHTML='<div class="beds-empty">Nothing tagged nearby on OpenStreetMap. Towns on the route usually have one — try from the town centre.</div>';}
+    if(!items.length){list.innerHTML='<div class="beds-empty">Nothing tagged nearby on OpenStreetMap. Towns on the route usually have one. Try from the town centre.</div>';}
     else{
       list.innerHTML=items.slice(0,30).map((b,i)=>`<div class="bed-row" data-i="${i}">
         <div class="bed-row-main"><span class="bed-name">${escapeHtml(b.name)}</span><span class="bed-meta">${amenityLabel(b.type)} · ${b.dist<1?Math.round(b.dist*1000)+" m":b.dist.toFixed(1)+" km"}</span></div>
@@ -2594,7 +2594,7 @@ async function findNear(kind){
     }
   }catch(e){
     ttl.textContent="Couldn't reach OpenStreetMap";
-    list.innerHTML='<div class="beds-empty">No signal or the service is busy — try again in a minute.</div>';
+    list.innerHTML='<div class="beds-empty">No signal or the service is busy. Try again in a minute.</div>';
   }
   bedsSearching=false;
 }
@@ -2701,7 +2701,7 @@ async function downloadOfflineMaps(){
   const fill=document.getElementById("dl-fill"),pct=document.getElementById("dl-pct"),sub=document.getElementById("dl-sub");
   const keys=routeTiles();
   const mb=Math.round(keys.length*0.018);
-  if(!confirm(`Save the whole Porto→Vigo map for offline use?\n\n${keys.length.toLocaleString()} map tiles · about ${mb} MB.\nDo this on wifi. You can keep walking once it's done — the map will work with no signal.`))return;
+  if(!confirm(`Save the whole Porto→Vigo map for offline use?\n\n${keys.length.toLocaleString()} map tiles · about ${mb} MB.\nDo this on wifi. You can keep walking once it's done; the map will work with no signal.`))return;
   dlRunning=true;btn.classList.add("busy");wrap.classList.add("show");
   const cache=await caches.open("camino-tiles");
   let done=0,failed=0;const total=keys.length;
@@ -2878,7 +2878,7 @@ function initJournal(){
   });
 }
 
-/* credencial stamp gallery — one slot per overnight, keyed by town id (plan-proof) */
+/* credencial stamp gallery: one slot per overnight, keyed by town id (plan-proof) */
 let stamps=store.get("camino-stamps",{});
 let stampKey=null;
 function stampSlots(){
@@ -2923,7 +2923,7 @@ function initStamps(){
         const s=Math.min(img.width,img.height),c=document.createElement("canvas");c.width=c.height=520;
         c.getContext("2d").drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,520,520);
         stamps[stampKey]=c.toDataURL("image/jpeg",0.72);
-        try{store.set("camino-stamps",stamps);}catch(err){alert("Storage is full — free some journal photos first.");delete stamps[stampKey];}
+        try{store.set("camino-stamps",stamps);}catch(err){alert("Storage is full. Free some journal photos first.");delete stamps[stampKey];}
         renderStamps();
       };
       img.src=ev.target.result;

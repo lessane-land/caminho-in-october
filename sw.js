@@ -1,5 +1,5 @@
 const CACHE = "camino-v32";
-const TILE_CACHE = "camino-tiles";   // offline map tiles — persists across app updates, only cleared on demand
+const TILE_CACHE = "camino-tiles";   // offline map tiles; persists across app updates, only cleared on demand
 const ASSETS = ["./", "./index.html", "./manifest.json", "./config.js", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
 self.addEventListener("install", e => {
@@ -70,7 +70,7 @@ self.addEventListener("fetch", e => {
   }
 
   // Everything else (icons, fonts, Leaflet): cache-first; only cache good responses.
-  // On a cache miss that also fails offline, return a clean 504 — NOT index.html,
+  // On a cache miss that also fails offline, return a clean 504, NOT index.html,
   // which would be parsed as JS/CSS for a missing script or stylesheet.
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
