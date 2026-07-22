@@ -466,6 +466,8 @@
   .bd-click{cursor:pointer;border-radius:6px;transition:background .15s}
   .bd-click:hover{background:var(--night-card)}
   .bd-sight.bd-click{padding-left:8px;margin-left:-8px}
+  .bd-links{display:flex;gap:5px;flex:none}
+  .bd-sec h5 i{font-style:normal;font-size:.52rem;letter-spacing:.08em;color:var(--mute);opacity:.8}
   .bd-sec{margin-bottom:16px}
   .bd-sec h5{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sea-shallow);font-weight:500;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--night-border)}
   .bd-bed{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0;font-size:.86rem;color:var(--ink-soft)}
@@ -1242,6 +1244,9 @@ function bedLink(a,townQ,iso,isoNext){
     return `<a class="book-mini" href="https://www.google.com/search?q=${encodeURIComponent(a[0]+" "+town+" albergue telefone")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">info</a>`;
   return `<a class="book-mini" href="${bookingUrl(a[0]+", "+town,iso,isoNext)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">book</a>`;
 }
+function bedMapsMini(a,w){
+  return `<a class="book-mini" href="https://maps.apple.com/?q=${encodeURIComponent(a[0]+", "+w.q.split(",")[0])}&sll=${w.lat},${w.lon}&z=15" target="_blank" rel="noopener" onclick="event.stopPropagation()">maps</a>`;
+}
 
 /* profile svg */
 function smoothPath(pts){
@@ -1471,8 +1476,8 @@ function render(){
     }).join("");
     const nightIso=stageISO(i),nightIsoNext=stageISOPlus(i,1);
     const midStops=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
-    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 km ${(w.km-st.a.km).toFixed(1).replace(".0","")} of the stage</span>${bedLink(a,w.q,nightIso,nightIsoNext)}</span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
-    const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span>${bedLink(a,st.b.q,nightIso,nightIsoNext)}</span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
+    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 km ${(w.km-st.a.km).toFixed(1).replace(".0","")} of the stage</span>${bedMapsMini(a,w)}${bedLink(a,w.q,nightIso,nightIsoNext)}</span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
+    const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span>${bedMapsMini(a,st.b)}${bedLink(a,st.b.q,nightIso,nightIsoNext)}</span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
     const bookAll=st.b.sleep&&st.b.sleep.length?`<a class="book-mini town" href="${bookingUrl(st.b.q,nightIso,nightIsoNext)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">All beds in ${st.b.name.split(",")[0]} for ${stageDateLabel(i)} \u00b7 Booking.com</a>`:"";
     return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
@@ -1931,9 +1936,10 @@ function bigRepaint(){
 // the way, the sights, and the services — using the space the wide screen gives.
 function setBigDetails(st){
   const el=document.getElementById("big-details");if(!el||!st)return;
-  const bedRow=(a,w)=>`<div class="bd-bed"><span>${escapeHtml(a[0])} <em>${a[2]}</em></span>${mapBedLink(a,w)}</div>`;
+  const bedRow=(a,w)=>`<div class="bd-bed"><span>${escapeHtml(a[0])} <em>${a[2]}</em></span><span class="bd-links">${bedMapsLink(a,w)}${mapBedLink(a,w)}</span></div>`;
   let h="";
-  h+=`<div class="bd-sec"><h5>Tonight · ${st.b.name.split(",")[0]}</h5>`;
+  const destIdx=st.seg.length-1;
+  h+=`<div class="bd-sec"><h5 class="bd-click" onclick="selectBigWp(${destIdx})">Tonight · ${st.b.name.split(",")[0]} <i>· show</i></h5>`;
   if(st.b.sleep&&st.b.sleep.length)h+=st.b.sleep.map(a=>bedRow(a,st.b)).join("");
   else h+=`<p class="bd-note">The finish — we pick where to celebrate.</p>`;
   if(EVENINGS[st.b.id])h+=`<p class="bd-note">${EVENINGS[st.b.id]}</p>`;
@@ -2247,15 +2253,20 @@ function mapNightISO(w){
 function mapBedLink(a,w){
   const town=w.q.split(",")[0];
   if(/municipal|parish|public|xunta|monaster|donation/i.test(a[1]+" "+a[2]))
-    return `<a href="https://www.google.com/search?q=${encodeURIComponent(a[0]+" "+town+" albergue telefone")}" target="_blank" rel="noopener">info</a>`;
+    return `<a href="https://www.google.com/search?q=${encodeURIComponent(a[0]+" "+town+" albergue telefone")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">info</a>`;
   const[iso,isoNext]=mapNightISO(w);
   const url=iso?bookingUrl(a[0]+", "+town,iso,isoNext):("https://www.booking.com/searchresults.html?ss="+encodeURIComponent(a[0]+", "+town)+"&group_adults=2&no_rooms=1");
-  return `<a href="${url}" target="_blank" rel="noopener">book</a>`;
+  return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">book</a>`;
+}
+// Apple Maps search for the albergue BY NAME, anchored near its waypoint —
+// lands on the actual door so directions can start from wherever we are.
+function bedMapsLink(a,w){
+  return `<a href="https://maps.apple.com/?q=${encodeURIComponent(a[0]+", "+w.q.split(",")[0])}&sll=${w.lat},${w.lon}&z=15" target="_blank" rel="noopener" onclick="event.stopPropagation()">maps</a>`;
 }
 function poiHtml(w){return w.poi?("<br><span class=\'pp-sight\'>\u25c6 "+w.poi+"</span>"):"";}
 function bedsHtml(w){
   if(!w.sleep||!w.sleep.length)return "";
-  return "<br><span class='pp-beds'>Beds:</span> "+w.sleep.map(a=>a[0]+" <span class='pp-price'>("+a[2]+")</span> "+mapBedLink(a,w)).join("<br>");
+  return "<br><span class='pp-beds'>Beds:</span> "+w.sleep.map(a=>a[0]+" <span class='pp-price'>("+a[2]+")</span> "+bedMapsLink(a,w)+" "+mapBedLink(a,w)).join("<br>");
 }
 function wpPopup(w){
   return "<b>"+w.name.split(",")[0]+"</b><br><span class='pp-km'>km "+w.km+" \u00b7 K. "+(160.5-w.km).toFixed(1).replace(".0","")+" to Vigo \u00b7 <a href=\"https://maps.apple.com/?q="+encodeURIComponent(w.q)+"\" target=\"_blank\" rel=\"noopener\">Maps</a></span>"+poiHtml(w)+bedsHtml(w);
