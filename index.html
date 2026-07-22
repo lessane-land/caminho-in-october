@@ -26,7 +26,7 @@
     --success:#7ab87a; --warn:#d4a672; --danger:#e07856;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{scroll-behavior:smooth;overflow-x:clip}
+  html{scroll-behavior:smooth;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{
     font-family:'Inter Tight',system-ui,sans-serif;
     background:var(--night-deep); color:var(--ink); line-height:1.6;
@@ -445,8 +445,11 @@
      use the space on the right that was empty before */
   @media (orientation:landscape){
     .big-body{flex-direction:row;gap:18px}
-    .big-main{flex:1 1 60%;min-width:0}
-    .big-details{display:block;flex:1 1 40%;max-width:440px;overflow-y:auto;padding-left:18px;border-left:1px solid var(--night-border)}
+    .big-main{flex:1 1 62%;min-width:0}
+    .big-details{display:block;flex:1 1 38%;max-width:440px;overflow-y:auto;padding-left:18px;border-left:1px solid var(--night-border)}
+    /* chart owns the column; caption is a compact one/two-liner beneath it */
+    .big-main .bigview-svg{flex:1 1 auto}
+    .big-cap{flex:none;font-size:.6rem;line-height:1.5;margin-top:8px;max-height:3.6em;overflow:hidden}
   }
   /* Ver grande is a landscape experience: in portrait, prompt to rotate */
   .big-rotate{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
