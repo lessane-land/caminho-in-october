@@ -267,6 +267,7 @@
   .playlist-name{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--paper);margin-bottom:6px;font-weight:500}
   .playlist-desc{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.82rem;margin-bottom:13px;line-height:1.5}
   .playlist-embed{width:100%;height:420px;border:none;border-radius:8px;background:transparent}
+  .playlist-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 
   /* phrasebook */
   .phrase-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
@@ -435,9 +436,30 @@
   .big-actions{display:flex;gap:8px}
   .big-actions button{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);padding:8px 15px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
   #big-locate{border-color:var(--sea-glow);color:var(--sea-shallow)}
+  .big-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+  .big-main{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-  .bigview-svg svg{max-height:100%;width:100%}
-  .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px}
+  .bigview-svg svg{max-height:100%;max-width:100%;width:100%}
+  .big-details{display:none}
+  /* landscape: chart on the left fills its column; details (beds/sights/services)
+     use the space on the right that was empty before */
+  @media (orientation:landscape){
+    .big-body{flex-direction:row;gap:18px}
+    .big-main{flex:1 1 60%;min-width:0}
+    .big-details{display:block;flex:1 1 40%;max-width:440px;overflow-y:auto;padding-left:18px;border-left:1px solid var(--night-border)}
+  }
+  .bd-sec{margin-bottom:16px}
+  .bd-sec h5{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sea-shallow);font-weight:500;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--night-border)}
+  .bd-bed{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0;font-size:.86rem;color:var(--ink-soft)}
+  .bd-bed em{font-style:normal;color:var(--terracotta-bright);font-family:'Fraunces',serif;font-size:.82rem}
+  .bd-bed a{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:3px 9px;text-decoration:none;flex:none}
+  .bd-grp{margin:6px 0 10px}
+  .bd-grp>b{font-family:'Fraunces',serif;color:var(--paper);font-size:.9rem;font-weight:500}
+  .bd-grp>span{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--mute)}
+  .bd-sight{padding:6px 0;font-size:.84rem;color:var(--ink-soft);line-height:1.5}
+  .bd-sight b{font-family:'Fraunces',serif;color:var(--gold-bright);font-weight:500}
+  .bd-note{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.85rem;line-height:1.55;margin-top:4px}
+  .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px;flex:none}
   .hint-jump{background:transparent;border:1px solid var(--gold);color:var(--gold-bright);border-radius:50px;padding:2px 10px;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
   .hint-jump:hover{background:var(--gold);color:var(--night-deep)}
   .book-mini{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:2px 9px;text-decoration:none;margin-left:8px;white-space:nowrap;transition:all .2s}
@@ -478,17 +500,37 @@
   .leaflet-popup-content .pp-price{color:var(--terracotta-bright)}
   .leaflet-popup-content a[target]{color:var(--sea-shallow);font-weight:600}
   /* fullscreen "grande" map */
-  .map-wrap.fullscreen{position:fixed;inset:0;z-index:260;margin:0;border-radius:0;padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 8px);display:flex;flex-direction:column;gap:8px}
-  .map-wrap.fullscreen #route-map{flex:1;height:auto;min-height:0}
-  .map-wrap.fullscreen .map-tools{margin-top:0}
-  .map-wrap.fullscreen .dl-wrap{margin-top:0}
+  .map-wrap.fullscreen{position:fixed;inset:0;z-index:260;margin:0;border-radius:0;padding:calc(env(safe-area-inset-top) + 6px) 8px calc(env(safe-area-inset-bottom) + 6px);display:flex;flex-direction:column;gap:6px;overflow:hidden;background:var(--night-deep)}
+  /* map fills all remaining space; the control bar is a FIXED-height slim row,
+     so the map never grows/shrinks with the legend or status text underneath */
+  .map-wrap.fullscreen #route-map{flex:1 1 auto;height:auto;min-height:0}
+  .map-wrap.fullscreen .map-note{display:none}
+  .map-wrap.fullscreen .map-status{display:none}
+  .map-wrap.fullscreen .map-tools{flex:0 0 auto;margin-top:0;flex-wrap:nowrap;overflow-x:auto;gap:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .map-wrap.fullscreen .map-tools::-webkit-scrollbar{display:none}
+  .map-wrap.fullscreen .map-btn{flex:none;padding:8px 12px;font-size:.56rem}
+  .map-wrap.fullscreen .dl-wrap{flex:0 0 auto;margin-top:0}
+  @media (orientation:landscape){
+    .map-wrap.fullscreen{padding-top:calc(env(safe-area-inset-top) + 3px);padding-bottom:calc(env(safe-area-inset-bottom) + 3px);gap:4px}
+    .map-wrap.fullscreen .map-btn{padding:6px 11px}
+  }
+  /* smaller, tidier map buttons on phones (the bottom row was too big) */
+  @media (max-width:560px){
+    .map-btn{padding:8px 11px;font-size:.57rem;gap:6px}
+    .map-btn svg{width:12px;height:12px}
+    .map-note{font-size:.53rem;gap:9px 12px}
+  }
   /* numbered stage badges on the map */
   .stage-badge{display:flex;align-items:center;justify-content:center}
   .stage-badge span{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--terracotta),var(--gold));color:var(--night-deep);font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;border:2px solid var(--night-deep);box-shadow:0 0 8px rgba(242,194,48,.6)}
   .stage-badge.end span{background:var(--gold-bright);width:24px;height:24px;font-size:.66rem}
   .map-tt.town.stage{color:var(--gold-bright);border-color:rgba(242,194,48,.45);font-weight:700}
+  /* declutter: at the zoomed-out overview, drop the name labels (badges/dots stay) */
+  #route-map.labels-far .leaflet-tooltip.map-tt.town,
+  #route-map.labels-far .leaflet-tooltip.map-tt.boat{display:none}
   .found-pin{font-size:15px;line-height:24px;text-align:center;color:#ffb37a;filter:drop-shadow(0 0 5px rgba(224,120,86,.95))}
   .leaflet-popup-content .pp-when{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-bright)}
+  .leaflet-popup-content .pp-when2{display:inline-block;margin-top:3px;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.04em;text-transform:none;color:var(--ink-soft)}
   /* live "beds near" results panel */
   .beds-panel{position:absolute;left:0;right:0;bottom:0;z-index:500;background:var(--night-soft);border-top:1px solid var(--gold);border-radius:14px 14px 0 0;box-shadow:0 -14px 40px -12px rgba(0,0,0,.7);max-height:56%;display:none;flex-direction:column}
   .beds-panel.show{display:flex;animation:fadeIn .25s ease}
@@ -864,9 +906,9 @@
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/><circle cx="15" cy="12" r="1.5"/></svg>Vigo &middot; <em>the reward</em></h3>
       <div class="food-list">
         <div class="food-card">
-          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>R&uacute;a da Pedra &middot; the oysters</div>
-          <p class="food-desc">The ostreiras have shucked oysters on this street for generations. From ~11:00. <strong>The contractual finish line</strong>, and with the 17:25 AVE, a whole victory morning for it.</p>
-          <a href="https://maps.apple.com/?q=R%C3%BAa%20da%20Pedra%20Vigo" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>A Pedra &middot; R&uacute;a das Ostras &middot; the oysters</div>
+          <p class="food-desc">The ostreiras have shucked oysters on the <strong>Mercado da Pedra</strong> (R&uacute;a das Ostras / Pescader&iacute;a) for generations. From ~11:00. <strong>The contractual finish line</strong>, and with the 17:25 AVE, a whole victory morning for it.</p>
+          <a href="https://maps.apple.com/?ll=42.2390,-8.7250&q=Mercado%20da%20Pedra%2C%20Vigo" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/></svg>Captain Nemo's harbour</div>
@@ -892,13 +934,19 @@
           <div class="playlist-label"><svg class="playlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Portugal side</div>
           <h4 class="playlist-name">Am&aacute;lia Rodrigues &middot; fado</h4>
           <p class="playlist-desc">The queen of fado, the sound of Portuguese saudade. For the eucalyptus stretches when the ocean disappears and you miss it after four minutes.</p>
-          <a href="https://music.apple.com/us/search?term=amalia%20rodrigues" target="_blank" rel="noopener" class="book-btn">Open in Apple Music<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <div class="playlist-links">
+            <a href="https://music.apple.com/us/search?term=amalia%20rodrigues" target="_blank" rel="noopener" class="book-btn">Apple Music<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+            <a href="https://open.spotify.com/search/amalia%20rodrigues" target="_blank" rel="noopener" class="book-btn terra">Spotify<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
         </div>
         <div class="playlist-card">
           <div class="playlist-label"><svg class="playlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Galicia side</div>
           <h4 class="playlist-name">Luar na Lubre &middot; galego folk</h4>
           <p class="playlist-desc">Bagpipes, hurdy-gurdy and Atlantic melancholy, Galicia is Celtic, and after the boat the soundtrack should be too.</p>
-          <a href="https://music.apple.com/us/search?term=luar%20na%20lubre" target="_blank" rel="noopener" class="book-btn">Open in Apple Music<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <div class="playlist-links">
+            <a href="https://music.apple.com/us/search?term=luar%20na%20lubre" target="_blank" rel="noopener" class="book-btn">Apple Music<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+            <a href="https://open.spotify.com/search/luar%20na%20lubre" target="_blank" rel="noopener" class="book-btn terra">Spotify<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
         </div>
       </div>
     </div>
@@ -993,8 +1041,13 @@
     <div class="big-stats" id="big-stats"></div>
     <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
-  <div class="bigview-svg" id="big-svg"></div>
-  <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
+  <div class="big-body">
+    <div class="big-main">
+      <div class="bigview-svg" id="big-svg"></div>
+      <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
+    </div>
+    <div class="big-details" id="big-details"></div>
+  </div>
   <div class="big-hint" id="big-hint">Rotate to landscape for the full ribbon.</div>
 </div>
 
@@ -1072,7 +1125,7 @@ const WPTS=[
  {km:146.5,name:"Priegue",alt:150,q:"Priegue, Nigr\u00e1n, Spain",lat:42.1570,lon:-8.7990},
  {km:149.5,name:"Sai\u00e1ns",alt:90,q:"Sai\u00e1ns, Vigo, Spain",lat:42.1760,lon:-8.8120},
  {km:152.5,name:"Coruxo",alt:60,q:"Coruxo, Vigo, Spain",lat:42.1910,lon:-8.7880},
- {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",poi:"Verne statue on the waterfront, oysters on R\u00faa da Pedra",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
+ {id:"vigo",km:160.5,name:"Vigo, Casco Vello",alt:25,q:"Casco Vello, Vigo, Spain",poi:"Verne statue on the waterfront, oysters at A Pedra (R\u00faa das Ostras)",lat:42.2390,lon:-8.7250,sleep:[["Kaps Hostel","the pilgrim favourite (no public albergue)","~18 \u20ac"],["Casco Vello guesthouses","a real bed to celebrate","30\u201345 \u20ac"]]}
 ];
 const IDX={};WPTS.forEach((w,i)=>{if(w.id)IDX[w.id]=i;});
 const SEG_ELEV={"porto>vilacha":[75,130],"vilacha>vdc":[30,35],"vdc>apulia":[55,55],"apulia>esposende":[45,45],"esposende>cneiva":[140,80],"cneiva>viana":[190,250],"viana>ancora":[180,185],"ancora>caminha":[60,60],"caminha>aguarda":[40,5],"aguarda>oia":[150,170],"oia>mougas":[40,35],"mougas>baiona":[160,175],"baiona>vigo":[380,360]};
@@ -1565,7 +1618,7 @@ const PHRASES={
   {en:'Good morning',ca:'Bom dia',lang:'PT',phon:'bong DEE-ah'},
   {en:'Good morning',ca:'Bo d\u00eda',lang:'GAL',phon:'boh DEE-ah'},
   {en:'Thank you (said by a woman)',ca:'Obrigada',lang:'PT',phon:'oh-bree-GAH-dah'},
-  {en:'Thank you',ca:'Grazas',lang:'GAL',phon:'GRAH-thas'},
+  {en:'Thank you',ca:'Grazas',lang:'GAL',phon:'GRAH-sas'},
   {en:'Please',ca:'Por favor / se fai favor',lang:'PT\u00b7GAL',phon:'poor fah-VOR'},
   {en:'Where is the albergue?',ca:'Onde fica o albergue?',lang:'PT',phon:'ON-deh FEE-kah oo al-BER-geh'}
  ],
@@ -1574,12 +1627,12 @@ const PHRASES={
   {en:'The trail greeting',ca:'Bo cami\u00f1o',lang:'GAL',phon:'boh kah-MEEN-yoh',note:'Switch the moment you step off the boat.'},
   {en:'Stamp my credencial, please',ca:'Pode carimbar, por favor?',lang:'PT',phon:'POH-deh kah-reem-BAR'},
   {en:'A stamp, please',ca:'Un selo, por favor',lang:'GAL',phon:'oon SEH-loh'},
-  {en:'How far to...?',ca:'Canto queda ata...?',lang:'GAL',phon:'KAN-toh KEH-dah AH-tah'},
+  {en:'How far to...?',ca:'Canto falta ata...?',lang:'GAL',phon:'KAN-toh FAL-tah AH-tah'},
   {en:'Two beds, please',ca:'Duas camas, por favor',lang:'PT',phon:'DOO-ash KAH-mash'}
  ],
  food:[
   {en:'Milky coffee + custard tart',ca:'Um gal\u00e3o e uma nata, por favor',lang:'PT',phon:'oong gah-LOWNG ee OO-mah NAH-tah',note:'The Portuguese breakfast of champions.'},
-  {en:'The victory order',ca:'Unha raci\u00f3n de polbo, por favor',lang:'GAL',phon:'OO-nyah rah-thee-ON deh POL-boh',note:'Octopus. Galicia will judge us if we skip it.'},
+  {en:'The victory order',ca:'Unha raci\u00f3n de polbo, por favor',lang:'GAL',phon:'OO-nyah rah-see-ON deh POL-boh',note:'Octopus. Galicia will judge us if we skip it.'},
   {en:'A glass of vinho verde',ca:'Um copo de vinho verde',lang:'PT',phon:'oong KOH-poo deh VEEN-yoo VER-deh'},
   {en:'A glass of albari\u00f1o',ca:'Unha copa de albari\u00f1o',lang:'GAL',phon:'OO-nyah KOH-pah deh al-bah-REE-nyoh'},
   {en:'The bill, please',ca:'A conta, por favor',lang:'PT\u00b7GAL',phon:'ah KON-tah'},
@@ -1588,8 +1641,8 @@ const PHRASES={
  charm:[
   {en:'It is very beautiful',ca:'\u00c9 moi bonito',lang:'GAL',phon:'eh moy boh-NEE-toh'},
   {en:'My love',ca:'Meu amor',lang:'PT\u00b7GAL',phon:'MEH-oo ah-MOR',note:'For the Oia sunset, obviously.'},
-  {en:'Ten years',ca:'Dez anos',lang:'GAL',phon:'deth AH-nos',note:'For October 8th. Say it slowly.'},
-  {en:'We walked from Porto',ca:'Vi\u00f1emos andando desde Porto',lang:'GAL',phon:'vee-NYEH-mos an-DAN-doh',note:'Earned bragging rights.'},
+  {en:'Ten years',ca:'Dez anos',lang:'GAL',phon:'des AH-nos',note:'For October 8th. Say it slowly.'},
+  {en:'We walked from Porto',ca:'Vi\u00f1emos andando desde Porto',lang:'GAL',phon:'bee-NYEH-mos an-DAN-doh',note:'Earned bragging rights.'},
   {en:'See you tomorrow',ca:'Ata ma\u00f1\u00e1',lang:'GAL',phon:'AH-tah mah-NYAH'},
   {en:'It is perfect',ca:'\u00c9 perfecto',lang:'GAL',phon:'eh per-FEK-toh'}
  ]
@@ -1598,9 +1651,19 @@ function speak(text,lang){
   if(!('speechSynthesis' in window))return;
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang=lang&&lang.indexOf('PT')>=0?'pt-PT':'gl-ES';u.rate=0.85;
+  const isPT=lang&&lang.indexOf('PT')>=0;
+  u.lang=isPT?'pt-PT':'gl-ES';u.rate=0.85;
   const voices=speechSynthesis.getVoices();
-  const v=voices.find(v=>v.lang.startsWith(u.lang.slice(0,2)))||voices.find(v=>v.lang.startsWith('es'));
+  let v;
+  if(isPT){v=voices.find(x=>x.lang.startsWith('pt'));}
+  else{
+    // Coastal Galician is seseo (z/c = s), so a Castilian es-ES voice (which says
+    // "th") is wrong. Prefer a real Galician voice, then any seseo Spanish
+    // variant (Latin American), then fall back to whatever Spanish exists.
+    v=voices.find(x=>x.lang.startsWith('gl'))
+      ||voices.find(x=>/^es-(419|US|MX|AR|CO|CL|PE|VE|EC|GT|CR|PA|DO|BO|PY|UY|NI|HN|SV|PR)/i.test(x.lang))
+      ||voices.find(x=>x.lang.startsWith('es'));
+  }
   if(v)u.voice=v;
   speechSynthesis.speak(u);
 }
@@ -1752,9 +1815,9 @@ function bigProfileSVG(st,g){
     if(hasBed)glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
     if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
     return `<circle class="big-wp" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?10:7}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}" onclick="selectBigWp(${i});event.stopPropagation()"/>
-      <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
+      <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="${on?"#f6d35f":hi?"#f2c230":"#5b6d85"}">${w.alt}</text>
       ${glyphs}
-      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":"#9fb0c5"}" class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" style="cursor:pointer">${w.name.split(",")[0].split(" (")[0]}</text>`;
+      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*16}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12.5" fill="${on?"#f6d35f":"#9fb0c5"}" class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" style="cursor:pointer">${w.name.split(",")[0].split(" (")[0]}</text>`;
   }).join("");
   let walked="",gps="";
   if(g){
@@ -1773,13 +1836,13 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    <g transform="translate(${W-padR-306},18)" font-family="DM Mono, monospace" font-size="10">
-      <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
-      <rect x="58" y="-8" width="16" height="4" fill="#f2c230"/><text x="79" y="-3" fill="#5b6d85">3-6%</text>
-      <rect x="128" y="-8" width="16" height="4" fill="#ef8354"/><text x="149" y="-3" fill="#5b6d85">steep</text>
-      <path d="M 196 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="211" y="-3" fill="#5b6d85">bed</text>
-      <path d="M 246 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="257" y="-3" fill="#5b6d85">sight</text>
-      ${det?`<text x="196" y="-3" fill="#33455f">gpx terrain</text>`:""}
+    <g transform="translate(${W-padR-(det?420:300)},16)" font-family="DM Mono, monospace" font-size="11">
+      <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-4" fill="#5b6d85">flat</text>
+      <rect x="60" y="-8" width="16" height="4" fill="#f2c230"/><text x="81" y="-4" fill="#5b6d85">3-6%</text>
+      <rect x="134" y="-8" width="16" height="4" fill="#ef8354"/><text x="155" y="-4" fill="#5b6d85">steep</text>
+      <path d="M 208 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="223" y="-4" fill="#5b6d85">bed</text>
+      <path d="M 262 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="273" y="-4" fill="#5b6d85">sight</text>
+      ${det?`<text x="318" y="-4" fill="#5b6d85">gpx terrain</text>`:""}
     </g>
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -1800,6 +1863,26 @@ function bigRepaint(){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
   setBigCap(st);
+}
+// The landscape side panel: everything about this day — beds tonight, beds on
+// the way, the sights, and the services — using the space the wide screen gives.
+function setBigDetails(st){
+  const el=document.getElementById("big-details");if(!el||!st)return;
+  const bedRow=(a,w)=>`<div class="bd-bed"><span>${escapeHtml(a[0])} <em>${a[2]}</em></span>${mapBedLink(a,w)}</div>`;
+  let h="";
+  h+=`<div class="bd-sec"><h5>Tonight · ${st.b.name.split(",")[0]}</h5>`;
+  if(st.b.sleep&&st.b.sleep.length)h+=st.b.sleep.map(a=>bedRow(a,st.b)).join("");
+  else h+=`<p class="bd-note">The finish — we pick where to celebrate.</p>`;
+  if(EVENINGS[st.b.id])h+=`<p class="bd-note">${EVENINGS[st.b.id]}</p>`;
+  h+=`</div>`;
+  const midBeds=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
+  if(midBeds.length)h+=`<div class="bd-sec"><h5>Beds on the way</h5>`+midBeds.map(w=>`<div class="bd-grp"><b>${w.name.split(",")[0]}</b> <span>· km ${(w.km-st.a.km).toFixed(1).replace(".0","")}</span>${w.sleep.map(a=>bedRow(a,w)).join("")}</div>`).join("")+`</div>`;
+  const sights=st.seg.filter(w=>w.poi);
+  if(sights.length)h+=`<div class="bd-sec"><h5>Sights this stage</h5>`+sights.map(w=>`<div class="bd-sight"><b>${w.name.split(",")[0]}</b> — ${w.poi}</div>`).join("")+`</div>`;
+  if(st.svc)h+=`<div class="bd-sec"><h5>Services</h5><p class="bd-note">${st.svc}</p></div>`;
+  const fn=FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ");
+  if(fn)h+=`<div class="bd-sec"><h5>Field note</h5><p class="bd-note">${fn}</p></div>`;
+  el.innerHTML=h;
 }
 function selectBigWp(i){bigSel=(bigSel===i)?null:i;bigRepaint();}
 function setBigStats(g,st){
@@ -1873,7 +1956,8 @@ function openBig(n){
   document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+stageDateLabel(bigN-1)+" \u00b7 K. "+(160.5-st.b.km).toFixed(1).replace(".0","");
   bigRepaint();
   setBigStats(null,st);
-  let hint="Rotate to landscape for the full ribbon.";
+  setBigDetails(st);
+  let hint="Rotate to landscape for the day's beds, sights and services.";
   const wx=store.get("camino-wx-"+st.b.id,null);
   if(wx&&wx.d&&wx.d.daily)hint+="  \u00b7 today at "+st.b.name.split(",")[0]+": rain "+wx.d.daily.precipitation_probability_max[0]+"% \u00b7 wind "+Math.round(wx.d.daily.wind_speed_10m_max[0])+" km/h";
   document.getElementById("big-hint").textContent=hint;
@@ -2078,8 +2162,16 @@ function initMap(){
     d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
     d.onclick=e=>{e.preventDefault();mapLocate();};return d;}});
   new Ctl({position:"topleft"}).addTo(MAP);
+  MAP.on("zoomend",updateLabelZoom);
   drawRoute();
   refreshMapStatus();
+}
+// Town-name labels collide at the full-route overview. Hide them below this zoom
+// (numbered stage badges + dots still show); reveal names as you zoom in.
+const LABEL_MIN_ZOOM=11;
+function updateLabelZoom(){
+  const rm=document.getElementById("route-map");if(!rm||!MAP)return;
+  rm.classList.toggle("labels-far",MAP.getZoom()<LABEL_MIN_ZOOM);
 }
 let mapLabels=store.get("camino-map-labels",true);   // town names on/off
 let mapPoints=store.get("camino-map-points",true);   // albergues + sights on/off
@@ -2134,7 +2226,13 @@ function drawRoute(fit){
     const label=w.name.split(",")[0].split(" (")[0];
     if(k!==undefined){
       const badge=k===0?"▶":String(k);
-      const when=k===0?"Start of the walk":("End of stage "+k+" · "+stageDateLabel(k-1));
+      let when;
+      if(k===0){when="▶ Start of the walk · "+stageDateLabel(0).replace(/,.*/,"");}
+      else{
+        const st=STAGES[k-1];
+        when="End of stage "+k+" · "+stageDateLabel(k-1);
+        if(st)when+="<br><span class='pp-when2'>"+st.a.name.split(",")[0]+" → "+st.b.name.split(",")[0]+" · "+st.km+" km · ▲ "+st.up+" m · ▼ "+st.down+" m</span>";
+      }
       L.marker([w.lat,w.lon],{icon:L.divIcon({className:"stage-badge"+(k===0||k===stops.length-1?" end":""),html:"<span>"+badge+"</span>",iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:600}).addTo(grp)
         .bindTooltip(label,{permanent:mapLabels,direction:"right",className:"map-tt town stage",offset:[11,0]})
         .bindPopup(wpPopup(w)+"<br><span class='pp-when'>"+when+"</span>");
@@ -2146,6 +2244,7 @@ function drawRoute(fit){
   });
   grp.addTo(MAP);MAPLAYER=grp;
   if(fit!==false)MAP.fitBounds(L.latLngBounds(latlngs).pad(0.08));
+  updateLabelZoom();
 }
 function toggleLabels(){
   mapLabels=!mapLabels;store.set("camino-map-labels",mapLabels);
