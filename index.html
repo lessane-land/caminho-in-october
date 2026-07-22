@@ -1297,15 +1297,32 @@ function stageDateObj(i){const d=new Date(startDate+"T12:00:00");d.setDate(d.get
 function stageDateLabel(i){return stageDateObj(i).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});}
 function stageISO(i){const d=stageDateObj(i);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function stageISOPlus(i,plus){const d=stageDateObj(i);d.setDate(d.getDate()+plus);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-/* "boots on by" — Naismith (distance + climb) plus ~1 h of stops, back from sunset */
+/* same analytic solar math as sunsetLabel, but both ends of the day (minutes) */
+function solarTimes(i,st){
+  const d=stageDateObj(i);const tz=st.b.km<=104?1:2;const rad=Math.PI/180;
+  const day=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+  const decl=23.45*Math.sin(rad*(360/365)*(284+day));
+  const cosH=(Math.cos(90.833*rad)-Math.sin(st.b.lat*rad)*Math.sin(decl*rad))/(Math.cos(st.b.lat*rad)*Math.cos(decl*rad));
+  if(cosH<-1||cosH>1)return null;
+  const ha=Math.acos(cosH)/rad;
+  const B=rad*(360/365)*(day-81);
+  const eq=9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
+  const noon=12+tz-st.b.lon/15-eq/60;
+  return {rise:(noon-ha/15+0.17)*60,set:(noon+ha/15-0.17)*60};
+}
+/* pilgrim logic, not survival logic: leave early enough to ARRIVE by ~15:30
+   (albergue beds, showers, the evening) — never earlier than first light.
+   Time on feet = Naismith (distance + climb) + ~1 h of stops. */
 function leaveByLabel(i,st){
-  const ss=sunsetLabel(i,st);if(!ss)return "";
-  const p=ss.split(":");
-  const need=(st.km/4.2+st.up/600+1)*60;                 // minutes incl. buffer
-  let lv=(+p[0]*60+ +p[1])-need;
-  if(lv<6*60)return "🥾 dawn start · long day";
-  const hh=Math.floor(lv/60),mm=Math.floor(lv%60/5)*5;   // round down to 5 min
-  return "🥾 boots on ≤ "+hh+":"+String(mm).padStart(2,"0");
+  const s=solarTimes(i,st);if(!s)return "";
+  const total=(st.km/4.2+st.up/600+1)*60;
+  let out=15.5*60-total;                     // target: in by 15:30
+  const firstLight=s.rise+10;
+  if(out<firstLight)out=firstLight;          // can't beat the sun
+  const arr=out+total;
+  const tight=arr>s.set-40;
+  const f=m=>{m=Math.round(m/5)*5;return Math.floor(m/60)+":"+String(Math.round(m%60)).padStart(2,"0");};
+  return "🥾 out ~"+f(out)+" · in ~"+f(arr)+(tight?" · tight!":"");
 }
 /* booking links: private beds get Booking.com with the night's dates prefilled;
    municipal/parish/donation albergues can't be booked online, they get an info search */
