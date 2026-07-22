@@ -569,6 +569,33 @@
   .bed-row-links a:hover{background:var(--sea-deep);color:var(--paper)}
   .beds-empty{padding:24px 16px;text-align:center;font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.9rem;line-height:1.5}
   .beds-foot{padding:9px 16px;font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute-dim);border-top:1px solid var(--night-border)}
+  .beds-chips{display:flex;gap:6px;padding:9px 12px 2px;overflow-x:auto;scrollbar-width:none}
+  .beds-chips::-webkit-scrollbar{display:none}
+  .beds-chips .phrase-cat-btn{flex:none;padding:6px 12px;font-size:.58rem}
+  /* leave-by chip on stage heads */
+  .leaveby{color:var(--terracotta-bright)}
+  .planb h4{color:var(--warn)}
+  /* SOS per-town quick links */
+  .sos-towns{margin-top:16px;background:var(--night-soft);border:1px solid var(--night-border);border-radius:8px;padding:6px 16px 10px}
+  .sos-head{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);padding:10px 0 6px;border-bottom:1px solid var(--night-border)}
+  .sos-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--night-border);font-size:.88rem}
+  .sos-row:last-child{border-bottom:none}
+  .sos-row b{color:var(--paper);font-family:'Fraunces',serif;font-weight:500}
+  .sos-links{display:flex;gap:6px;flex:none}
+  .sos-links a{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:3px 9px;text-decoration:none}
+  .sos-links a:hover{background:var(--sea-deep);color:var(--paper)}
+  /* credencial stamp gallery */
+  .stamp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:16px}
+  .stamp-cell{text-align:center}
+  .stamp-slot{position:relative;aspect-ratio:1;border:2px dashed var(--night-border);border-radius:50%;background:var(--night-soft);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .25s ease}
+  .stamp-slot:hover{border-color:var(--terracotta);transform:scale(1.04)}
+  .stamp-slot.has{border-style:solid;border-color:var(--gold);box-shadow:0 0 14px rgba(242,194,48,.25);transform:rotate(-3deg)}
+  .stamp-slot img{width:100%;height:100%;object-fit:cover}
+  .stamp-plus{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--mute);font-weight:300}
+  .stamp-del{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(10,14,26,.85);color:var(--ink-soft);font-size:.7rem;cursor:pointer;display:none;align-items:center;justify-content:center}
+  .stamp-slot.has:hover .stamp-del{display:flex}
+  .stamp-town{margin-top:8px;font-family:'Fraunces',serif;font-size:.85rem;color:var(--paper);font-weight:500}
+  .stamp-when{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:2px}
   /* new-version banner */
   .update-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:400;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:9px 9px 9px 18px;display:none;align-items:center;gap:14px;box-shadow:0 14px 44px -10px rgba(0,0,0,.7);max-width:calc(100vw - 28px)}
   .update-toast.show{display:flex;animation:fadeIn .3s ease}
@@ -748,6 +775,26 @@
     </div>
 
     <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>If something goes wrong &middot; <em>respira</em></h3>
+      <p class="sub-sub">Hopefully never opened. Everything here works offline; the numbers are tappable.</p>
+      <div class="log-grid">
+        <div class="log-card"><div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.79.68 2.64a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.44-1.25a2 2 0 0 1 2.11-.45c.85.33 1.74.56 2.64.68A2 2 0 0 1 22 16.92z"/></svg>Emergency &middot; both countries</div>
+          <div class="log-value"><a href="tel:112" style="color:inherit;text-decoration:none">112</a></div>
+          <div class="log-note">One number, Portugal and Spain, works without credit or coverage from your own operator.</div></div>
+        <div class="log-card"><div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Health advice &middot; Portugal</div>
+          <div class="log-value"><a href="tel:808242424" style="color:inherit;text-decoration:none">808 24 24 24</a></div>
+          <div class="log-note">SNS 24 &middot; nurse line, English available. Blister triage without an ER.</div></div>
+        <div class="log-card"><div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Health emergencies &middot; Galicia</div>
+          <div class="log-value"><a href="tel:061" style="color:inherit;text-decoration:none">061</a></div>
+          <div class="log-note">Urxencias Sanitarias after the boat. EU health card (TSE) in the pack pocket.</div></div>
+        <div class="log-card"><div class="log-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Taxi &middot; Spanish coast</div>
+          <div class="log-value" style="font-size:1rem"><a href="tel:986610255" style="color:inherit;text-decoration:none">A Guarda 986 610 255</a><br><a href="tel:986355330" style="color:inherit;text-decoration:none">Baiona 986 355 330</a></div>
+          <div class="log-note">The loneliest stretch. Save both before the boat; also the ATSA bus info numbers.</div></div>
+      </div>
+      <div class="sos-towns" id="sos-towns"></div>
+    </div>
+
+    <div class="sub-section">
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Map &middot; <em>the coast</em></h3>
       <p class="sub-sub">Two countries, one ocean, one boat.</p>
       <div class="map-wrap">
@@ -770,6 +817,7 @@
         </div>
         <div class="beds-panel" id="beds-panel">
           <div class="beds-panel-head"><b id="beds-title">Beds nearby</b><button id="beds-close" aria-label="Close">✕</button></div>
+          <div class="beds-chips" id="beds-chips"></div>
           <div class="beds-list" id="beds-list"></div>
           <div class="beds-foot">Live from OpenStreetMap · tap a result to find it on the map</div>
         </div>
@@ -1024,9 +1072,12 @@
       <div class="journal-grid" id="journal-grid"></div>
     </div>
 
-    
-
-    
+    <div class="sub-section">
+      <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4"/></svg>A credencial &middot; <em>the stamps</em></h3>
+      <p class="sub-sub">One sello per night. Tap a circle, photograph the stamp, watch the credencial fill. Stored on this phone.</p>
+      <div class="stamp-grid" id="stamps-grid"></div>
+      <input type="file" accept="image/*" capture="environment" id="stamp-input" style="display:none">
+    </div>
   </div>
 </section>
 
@@ -1173,6 +1224,17 @@ const SVCS=[
  [122.5,135.5,"Bars in Moug\u00e1s and As Mari\u00f1as; Baiona has everything, including a gear shop."],
  [135.5,160.5,"A Ramallosa, Nigr\u00e1n and Coruxo have everything; save a snack for the Priegue climb."]
 ];
+/* Plan B per stretch: how to skip ahead or bail WITHOUT walking (verified Jul 2026:
+   Metro do Porto line B, Transdev 107 + A28 express, CP Linha do Minho, ATSA coastal) */
+const PLANB=[
+ [0,28,"Metro line B runs Porto ↔ Vila do Conde ↔ Póvoa every 20-30 min all day — hop on at Matosinhos or Mindelo if day one bites. Cheap, ~1 h."],
+ [28,52,"Metro B still covers Vila do Conde ↔ Póvoa. Póvoa/Apúlia → Esposende has NO train: Transdev bus 107 (Braga–Esposende–Póvoa line) or a ~15 min taxi."],
+ [52,77,"No train until Viana. Transdev's A28 express (Viana–Esposende–Porto) or a ~25 min taxi Esposende → Viana; from Darque a city bus crosses into Viana."],
+ [77,104,"Easiest bail-out stretch of the walk: CP Linha do Minho hugs this coast — stations at Viana, Vila Praia de Âncora, Moledo and Caminha, regional trains every few hours."],
+ [104,122.5,"After the boat: ATSA coastal bus A Guarda–Oia–Baiona–Vigo, sparse (1-2/day) — call 986 610 255 (A Guarda) to confirm times, or taxi A Guarda/Oia → Baiona (~20-30 min)."],
+ [122.5,135.5,"Same sparse ATSA coastal line passes Mougás toward Baiona; Baiona taxis 986 355 330. Short stage — a taxi hop costs little if the knees protest."],
+ [135.5,160.5,"Buses Baiona ↔ Vigo run all day via A Ramallosa and Coruxo (~1 h). Sit down, ride into Vigo like sensible people, zero shame at km 135."]
+];
 const FIELD=[
  [0,28,"Vila do Conde's Santa Clara aqueduct ran 999 arches and nearly 5 km, one of Iberia's longest, to feed one convent. The Ave shipyards below it built ships for the Age of Discoveries."],
  [28,52,"The sunken fields behind the Ap\u00falia dunes are masseiras: crops dug below dune level so the sand walls trap heat and block wind, desert agriculture, invented on a rainy coast."],
@@ -1235,6 +1297,16 @@ function stageDateObj(i){const d=new Date(startDate+"T12:00:00");d.setDate(d.get
 function stageDateLabel(i){return stageDateObj(i).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});}
 function stageISO(i){const d=stageDateObj(i);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function stageISOPlus(i,plus){const d=stageDateObj(i);d.setDate(d.getDate()+plus);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+/* "boots on by" — Naismith (distance + climb) plus ~1 h of stops, back from sunset */
+function leaveByLabel(i,st){
+  const ss=sunsetLabel(i,st);if(!ss)return "";
+  const p=ss.split(":");
+  const need=(st.km/4.2+st.up/600+1)*60;                 // minutes incl. buffer
+  let lv=(+p[0]*60+ +p[1])-need;
+  if(lv<6*60)return "🥾 dawn start · long day";
+  const hh=Math.floor(lv/60),mm=Math.floor(lv%60/5)*5;   // round down to 5 min
+  return "🥾 boots on ≤ "+hh+":"+String(mm).padStart(2,"0");
+}
 /* booking links: private beds get Booking.com with the night's dates prefilled;
    municipal/parish/donation albergues can't be booked online, they get an info search */
 function bookingUrl(ss,iso,isoNext){return "https://www.booking.com/searchresults.html?ss="+encodeURIComponent(ss)+"&checkin="+iso+"&checkout="+isoNext+"&group_adults=2&no_rooms=1";}
@@ -1452,11 +1524,11 @@ function renderPlans(){
   else if(planId==="X"&&longest>32){warn.textContent=`Careful: our longest day is ${longest.toFixed(1)} km. In October daylight that is a headlamp situation.`;warn.classList.add("show");}
   else warn.classList.remove("show");
 }
-function setPlan(id){planId=id;store.set("camino-plan",id);STAGES=buildStages();renderPlans();render();if(typeof MAP!=="undefined"&&MAP)drawRoute(false);}
+function setPlan(id){planId=id;store.set("camino-plan",id);STAGES=buildStages();renderPlans();render();renderStamps();if(typeof MAP!=="undefined"&&MAP)drawRoute(false);}
 function toggleStop(id){
   customStops=customStops.includes(id)?customStops.filter(x=>x!==id):[...customStops,id];
   store.set("camino-custom",customStops);
-  STAGES=buildStages();renderPlans();render();
+  STAGES=buildStages();renderPlans();render();renderStamps();
 }
 
 /* stages render */
@@ -1495,6 +1567,7 @@ function render(){
             <span class="down">\u25bc \u2212${st.down} m</span>
             <span class="dots">${dots}</span>
             <span class="sunset">sunset ~${sunsetLabel(i,st)}</span>
+            <span class="leaveby">${leaveByLabel(i,st)}</span>
           </div>
         </div>
         <div class="detail">
@@ -1511,6 +1584,7 @@ function render(){
           <div class="blk"><h4>Where we sleep tonight</h4><ul>${sleep}</ul>${bookAll}</div>
           ${midSleepHtml}
           <div class="blk"><h4>Services along the way</h4><p class="svc">${st.svc}</p></div>
+          <div class="blk planb"><h4>If legs say no · plan B</h4><p class="svc">${PLANB.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ")}</p></div>
           <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"We pick, it is our route."}</p></div>
           <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Walked, tap to undo":"Mark stage as walked"}</button>
         </div>
@@ -2403,7 +2477,8 @@ async function findBedsNear(){
   let lat,lon,where;
   if(mapWatch!=null&&MAPME){const c=MAPME.getLatLng();lat=c.lat;lon=c.lng;where="where we are now";}
   else{const c=MAP.getCenter();lat=c.lat;lon=c.lng;where="here";}
-  panel.classList.add("show");ttl.textContent="Searching beds near "+where+"…";list.innerHTML='<div class="beds-empty">Looking on OpenStreetMap…</div>';
+  panel.classList.add("show");renderNearChips("beds");
+  ttl.textContent="Searching beds near "+where+"…";list.innerHTML='<div class="beds-empty">Looking on OpenStreetMap…</div>';
   bedsSearching=true;
   try{
     const beds=normBeds(await overpassLodging(lat,lon,3000),lat,lon);
@@ -2424,6 +2499,101 @@ async function findBedsNear(){
 function closeBedsPanel(){
   const p=document.getElementById("beds-panel");if(p)p.classList.remove("show");
   if(BEDSFOUND){BEDSFOUND.remove();BEDSFOUND=null;bedsMarkers=[];}
+}
+
+/* ---- "near me": pharmacy / ATM / supermarket / laundry via the same OSM engine ---- */
+const NEAR_KINDS={
+  beds:{label:"Beds",icon:"⌂"},
+  pharmacy:{label:"Pharmacy",icon:"✚",sel:'["amenity"="pharmacy"]'},
+  atm:{label:"ATM",icon:"€",sel:'["amenity"~"^(atm|bank)$"]'},
+  supermarket:{label:"Súper",icon:"◱",sel:'["shop"~"^(supermarket|convenience)$"]'},
+  laundry:{label:"Laundry",icon:"◌",sel:'["shop"~"^(laundry|dry_cleaning)$"]'}
+};
+async function overpassAmenity(sel,lat,lon,radius){
+  const q=`[out:json][timeout:25];(node${sel}(around:${radius},${lat},${lon});way${sel}(around:${radius},${lat},${lon}););out center 60;`;
+  let lastErr;
+  for(const url of OVERPASS){
+    try{
+      const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),20000);
+      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q),signal:ctrl.signal});
+      clearTimeout(to);
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      return (await r.json()).elements||[];
+    }catch(e){lastErr=e;}
+  }
+  throw lastErr||new Error("no data");
+}
+function amenityLabel(t){
+  return {pharmacy:"Pharmacy",atm:"ATM",bank:"Bank",supermarket:"Supermarket",convenience:"Mini-market",laundry:"Laundry",dry_cleaning:"Dry cleaning"}[t]||bedTypeLabel(t);
+}
+function normAmenity(els,lat,lon){
+  const seen=new Set(),out=[];
+  els.forEach(el=>{
+    const c=el.type==="node"?{lat:el.lat,lon:el.lon}:el.center;if(!c)return;
+    const t=el.tags||{};
+    const kind=t.amenity||t.shop||"place";
+    const name=t.name||t.brand||amenityLabel(kind);
+    const key=name.toLowerCase()+Math.round(c.lat*2000)+Math.round(c.lon*2000);if(seen.has(key))return;seen.add(key);
+    out.push({name,type:kind,lat:c.lat,lon:c.lon,phone:t.phone||t["contact:phone"]||null,dist:hav(lat,lon,c.lat,c.lon)});
+  });
+  out.sort((a,b)=>a.dist-b.dist);return out;
+}
+function renderNearChips(active){
+  const el=document.getElementById("beds-chips");if(!el)return;
+  el.innerHTML=Object.entries(NEAR_KINDS).map(([k,v])=>`<button class="phrase-cat-btn ${k===active?"active":""}" onclick="findNear('${k}')">${v.icon} ${v.label}</button>`).join("");
+}
+async function findNear(kind){
+  if(kind==="beds")return findBedsNear();
+  if(!MAP||bedsSearching)return;
+  const panel=document.getElementById("beds-panel"),list=document.getElementById("beds-list"),ttl=document.getElementById("beds-title");
+  let lat,lon,where;
+  if(mapWatch!=null&&MAPME){const c=MAPME.getLatLng();lat=c.lat;lon=c.lng;where="where we are";}
+  else{const c=MAP.getCenter();lat=c.lat;lon=c.lng;where="here";}
+  const K=NEAR_KINDS[kind];
+  panel.classList.add("show");renderNearChips(kind);
+  ttl.textContent="Searching "+K.label.toLowerCase()+" near "+where+"…";
+  list.innerHTML='<div class="beds-empty">Looking on OpenStreetMap…</div>';
+  bedsSearching=true;
+  try{
+    const items=normAmenity(await overpassAmenity(K.sel,lat,lon,2000),lat,lon);
+    if(BEDSFOUND)BEDSFOUND.remove();
+    BEDSFOUND=L.layerGroup();bedsMarkers=[];
+    items.slice(0,30).forEach(b=>{
+      const m=L.marker([b.lat,b.lon],{icon:L.divIcon({className:"found-pin",html:K.icon,iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:500})
+        .bindPopup(`<b>${escapeHtml(b.name)}</b><br><span class='pp-km'>${amenityLabel(b.type)} · ${b.dist<1?Math.round(b.dist*1000)+" m":b.dist.toFixed(1)+" km"}</span><br><a href='https://maps.apple.com/?ll=${b.lat},${b.lon}&q=${encodeURIComponent(b.name)}' target='_blank' rel='noopener'>Maps</a>${b.phone?` · <a href='tel:${b.phone.replace(/[^+\d]/g,"")}'>Call</a>`:""}`);
+      m.addTo(BEDSFOUND);bedsMarkers.push(m);
+    });
+    BEDSFOUND.addTo(MAP);
+    ttl.textContent=(items.length||"No")+" "+K.label.toLowerCase()+(items.length===1?"":"s")+" within 2 km of "+where;
+    if(!items.length){list.innerHTML='<div class="beds-empty">Nothing tagged nearby on OpenStreetMap. Towns on the route usually have one — try from the town centre.</div>';}
+    else{
+      list.innerHTML=items.slice(0,30).map((b,i)=>`<div class="bed-row" data-i="${i}">
+        <div class="bed-row-main"><span class="bed-name">${escapeHtml(b.name)}</span><span class="bed-meta">${amenityLabel(b.type)} · ${b.dist<1?Math.round(b.dist*1000)+" m":b.dist.toFixed(1)+" km"}</span></div>
+        <div class="bed-row-links">${b.phone?`<a href="tel:${b.phone.replace(/[^+\d]/g,"")}" onclick="event.stopPropagation()">call</a>`:""}<a href="https://maps.apple.com/?ll=${b.lat},${b.lon}&q=${encodeURIComponent(b.name)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">maps</a></div>
+      </div>`).join("");
+      list.querySelectorAll(".bed-row").forEach(row=>{
+        row.addEventListener("click",()=>{const m=bedsMarkers[+row.dataset.i];if(m&&MAP){MAP.panTo(m.getLatLng());m.openPopup();}});
+      });
+    }
+  }catch(e){
+    ttl.textContent="Couldn't reach OpenStreetMap";
+    list.innerHTML='<div class="beds-empty">No signal or the service is busy — try again in a minute.</div>';
+  }
+  bedsSearching=false;
+}
+
+/* ---- SOS per-town quick links (offline: they open Maps/search when tapped) ---- */
+function buildSOS(){
+  const el=document.getElementById("sos-towns");if(!el)return;
+  el.innerHTML='<div class="sos-head">Per town · health centre / pharmacy / taxi</div>'+SLEEP_ORDER.map(id=>{
+    const w=WPTS[IDX[id]];const town=w.name.split(",")[0].split(" (")[0];const es=w.km>104;
+    const enc=encodeURIComponent;
+    return `<div class="sos-row"><b>${town}</b><span class="sos-links">
+      <a href="https://maps.apple.com/?q=${enc((es?"centro de salud ":"centro de saúde ")+town)}&sll=${w.lat},${w.lon}&z=14" target="_blank" rel="noopener">health</a>
+      <a href="https://maps.apple.com/?q=${enc((es?"farmacia ":"farmácia ")+town)}&sll=${w.lat},${w.lon}&z=14" target="_blank" rel="noopener">pharmacy</a>
+      <a href="https://www.google.com/search?q=${enc("taxi "+town+(es?" pontevedra":" portugal")+" telefone")}" target="_blank" rel="noopener">taxi</a>
+    </span></div>`;
+  }).join("");
 }
 function mapLocate(){
   if(!navigator.geolocation||!MAP)return;
@@ -2691,6 +2861,62 @@ function initJournal(){
   });
 }
 
+/* credencial stamp gallery — one slot per overnight, keyed by town id (plan-proof) */
+let stamps=store.get("camino-stamps",{});
+let stampKey=null;
+function stampSlots(){
+  const stops=currentStops();
+  return stops.map((id,k)=>({id,k,town:WPTS[IDX[id]].name.split(",")[0].split(" (")[0],
+    label:k===0?"Start · Porto":("Night "+k),date:k===0?stageDateLabel(0).replace(/,.*/,""):stageDateLabel(k-1)}));
+}
+function renderStamps(){
+  const grid=document.getElementById("stamps-grid");if(!grid)return;
+  grid.innerHTML=stampSlots().map(s=>{
+    const img=stamps[s.id];
+    return `<div class="stamp-cell">
+      <div class="stamp-slot ${img?"has":""}" data-id="${s.id}">${img?`<img src="${img}" alt="stamp ${s.town}">`:`<span class="stamp-plus">+</span>`}${img?`<button class="stamp-del" data-id="${s.id}" aria-label="Remove">✕</button>`:""}</div>
+      <div class="stamp-town">${s.town}</div><div class="stamp-when">${s.label}</div>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".stamp-slot").forEach(sl=>{
+    sl.addEventListener("click",e=>{
+      if(e.target.classList.contains("stamp-del"))return;
+      stampKey=sl.dataset.id;document.getElementById("stamp-input").click();
+    });
+  });
+  grid.querySelectorAll(".stamp-del").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      if(!confirm("Remove this stamp photo?"))return;
+      delete stamps[btn.dataset.id];
+      try{store.set("camino-stamps",stamps);}catch(err){}
+      renderStamps();
+    });
+  });
+}
+function initStamps(){
+  const inp=document.getElementById("stamp-input");if(!inp)return;
+  inp.addEventListener("change",e=>{
+    const file=e.target.files[0];if(!file||!stampKey)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        // square crop, small: 8 stamps must fit comfortably in localStorage
+        const s=Math.min(img.width,img.height),c=document.createElement("canvas");c.width=c.height=520;
+        c.getContext("2d").drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,520,520);
+        stamps[stampKey]=c.toDataURL("image/jpeg",0.72);
+        try{store.set("camino-stamps",stamps);}catch(err){alert("Storage is full — free some journal photos first.");delete stamps[stampKey];}
+        renderStamps();
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value="";
+  });
+  renderStamps();
+}
+
 /* boot */
 const dateInput=document.getElementById('start-date');
 dateInput.value=startDate;
@@ -2698,7 +2924,7 @@ dateInput.addEventListener('change',()=>{startDate=dateInput.value||startDate;st
 document.getElementById('reset').addEventListener('click',()=>{store.set(doneKey(),[]);render();});
 document.getElementById('gps-btn').addEventListener('click',showGps);
 renderPlans();render();updateCountdown();setInterval(updateCountdown,60000);
-initBoat();setChip();setTrackChip();
+initBoat();setChip();setTrackChip();buildSOS();initStamps();
 autoLoadBundled();
 initJournal();pullJournal();
 pullShared().then(()=>{render();});
