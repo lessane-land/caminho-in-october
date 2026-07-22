@@ -436,9 +436,30 @@
   .big-actions{display:flex;gap:8px}
   .big-actions button{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);padding:8px 15px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
   #big-locate{border-color:var(--sea-glow);color:var(--sea-shallow)}
+  .big-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+  .big-main{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-  .bigview-svg svg{max-height:100%;width:100%}
-  .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px}
+  .bigview-svg svg{max-height:100%;max-width:100%;width:100%}
+  .big-details{display:none}
+  /* landscape: chart on the left fills its column; details (beds/sights/services)
+     use the space on the right that was empty before */
+  @media (orientation:landscape){
+    .big-body{flex-direction:row;gap:18px}
+    .big-main{flex:1 1 60%;min-width:0}
+    .big-details{display:block;flex:1 1 40%;max-width:440px;overflow-y:auto;padding-left:18px;border-left:1px solid var(--night-border)}
+  }
+  .bd-sec{margin-bottom:16px}
+  .bd-sec h5{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sea-shallow);font-weight:500;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--night-border)}
+  .bd-bed{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0;font-size:.86rem;color:var(--ink-soft)}
+  .bd-bed em{font-style:normal;color:var(--terracotta-bright);font-family:'Fraunces',serif;font-size:.82rem}
+  .bd-bed a{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:3px 9px;text-decoration:none;flex:none}
+  .bd-grp{margin:6px 0 10px}
+  .bd-grp>b{font-family:'Fraunces',serif;color:var(--paper);font-size:.9rem;font-weight:500}
+  .bd-grp>span{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--mute)}
+  .bd-sight{padding:6px 0;font-size:.84rem;color:var(--ink-soft);line-height:1.5}
+  .bd-sight b{font-family:'Fraunces',serif;color:var(--gold-bright);font-weight:500}
+  .bd-note{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);font-size:.85rem;line-height:1.55;margin-top:4px}
+  .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px;flex:none}
   .hint-jump{background:transparent;border:1px solid var(--gold);color:var(--gold-bright);border-radius:50px;padding:2px 10px;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
   .hint-jump:hover{background:var(--gold);color:var(--night-deep)}
   .book-mini{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sea-shallow);border:1px solid var(--sea-glow);border-radius:50px;padding:2px 9px;text-decoration:none;margin-left:8px;white-space:nowrap;transition:all .2s}
@@ -1020,8 +1041,13 @@
     <div class="big-stats" id="big-stats"></div>
     <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
-  <div class="bigview-svg" id="big-svg"></div>
-  <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
+  <div class="big-body">
+    <div class="big-main">
+      <div class="bigview-svg" id="big-svg"></div>
+      <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
+    </div>
+    <div class="big-details" id="big-details"></div>
+  </div>
   <div class="big-hint" id="big-hint">Rotate to landscape for the full ribbon.</div>
 </div>
 
@@ -1789,9 +1815,9 @@ function bigProfileSVG(st,g){
     if(hasBed)glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
     if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
     return `<circle class="big-wp" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?10:7}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}" onclick="selectBigWp(${i});event.stopPropagation()"/>
-      <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
+      <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="${on?"#f6d35f":hi?"#f2c230":"#5b6d85"}">${w.alt}</text>
       ${glyphs}
-      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":"#9fb0c5"}" class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" style="cursor:pointer">${w.name.split(",")[0].split(" (")[0]}</text>`;
+      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*16}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12.5" fill="${on?"#f6d35f":"#9fb0c5"}" class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" style="cursor:pointer">${w.name.split(",")[0].split(" (")[0]}</text>`;
   }).join("");
   let walked="",gps="";
   if(g){
@@ -1810,13 +1836,13 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    <g transform="translate(${W-padR-306},18)" font-family="DM Mono, monospace" font-size="10">
-      <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
-      <rect x="58" y="-8" width="16" height="4" fill="#f2c230"/><text x="79" y="-3" fill="#5b6d85">3-6%</text>
-      <rect x="128" y="-8" width="16" height="4" fill="#ef8354"/><text x="149" y="-3" fill="#5b6d85">steep</text>
-      <path d="M 196 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="211" y="-3" fill="#5b6d85">bed</text>
-      <path d="M 246 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="257" y="-3" fill="#5b6d85">sight</text>
-      ${det?`<text x="196" y="-3" fill="#33455f">gpx terrain</text>`:""}
+    <g transform="translate(${W-padR-(det?420:300)},16)" font-family="DM Mono, monospace" font-size="11">
+      <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-4" fill="#5b6d85">flat</text>
+      <rect x="60" y="-8" width="16" height="4" fill="#f2c230"/><text x="81" y="-4" fill="#5b6d85">3-6%</text>
+      <rect x="134" y="-8" width="16" height="4" fill="#ef8354"/><text x="155" y="-4" fill="#5b6d85">steep</text>
+      <path d="M 208 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="223" y="-4" fill="#5b6d85">bed</text>
+      <path d="M 262 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="273" y="-4" fill="#5b6d85">sight</text>
+      ${det?`<text x="318" y="-4" fill="#5b6d85">gpx terrain</text>`:""}
     </g>
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -1837,6 +1863,26 @@ function bigRepaint(){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
   setBigCap(st);
+}
+// The landscape side panel: everything about this day — beds tonight, beds on
+// the way, the sights, and the services — using the space the wide screen gives.
+function setBigDetails(st){
+  const el=document.getElementById("big-details");if(!el||!st)return;
+  const bedRow=(a,w)=>`<div class="bd-bed"><span>${escapeHtml(a[0])} <em>${a[2]}</em></span>${mapBedLink(a,w)}</div>`;
+  let h="";
+  h+=`<div class="bd-sec"><h5>Tonight · ${st.b.name.split(",")[0]}</h5>`;
+  if(st.b.sleep&&st.b.sleep.length)h+=st.b.sleep.map(a=>bedRow(a,st.b)).join("");
+  else h+=`<p class="bd-note">The finish — we pick where to celebrate.</p>`;
+  if(EVENINGS[st.b.id])h+=`<p class="bd-note">${EVENINGS[st.b.id]}</p>`;
+  h+=`</div>`;
+  const midBeds=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
+  if(midBeds.length)h+=`<div class="bd-sec"><h5>Beds on the way</h5>`+midBeds.map(w=>`<div class="bd-grp"><b>${w.name.split(",")[0]}</b> <span>· km ${(w.km-st.a.km).toFixed(1).replace(".0","")}</span>${w.sleep.map(a=>bedRow(a,w)).join("")}</div>`).join("")+`</div>`;
+  const sights=st.seg.filter(w=>w.poi);
+  if(sights.length)h+=`<div class="bd-sec"><h5>Sights this stage</h5>`+sights.map(w=>`<div class="bd-sight"><b>${w.name.split(",")[0]}</b> — ${w.poi}</div>`).join("")+`</div>`;
+  if(st.svc)h+=`<div class="bd-sec"><h5>Services</h5><p class="bd-note">${st.svc}</p></div>`;
+  const fn=FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ");
+  if(fn)h+=`<div class="bd-sec"><h5>Field note</h5><p class="bd-note">${fn}</p></div>`;
+  el.innerHTML=h;
 }
 function selectBigWp(i){bigSel=(bigSel===i)?null:i;bigRepaint();}
 function setBigStats(g,st){
@@ -1910,7 +1956,8 @@ function openBig(n){
   document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+stageDateLabel(bigN-1)+" \u00b7 K. "+(160.5-st.b.km).toFixed(1).replace(".0","");
   bigRepaint();
   setBigStats(null,st);
-  let hint="Rotate to landscape for the full ribbon.";
+  setBigDetails(st);
+  let hint="Rotate to landscape for the day's beds, sights and services.";
   const wx=store.get("camino-wx-"+st.b.id,null);
   if(wx&&wx.d&&wx.d.daily)hint+="  \u00b7 today at "+st.b.name.split(",")[0]+": rain "+wx.d.daily.precipitation_probability_max[0]+"% \u00b7 wind "+Math.round(wx.d.daily.wind_speed_10m_max[0])+" km/h";
   document.getElementById("big-hint").textContent=hint;
