@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-  :root{
+  :root{color-scheme:dark;
     --night-deep:#0a111c; --night:#0f1826; --night-soft:#131f31; --night-card:#182842;
     --night-border:rgba(63,167,160,0.16);
     --paper:#e8eef5; --ink:#e8eef5; --ink-soft:#9fb0c5; --mute:#5b6d85; --mute-dim:#44536a;
@@ -497,11 +497,18 @@
 
 
   .timebar{margin-top:8px}
-  .timebar select,.timebar input[type=time]{background:var(--night-soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:'DM Mono',monospace;font-size:.72rem}
   td.eta{text-align:right;font-family:'DM Mono',monospace;color:var(--gold-bright);font-size:.72rem;white-space:nowrap}
-  .tl{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ink-soft);background:var(--night-soft);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0 2px}
+  .tl{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ink-soft);background:var(--night-soft);border:1px solid var(--night-border);border-radius:10px;padding:8px 12px;margin:10px 0 2px}
   .tl.late{border-color:#ef8354}
   .tl-warn{display:block;color:#ef8354;margin-top:3px}
+
+
+  .seg{display:inline-flex;border:1px solid var(--night-border);border-radius:50px;background:var(--night-soft);overflow:hidden}
+  .seg button{border:0;background:transparent;color:var(--ink-soft);font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.05em;padding:8px 13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .seg button+button{border-left:1px solid var(--night-border)}
+  .seg button:hover{color:var(--terracotta-bright)}
+  .seg button.on{background:var(--terracotta);color:var(--night-deep);font-weight:700}
+  input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(.7) sepia(.5) saturate(4) hue-rotate(5deg);cursor:pointer}
 
 </style>
 </head>
@@ -669,7 +676,7 @@
         <strong>The one reservation that can strand us.</strong> No bridge over the Mi&ntilde;o, we cross by water taxi (Xacobeo Transfer or Taxi Mar Caminha, 6-8 &euro;, 10-20 min). October runs a reduced, tide-dependent schedule: book 2-3 days ahead, confirm the evening before. Landing in Camposancos means Spain and <strong>clocks jump one hour forward</strong>. Plan B if the sea rebels: train to Valen&ccedil;a, cross the bridge to Tui.
       </div>
       <div class="boat-form">
-        <select id="boat-status"><option>Not booked</option><option>Booked</option></select>
+        <div class="seg" id="boat-status-seg"><button data-v="Not booked">Not booked</button><button data-v="Booked">Booked</button></div>
         <input type="time" id="boat-time" class="exp-input">
         <input type="text" id="boat-code" class="exp-input" placeholder="Confirmation code">
       </div>
@@ -719,7 +726,7 @@
       <p class="sub-sub">Four presets, or Custom to pick our own overnight stops, every card below rebuilds around whatever we choose.</p>
       <div class="plans" id="plans"></div>
       <div class="datebar"><span>Boots on</span><input type="date" id="start-date"><span id="plan-summary"></span></div>
-      <div class="datebar timebar"><span>Out the door</span><input type="time" id="t0-input" value="08:00"><span>pace</span><select id="pace-sel"><option value="3.5">relaxed &middot; 3.5 km/h</option><option value="4.2" selected>steady &middot; 4.2 km/h</option><option value="5">brisk &middot; 5.0 km/h</option></select><span>stops</span><select id="brk-sel"><option value="30">30 min</option><option value="45" selected>45 min</option><option value="60">1 h</option><option value="90">1 h 30</option></select></div>
+      <div class="datebar timebar"><span>Out the door</span><input type="time" id="t0-input" value="08:00"><span>pace</span><div class="seg" id="pace-seg"><button data-v="3.5" title="relaxed">3.5</button><button data-v="4.2" title="steady">4.2</button><button data-v="5" title="brisk">5.0</button></div><span>km/h</span><span>stops</span><div class="seg" id="brk-seg"><button data-v="30">30m</button><button data-v="45">45m</button><button data-v="60">1h</button><button data-v="90">1h30</button></div></div>
       <div class="custom-panel" id="custom-panel">
         <h4>Pick our overnight stops (Porto and Vigo are fixed)</h4>
         <div id="stop-list"></div>
@@ -1911,13 +1918,16 @@ async function pushShared(){
 }
 
 /* boat form */
+function boatStatusSet(v){document.querySelectorAll("#boat-status-seg button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));}
+function boatStatusVal(){const on=document.querySelector("#boat-status-seg button.on");return on?on.dataset.v:"Not booked";}
 function initBoat(){
-  const s=document.getElementById("boat-status"),t=document.getElementById("boat-time"),c=document.getElementById("boat-code");
-  if(!s)return;
+  const seg=document.getElementById("boat-status-seg"),t=document.getElementById("boat-time"),c=document.getElementById("boat-code");
+  if(!seg)return;
   const b=store.get("camino-boat",{s:"Not booked",t:"",c:""});
-  s.value=b.s||"Not booked";t.value=b.t||"";c.value=b.c||"";
-  const save=()=>{store.set("camino-boat",{s:s.value,t:t.value,c:c.value,ts:Date.now()});render();pushShared();};
-  [s,t,c].forEach(el=>el.addEventListener("change",save));
+  boatStatusSet(b.s||"Not booked");t.value=b.t||"";c.value=b.c||"";
+  const save=()=>{store.set("camino-boat",{s:boatStatusVal(),t:t.value,c:c.value,ts:Date.now()});render();pushShared();};
+  seg.querySelectorAll("button").forEach(btn=>{if(!btn.dataset.wired){btn.dataset.wired="1";btn.addEventListener("click",()=>{boatStatusSet(btn.dataset.v);save();});}});
+  [t,c].forEach(el=>el.addEventListener("change",save));
 }
 
 /* today mode */
@@ -2100,10 +2110,18 @@ function initJournal(){
 
 /* timeline controls */
 (function(){
-  const t0=document.getElementById("t0-input"),pc=document.getElementById("pace-sel"),bk=document.getElementById("brk-sel");
+  const t0=document.getElementById("t0-input");
   if(t0){t0.value=store.get("camino-t0","08:00");t0.addEventListener("change",()=>{store.set("camino-t0",t0.value||"08:00");render();});}
-  if(pc){pc.value=String(store.get("camino-pace",4.2));pc.addEventListener("change",()=>{store.set("camino-pace",+pc.value);render();});}
-  if(bk){bk.value=String(store.get("camino-brk",45));bk.addEventListener("change",()=>{store.set("camino-brk",+bk.value);render();});}
+  function seg(id,key,def){
+    const el=document.getElementById(id);if(!el)return;
+    const cur=String(store.get(key,def));
+    el.querySelectorAll("button").forEach(b=>{
+      b.classList.toggle("on",b.dataset.v===cur);
+      b.addEventListener("click",()=>{store.set(key,+b.dataset.v);el.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));render();});
+    });
+  }
+  seg("pace-seg","camino-pace",4.2);
+  seg("brk-seg","camino-brk",45);
 })();
 /* boot */
 const dateInput=document.getElementById('start-date');
