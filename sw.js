@@ -1,4 +1,4 @@
-const CACHE = "camino-v36";
+const CACHE = "camino-v37";
 const TILE_CACHE = "camino-tiles";   // offline map tiles; persists across app updates, only cleared on demand
 const ASSETS = ["./", "./index.html", "./manifest.json", "./config.js", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
@@ -22,7 +22,7 @@ function isLiveApi(url) {
   return url.hostname.endsWith(".supabase.co") || url.hostname === "api.open-meteo.com";
 }
 function isMapTile(url) {
-  return url.hostname.endsWith(".basemaps.cartocdn.com") || url.hostname === "server.arcgisonline.com";
+  return url.hostname.endsWith(".basemaps.cartocdn.com") || url.hostname === "server.arcgisonline.com" || url.hostname.endsWith("tile.openstreetmap.org");
 }
 
 self.addEventListener("fetch", e => {

@@ -551,6 +551,9 @@
     .big-side.open{display:flex}
   }
 
+
+  .leaflet-tile-pane .osm-dark{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.92) saturate(.6)}
+
 </style>
 </head>
 <body>
@@ -2056,7 +2059,7 @@ function initMap(){
   if(typeof L==="undefined"){if(fb&&rm){fb.style.display="";rm.style.display="none";}return;}
   if(MAP)return;
   MAP=L.map("route-map",{scrollWheelZoom:false});
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{attribution:"&copy; Esri &copy; OpenStreetMap contributors",maxZoom:16}).addTo(MAP);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",subdomains:"abc",maxZoom:19,className:"osm-dark"}).addTo(MAP);
   const Ctl=L.Control.extend({onAdd:function(){
     const d=L.DomUtil.create("div","leaflet-bar");
     d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
@@ -2256,6 +2259,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v36</div>
+<div class="appver">camino-app \u00b7 v37</div>
 </body>
 </html>
