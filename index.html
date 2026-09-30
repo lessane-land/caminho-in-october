@@ -434,8 +434,10 @@
   .big-actions{display:flex;gap:8px}
   .big-actions button{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);padding:8px 15px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
   #big-locate{border-color:var(--sea-glow);color:var(--sea-shallow)}
-  .bigview-svg{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-  .bigview-svg svg{max-height:100%;width:100%}
+  .bigview,.bigview *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .bigview{touch-action:manipulation}
+  .bigview-svg{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center}
+  .bigview-svg svg{width:100%;height:100%;display:block}
   .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px}
 
 
@@ -486,14 +488,14 @@
   .big-actions button{min-width:42px}
 
 
-  .big-cap{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ink-soft);text-align:center;margin-top:4px;min-height:20px}
+  .big-cap{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--ink-soft);text-align:center;margin-top:8px;min-height:48px;line-height:1.5;padding:0 10px}
   .big-cap b{color:var(--gold-bright);font-weight:500}
   .big-cap a{color:var(--sea-shallow);text-decoration:none;border-bottom:1px dotted var(--sea-shallow)}
   .big-wp{cursor:pointer}
 
 
-  .big-cap .cap-poi{display:block;font-family:'Fraunces',serif;font-style:italic;font-size:.82rem;letter-spacing:0;text-transform:none;color:var(--gold-bright);margin-top:3px}
-  .big-cap .cap-beds{display:block;font-size:.68rem;letter-spacing:.02em;text-transform:none;color:#5fc2bb;margin-top:2px}
+  .big-cap .cap-poi{display:block;font-family:'Fraunces',serif;font-style:italic;font-size:1.02rem;letter-spacing:0;text-transform:none;color:var(--gold-bright);margin-top:4px}
+  .big-cap .cap-beds{display:block;font-size:.78rem;letter-spacing:.02em;text-transform:none;color:#5fc2bb;margin-top:3px}
 
 
   .timebar{margin-top:8px}
@@ -516,6 +518,20 @@
 
   #upd-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 86px);z-index:999;display:flex;align-items:center;gap:14px;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:10px 12px 10px 18px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--paper);box-shadow:0 8px 30px rgba(0,0,0,.5);white-space:nowrap}
   #upd-banner button{background:var(--gold);border:0;color:var(--night-deep);font-family:'DM Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:7px 14px;border-radius:50px;cursor:pointer}
+
+
+  .miniprofile svg{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+  .big-cap a{padding:2px 3px}
+
+
+  .big-list{height:100%;width:100%;max-width:880px;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 2px}
+  .bl-row{display:grid;grid-template-columns:66px 1fr auto auto;gap:12px;align-items:center;padding:12px;border-bottom:1px solid var(--night-border);cursor:pointer;border-radius:10px}
+  .bl-row.on{background:var(--night-soft)}
+  .bl-eta{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--gold-bright)}
+  .bl-name{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--paper);display:flex;align-items:center;gap:8px;min-width:0}
+  .bl-name svg{width:13px;height:13px;flex:none}
+  .bl-alt,.bl-km{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--mute);text-align:right;white-space:nowrap}
+  .bl-us{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.12em;color:var(--night-deep);background:var(--gold);border-radius:9px;padding:8px 12px;margin:8px 0;text-align:center;font-weight:700}
 
 </style>
 </head>
@@ -921,7 +937,7 @@
   <div class="bigview-top">
     <div id="big-title"></div>
     <div class="big-stats" id="big-stats"></div>
-    <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
+    <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-list-btn">List</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
   <div class="bigview-svg" id="big-svg"></div>
   <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
@@ -1635,7 +1651,11 @@ let bigN=null,bigWatch=null,bigG=null,bigSel=null;
 function gradeColor(gr){return gr<3?"#4a90b8":gr<6?"#f2c230":"#ef8354";}
 function fmtH(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh>0?hh+"h "+String(mm).padStart(2,"0"):mm+" min";}
 function bigProfileSVG(st,g){
-  const W=1200,H=440,padL=54,padR=28,padT=36,padB=80;
+  let W=1200,H=440;
+  const holder=document.getElementById("big-svg");
+  if(holder){const r=holder.getBoundingClientRect();
+    if(r.width>80&&r.height>80){W=Math.min(1700,Math.max(700,Math.round(r.width)));H=Math.min(780,Math.max(320,Math.round(r.height)));}}
+  const padL=56,padR=30,padT=40,padB=84;
   const det=stageDetail(st,200);
   const base=det||st.seg.map(w=>[w.km,w.alt]);
   const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.map(w=>w.alt),20);
@@ -1646,26 +1666,26 @@ function bigProfileSVG(st,g){
   const line=smoothPath(pts);
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
   let grid="";
-  for(let a=0;a<=nice;a+=25){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#5b6d85">${a}</text>`;}
+  for(let a=0;a<=nice;a+=25){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
   let kmticks="";
-  for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-14}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#44536a">${k}</text>`;}
+  for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-14}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k}</text>`;}
   const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
     const x=X(w.km),y=Y(snapAlt(det,w.km,w.alt));const hi=w.alt===hiAlt;const on=i===bigSel;
     const hasBed=w.sleep&&w.sleep.length&&w.km>st.a.km;
     const hasPoi=!!w.poi;
-    let glyphs="";const gy=y-26;
+    let glyphs="";const gy=y-29;
     const bx=hasBed&&hasPoi?x-8:x;
     if(hasBed)glyphs+=`<path d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
     if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
     return `<g class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()">
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="26" fill="rgba(0,0,0,0)"/>
-      <rect x="${(x-34).toFixed(1)}" y="${H-padB+8+(i%2)*15}" width="68" height="17" fill="rgba(0,0,0,0)"/>
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?10:7}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}"/>
-      <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="30" fill="rgba(0,0,0,0)"/>
+      <rect x="${(x-34).toFixed(1)}" y="${H-padB+8+(i%2)*15}" width="76" height="19" fill="rgba(0,0,0,0)"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?12:8}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}"/>
+      <text x="${x.toFixed(1)}" y="${(y-15).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
       ${glyphs}
-      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}</text>
+      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}</text>
     </g>`;
   }).join("");
   let walked="",gps="";
@@ -1674,9 +1694,12 @@ function bigProfileSVG(st,g){
     walked=`<clipPath id="wclip"><rect x="0" y="0" width="${gx.toFixed(1)}" height="${H}"/></clipPath>
       <path d="${area}" fill="url(#goldfill)" clip-path="url(#wclip)"/>
       <path d="${line}" fill="none" stroke="#f2c230" stroke-width="4" stroke-linecap="round" clip-path="url(#wclip)" opacity=".85"/>`;
+    const usTag=g.off?("US \u00b7 "+g.off.toFixed(1)+" km off"):("US \u00b7 km "+(g.km-st.a.km).toFixed(1));
+    const usDot=g.off?`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="11" fill="#0a111c" stroke="#f2c230" stroke-width="3" stroke-dasharray="4 3"/>`
+                     :`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>`;
     gps=`<line x1="${gx.toFixed(1)}" y1="${padT}" x2="${gx.toFixed(1)}" y2="${H-padB}" stroke="#f2c230" stroke-dasharray="5 5" opacity=".5"/>
-      <circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>
-      <text x="${gx.toFixed(1)}" y="${padT-12}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#f6d35f">US \u00b7 km ${(g.km-st.a.km).toFixed(1)}</text>`;
+      ${usDot}
+      <text x="${gx.toFixed(1)}" y="${padT-12}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12" fill="#f6d35f">${usTag}</text>`;
   }
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
     <defs>
@@ -1685,14 +1708,14 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    <g transform="translate(${W-padR-330},18)" font-family="DM Mono, monospace" font-size="10">
+    <g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
       <rect x="56" y="-8" width="16" height="4" fill="#f2c230"/><text x="77" y="-3" fill="#5b6d85">3-6%</text>
       <rect x="122" y="-8" width="16" height="4" fill="#ef8354"/><text x="143" y="-3" fill="#5b6d85">steep</text>
       <path d="M 188 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="203" y="-3" fill="#5b6d85">bed</text>
       <path d="M 240 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="251" y="-3" fill="#5b6d85">sight</text>
     </g>
-    ${det?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="10" fill="#33455f">gpx terrain</text>`:""}
+    ${det?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="11" fill="#33455f">gpx terrain</text>`:""}
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${walked}
@@ -1708,9 +1731,28 @@ function setBigCap(st){
   if(w.sleep&&w.sleep.length)out+=`<span class="cap-beds">Beds: ${w.sleep.map(a=>a[0]+" ("+a[2]+")").join(" \u00b7 ")}</span>`;
   el.innerHTML=out;
 }
+let bigMode="ribbon";
+const BL_BED='<svg viewBox="0 0 12 12"><path d="M1 11 v-4.6 l5 -4.4 5 4.4 V11 z" fill="none" stroke="#5fc2bb" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const BL_POI='<svg viewBox="0 0 12 12"><path d="M6 0.5 l1.6 3.9 3.9 1.6 -3.9 1.6 -1.6 3.9 -1.6 -3.9 -3.9 -1.6 3.9 -1.6 z" fill="#f2c230"/></svg>';
+function bigListHTML(st,g){
+  let gpsDone=false,rows="";
+  st.seg.forEach((w,i)=>{
+    if(g&&!gpsDone&&g.km<=w.km&&w.km>st.a.km){gpsDone=true;rows+=`<div class="bl-us">${g.off?("WE ARE HERE \u00b7 "+g.off.toFixed(1)+" KM OFF THE PATH"):("WE ARE HERE \u00b7 KM "+(g.km-st.a.km).toFixed(1))}</div>`;}
+    const on=i===bigSel;
+    const beds=w.sleep&&w.sleep.length&&w.km>st.a.km;
+    rows+=`<div class="bl-row ${on?"on":""}" onclick="selectBigWp(${i})">
+      <span class="bl-eta">~${fmtT(etaMin(st,w.km))}</span>
+      <span class="bl-name">${w.name.split(",")[0]}${beds?BL_BED:""}${w.poi?BL_POI:""}</span>
+      <span class="bl-alt">${w.alt} m</span>
+      <span class="bl-km">km ${(w.km-st.a.km).toFixed(1).replace(".0","")}</span>
+    </div>`;
+  });
+  if(g&&!gpsDone)rows+=`<div class="bl-us">WE ARE HERE \u00b7 KM ${(g.km-st.a.km).toFixed(1)}</div>`;
+  return `<div class="big-list">${rows}</div>`;
+}
 function bigRepaint(){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
-  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
+  document.getElementById("big-svg").innerHTML=bigMode==="list"?bigListHTML(st,bigG):bigProfileSVG(st,bigG);
   setBigCap(st);
 }
 function selectBigWp(i){bigSel=(bigSel===i)?null:i;bigRepaint();}
@@ -1743,16 +1785,17 @@ function setBigStats(g,st){
 }
 function bigApply(pos,st){
   const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude);if(!b)return;
-  if(b.distKm>3){document.getElementById("big-hint").textContent="We are "+b.distKm.toFixed(1)+" km off the route right now.";return;}
+  const hint=document.getElementById("big-hint");
   if(b.km<st.a.km||b.km>st.b.km){
     const cur=STAGES.find(s=>b.km>=s.a.km&&b.km<=s.b.km);
-    document.getElementById("big-hint").textContent=cur?("We are on stage "+cur.n+" right now; use the arrows to jump."):"";
+    if(hint)hint.textContent=cur?("We are on stage "+cur.n+" right now; use the arrows to jump."):"";
     return;
   }
-  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km)};
+  if(b.distKm>15){if(hint)hint.textContent="We are "+b.distKm.toFixed(0)+" km from the route right now.";return;}
+  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km),off:b.distKm>1.2?b.distKm:0};
   bigRepaint();
   setBigStats(bigG,st);
-  document.getElementById("big-hint").textContent="Live \u00b7 updates as we walk.";
+  if(hint)hint.textContent=bigG.off?("Live \u00b7 "+bigG.off.toFixed(1)+" km off the path, the marker shows the nearest route point."):"Live \u00b7 updates as we walk.";
 }
 function bigStart(st){
   if(!navigator.geolocation)return;
@@ -1777,7 +1820,13 @@ function openBig(n){
 function bigLocate(){const st=STAGES.find(s=>s.n===bigN);if(st){stopBigWatch();bigStart(st);}}
 document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();});
 document.getElementById("big-locate").addEventListener("click",bigLocate);
+document.getElementById("big-list-btn").addEventListener("click",()=>{bigMode=bigMode==="ribbon"?"list":"ribbon";document.getElementById("big-list-btn").textContent=bigMode==="ribbon"?"List":"Ribbon";bigRepaint();});
 document.getElementById("big-prev").addEventListener("click",()=>openBig(bigN-1));
+let bigRsz=null;
+window.addEventListener("resize",()=>{
+  if(!document.getElementById("bigview").classList.contains("active"))return;
+  clearTimeout(bigRsz);bigRsz=setTimeout(bigRepaint,160);
+});
 document.getElementById("big-next-btn").addEventListener("click",()=>openBig(bigN+1));
 
 
@@ -1966,7 +2015,7 @@ function initMap(){
   if(typeof L==="undefined"){if(fb&&rm){fb.style.display="";rm.style.display="none";}return;}
   if(MAP)return;
   MAP=L.map("route-map",{scrollWheelZoom:false});
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(MAP);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{attribution:"&copy; Esri &copy; OpenStreetMap contributors",maxZoom:16}).addTo(MAP);
   const Ctl=L.Control.extend({onAdd:function(){
     const d=L.DomUtil.create("div","leaflet-bar");
     d.innerHTML='<a href="#" title="Locate us" style="font-size:15px;line-height:26px;">\u2316</a>';
@@ -2166,6 +2215,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v34</div>
+<div class="appver">camino-app \u00b7 v35</div>
 </body>
 </html>
