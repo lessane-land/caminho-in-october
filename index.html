@@ -534,8 +534,15 @@
   .bl-us{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.12em;color:var(--night-deep);background:var(--gold);border-radius:9px;padding:8px 12px;margin:8px 0;text-align:center;font-weight:700}
 
 
-  .big-main{flex:1;min-height:0;display:flex;gap:18px}
-  .big-side{width:360px;flex:none;display:flex;flex-direction:column;min-height:0;border:1px solid var(--night-border);border-radius:14px;padding:12px;background:var(--night)}
+  .big-main{flex:1;min-height:0;display:flex;gap:16px}
+  .big-stage{flex:1.35;min-width:0;min-height:0;display:flex;flex-direction:column}
+  #big-map{flex:1;min-height:0;display:none;border-radius:14px;overflow:hidden;border:1px solid var(--night-border);background:#0a111c}
+  .big-stage.mode-map #big-map{display:block}
+  .big-stage.mode-map .bigview-svg{display:none}
+  .bm-tip{background:var(--night-card);border:1px solid var(--night-border);color:var(--paper);font-family:'DM Mono',monospace;font-size:.68rem;border-radius:8px;padding:4px 8px}
+  .bm-tip::before{display:none}
+  .bm-tip.bm-us{color:var(--night-deep);background:var(--gold);border-color:var(--gold);font-weight:700}
+  .big-side{flex:1;max-width:380px;min-width:290px;display:flex;flex-direction:column;min-height:0;border:1px solid var(--night-border);border-radius:14px;padding:12px;background:var(--night)}
   .bs-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
   .bs-filters button{padding:7px 13px;font-size:.62rem}
   #bs-close{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);border-radius:50px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
@@ -545,10 +552,27 @@
   .bl-det .d-bed{display:block;color:#5fc2bb}
   .bl-det a{color:var(--sea-shallow);text-decoration:none;border-bottom:1px dotted var(--sea-shallow)}
   .bl-empty{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--mute);text-align:center;padding:26px 10px}
-  @media (min-width:1000px){ #big-list-btn{display:none} #bs-close{display:none} }
-  @media (max-width:999px){
-    .big-side{position:fixed;inset:0;z-index:260;width:auto;border-radius:0;border:0;background:var(--night-deep);display:none;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 14px)}
-    .big-side.open{display:flex}
+  @media (max-width:899px){
+    .big-cap{display:none}
+    .big-stats b{font-size:1.15rem}
+    .big-stats{gap:10px 16px}
+    .big-actions button,#big-modes button{padding:7px 11px}
+  }
+  @media (max-width:899px) and (orientation:portrait){
+    .big-main{flex-direction:column;gap:10px}
+    .big-stage{flex:1.15}
+    .big-side{max-width:none;min-width:0;flex:1;padding:10px}
+  }
+  @media (max-width:899px) and (orientation:landscape){
+    .big-side{max-width:300px;min-width:236px;padding:10px}
+  }
+  @media (max-height:500px){
+    .big-hint{display:none}
+    .bigview-top{margin-bottom:4px}
+    .big-stats b{font-size:1.05rem}
+    .big-stats span{font-size:.48rem}
+    .big-actions button,#big-modes button{padding:6px 10px}
+    .bigview{padding-top:calc(env(safe-area-inset-top) + 8px)}
   }
 
 
@@ -958,15 +982,15 @@
   <div class="bigview-top">
     <div id="big-title"></div>
     <div class="big-stats" id="big-stats"></div>
-    <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-list-btn">List</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
+    <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><div class="seg" id="big-modes"><button data-m="ribbon" class="on">Ribbon</button><button data-m="map">Map</button></div><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
   <div class="big-main">
-    <div class="bigview-svg" id="big-svg"></div>
+    <div class="big-stage" id="big-stage">
+      <div class="bigview-svg" id="big-svg"></div>
+      <div id="big-map"></div>
+    </div>
     <aside class="big-side" id="big-side">
-      <div class="bs-head">
-        <div class="seg bs-filters" id="bs-filters"><button data-f="all" class="on">All</button><button data-f="beds">Beds</button><button data-f="sights">Sights</button></div>
-        <button id="bs-close">Close</button>
-      </div>
+      <div class="bs-head"><div class="seg bs-filters" id="bs-filters"><button data-f="all" class="on">All</button><button data-f="beds">Beds</button><button data-f="sights">Sights</button></div></div>
       <div class="bs-list" id="bs-list"></div>
     </aside>
   </div>
@@ -1684,8 +1708,10 @@ function bigProfileSVG(st,g){
   let W=1200,H=440;
   const holder=document.getElementById("big-svg");
   if(holder){const r=holder.getBoundingClientRect();
-    if(r.width>80&&r.height>80){W=Math.min(1700,Math.max(700,Math.round(r.width)));H=Math.min(780,Math.max(320,Math.round(r.height)));}}
-  const padL=56,padR=30,padT=40,padB=84;
+    if(r.width>60&&r.height>60){W=Math.min(1800,Math.max(340,Math.round(r.width)));H=Math.min(820,Math.max(210,Math.round(r.height)));}}
+  const slim=H<360||W<560;
+  const padL=slim?44:56,padR=slim?18:30,padT=slim?30:40,padB=slim?76:84;
+  const nrows=W<560?3:2,rY=W<560?14:15,rTop=W<560?16:20;
   const det=stageDetail(st,200);
   const base=det||st.seg.map(w=>[w.km,w.alt]);
   const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.map(w=>w.alt),20);
@@ -1696,9 +1722,10 @@ function bigProfileSVG(st,g){
   const line=smoothPath(pts);
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
   let grid="";
-  for(let a=0;a<=nice;a+=25){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
+  const gstep=(H-padT-padB)/(nice/25)<16?50:25;
+  for(let a=0;a<=nice;a+=gstep){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
   let kmticks="";
-  for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-14}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k}</text>`;}
+  for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k}</text>`;}
   const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
@@ -1711,11 +1738,11 @@ function bigProfileSVG(st,g){
     if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
     return `<g class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()">
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="30" fill="rgba(0,0,0,0)"/>
-      <rect x="${(x-34).toFixed(1)}" y="${H-padB+8+(i%2)*15}" width="76" height="19" fill="rgba(0,0,0,0)"/>
+      <rect x="${(x-34).toFixed(1)}" y="${H-padB+rTop-12+(i%nrows)*rY}" width="76" height="17" fill="rgba(0,0,0,0)"/>
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?12:8}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}"/>
       <text x="${x.toFixed(1)}" y="${(y-15).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
       ${glyphs}
-      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}</text>
+      <text x="${(i===0?Math.max(x-8,6):i===st.seg.length-1?Math.min(x+8,W-6):x).toFixed(1)}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${i===0?"start":i===st.seg.length-1?"end":"middle"}" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}</text>
     </g>`;
   }).join("");
   let walked="",gps="";
@@ -1738,13 +1765,13 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    <g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
+    ${W<680?"":`<g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
       <rect x="56" y="-8" width="16" height="4" fill="#f2c230"/><text x="77" y="-3" fill="#5b6d85">3-6%</text>
       <rect x="122" y="-8" width="16" height="4" fill="#ef8354"/><text x="143" y="-3" fill="#5b6d85">steep</text>
       <path d="M 188 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="203" y="-3" fill="#5b6d85">bed</text>
       <path d="M 240 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="251" y="-3" fill="#5b6d85">sight</text>
-    </g>
+    </g>`}
     ${det?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="11" fill="#33455f">gpx terrain</text>`:""}
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -1789,9 +1816,62 @@ function bigSideHTML(st,g){
   if(!rows)rows=`<div class="bl-empty">Nothing of this kind on this stage.</div>`;
   return rows;
 }
+/* stage map */
+let BIGMAP=null,BIGLAYER=null,bigMapFitted=null,bigViewMode=store.get("camino-bigview","ribbon");
+function stageLatLngs(st){
+  const g=store.get("camino-gpx",null);
+  if(g&&g.P&&g.anchors&&g.anchors[st.a.id]!=null&&g.anchors[st.b.id]!=null){
+    const ia=g.anchors[st.a.id],ib=g.anchors[st.b.id],lo=Math.min(ia,ib),hi=Math.max(ia,ib);
+    if(hi-lo>=2){const step=Math.max(1,Math.floor((hi-lo)/400));const out=[];for(let i=lo;i<=hi;i+=step)out.push([g.P[i][0],g.P[i][1]]);out.push([g.P[hi][0],g.P[hi][1]]);return out;}
+  }
+  return st.seg.filter(w=>w.lat&&w.lon).map(w=>[w.lat,w.lon]);
+}
+function ensureBigMap(){
+  if(BIGMAP||typeof L==="undefined")return;
+  const el=document.getElementById("big-map");if(!el)return;
+  BIGMAP=L.map(el,{zoomControl:true,attributionControl:false});
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{subdomains:"abc",maxZoom:19,className:"osm-dark"}).addTo(BIGMAP);
+  BIGLAYER=L.layerGroup().addTo(BIGMAP);
+}
+function paintBigMap(st,g){
+  if(typeof L==="undefined")return;
+  ensureBigMap();if(!BIGMAP)return;
+  BIGLAYER.clearLayers();
+  const line=stageLatLngs(st);
+  if(line.length>1)L.polyline(line,{color:"#f2c230",weight:3,dashArray:"7 7",opacity:.9}).addTo(BIGLAYER);
+  st.seg.forEach((w,i)=>{
+    if(!w.lat||!w.lon)return;
+    const beds=w.sleep&&w.sleep.length&&w.km>st.a.km;
+    const on=i===bigSel;
+    const col=on?"#f6d35f":beds?"#5fc2bb":w.poi?"#f2c230":"#4a90b8";
+    const ends=i===0||i===st.seg.length-1;
+    const m=L.circleMarker([w.lat,w.lon],{radius:on?11:(ends?9:7),color:col,weight:3,fillColor:"#0a111c",fillOpacity:1}).addTo(BIGLAYER);
+    m.bindTooltip(w.name.split(",")[0],{direction:"top",offset:[0,-9],className:"bm-tip"});
+    m.on("click",()=>selectBigWp(i));
+  });
+  if(g&&g.lat!=null){
+    L.circleMarker([g.lat,g.lon],{radius:9,color:"#f2c230",weight:4,fillColor:"#ffffff",fillOpacity:1})
+      .bindTooltip(g.off?("US \u00b7 "+g.off.toFixed(1)+" km off"):"US",{permanent:true,direction:"right",offset:[12,0],className:"bm-tip bm-us"})
+      .addTo(BIGLAYER);
+  }
+  if(bigMapFitted!==bigN&&line.length>1){try{BIGMAP.fitBounds(L.latLngBounds(line).pad(0.12));bigMapFitted=bigN;}catch(e){}}
+  setTimeout(()=>{try{BIGMAP&&BIGMAP.invalidateSize();}catch(e){}},60);
+}
+function setBigMode(m){
+  bigViewMode=m==="map"?"map":"ribbon";store.set("camino-bigview",bigViewMode);
+  const stg=document.getElementById("big-stage");if(stg)stg.classList.toggle("mode-map",bigViewMode==="map");
+  document.querySelectorAll("#big-modes button").forEach(b=>b.classList.toggle("on",b.dataset.m===bigViewMode));
+  bigRepaint();
+  if(bigViewMode==="map")setTimeout(()=>{try{
+    BIGMAP&&BIGMAP.invalidateSize();
+    const st=STAGES.find(s=>s.n===bigN);
+    if(st&&bigMapFitted!==bigN){const line=stageLatLngs(st);if(line.length>1){BIGMAP.fitBounds(L.latLngBounds(line).pad(0.12));bigMapFitted=bigN;}}
+  }catch(e){}},90);
+}
 function bigRepaint(){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
-  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
+  if(bigViewMode==="map")paintBigMap(st,bigG);
+  else document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
   const bl=document.getElementById("bs-list");if(bl)bl.innerHTML=bigSideHTML(st,bigG);
   document.querySelectorAll("#bs-filters button").forEach(b=>b.classList.toggle("on",b.dataset.f===bigFilter));
   setBigCap(st);
@@ -1834,7 +1914,7 @@ function bigApply(pos,st){
     return;
   }
   if(b.distKm>15){if(hint)hint.textContent="We are "+b.distKm.toFixed(0)+" km from the route right now.";return;}
-  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km),off:b.distKm>1.2?b.distKm:0};
+  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km),off:b.distKm>1.2?b.distKm:0,lat:pos.coords.latitude,lon:pos.coords.longitude};
   bigRepaint();
   setBigStats(bigG,st);
   if(hint)hint.textContent=bigG.off?("Live \u00b7 "+bigG.off.toFixed(1)+" km off the path, the marker shows the nearest route point."):"Live \u00b7 updates as we walk.";
@@ -1851,7 +1931,8 @@ function openBig(n){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("bigview").classList.add("active");
   document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+stageDateLabel(bigN-1)+" \u00b7 K. "+(160.5-st.b.km).toFixed(1).replace(".0","");
-  bigRepaint();
+  bigMapFitted=null;
+  setBigMode(bigViewMode);
   setBigStats(null,st);
   let hint="Rotate to landscape for the full ribbon.";
   const wx=store.get("camino-wx-"+st.b.id,null);
@@ -1860,17 +1941,23 @@ function openBig(n){
   bigStart(st);
 }
 function bigLocate(){const st=STAGES.find(s=>s.n===bigN);if(st){stopBigWatch();bigStart(st);}}
-document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");document.getElementById("big-side").classList.remove("open");stopBigWatch();});
+document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();});
 document.getElementById("big-locate").addEventListener("click",bigLocate);
-document.getElementById("big-list-btn").addEventListener("click",()=>document.getElementById("big-side").classList.add("open"));
-document.getElementById("bs-close").addEventListener("click",()=>document.getElementById("big-side").classList.remove("open"));
+document.querySelectorAll("#big-modes button").forEach(b=>b.addEventListener("click",()=>setBigMode(b.dataset.m)));
 document.querySelectorAll("#bs-filters button").forEach(b=>b.addEventListener("click",()=>{bigFilter=b.dataset.f;bigRepaint();}));
 document.getElementById("big-prev").addEventListener("click",()=>openBig(bigN-1));
 let bigRsz=null;
-window.addEventListener("resize",()=>{
+function bigResized(){
   if(!document.getElementById("bigview").classList.contains("active"))return;
-  clearTimeout(bigRsz);bigRsz=setTimeout(bigRepaint,160);
-});
+  clearTimeout(bigRsz);
+  bigRsz=setTimeout(()=>{if(bigViewMode==="map"){try{BIGMAP&&BIGMAP.invalidateSize();}catch(e){}}else bigRepaint();},140);
+}
+window.addEventListener("resize",bigResized);
+if(window.ResizeObserver){
+  const bro=new ResizeObserver(bigResized);
+  const h1=document.getElementById("big-svg"),h2=document.getElementById("big-map");
+  if(h1)bro.observe(h1);if(h2)bro.observe(h2);
+}
 document.getElementById("big-next-btn").addEventListener("click",()=>openBig(bigN+1));
 
 
@@ -2259,6 +2346,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v37</div>
+<div class="appver">camino-app \u00b7 v38</div>
 </body>
 </html>
