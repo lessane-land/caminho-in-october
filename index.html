@@ -510,6 +510,13 @@
   .seg button.on{background:var(--terracotta);color:var(--night-deep);font-weight:700}
   input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(.7) sepia(.5) saturate(4) hue-rotate(5deg);cursor:pointer}
 
+
+  .appver{text-align:center;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;color:#33455f;padding:18px 0 96px}
+
+
+  #upd-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 86px);z-index:999;display:flex;align-items:center;gap:14px;background:var(--night-card);border:1px solid var(--gold);border-radius:50px;padding:10px 12px 10px 18px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--paper);box-shadow:0 8px 30px rgba(0,0,0,.5);white-space:nowrap}
+  #upd-banner button{background:var(--gold);border:0;color:var(--night-deep);font-family:'DM Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.05em;padding:7px 14px;border-radius:50px;cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -1147,7 +1154,7 @@ function profileSVG(st){
   const dots=st.seg.map((w,i)=>{
     const y=Y(snapAlt(det,w.km,w.alt));
     const hiTxt=w.alt===hiAlt?`<text x="${X(w.km).toFixed(1)}" y="${(y-9).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#f2c230">${w.alt}</text>`:"";
-    return `<circle class="wp-dot ${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${i}" cx="${X(w.km).toFixed(1)}" cy="${y.toFixed(1)}" r="5" onclick="selectWp(${st.n},${i});event.stopPropagation()"/>${hiTxt}`;
+    return `<g style="cursor:pointer" onclick="selectWp(${st.n},${i});event.stopPropagation()"><circle cx="${X(w.km).toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="rgba(0,0,0,0)"/><circle class="wp-dot ${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${i}" cx="${X(w.km).toFixed(1)}" cy="${y.toFixed(1)}" r="5"/></g>${hiTxt}`;
   }).join("");
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -1650,12 +1657,16 @@ function bigProfileSVG(st,g){
     const hasPoi=!!w.poi;
     let glyphs="";const gy=y-26;
     const bx=hasBed&&hasPoi?x-8:x;
-    if(hasBed)glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
-    if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
-    return `<circle class="big-wp" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?10:7}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}" onclick="selectBigWp(${i});event.stopPropagation()"/>
+    if(hasBed)glyphs+=`<path d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
+    if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
+    return `<g class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()">
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="26" fill="rgba(0,0,0,0)"/>
+      <rect x="${(x-34).toFixed(1)}" y="${H-padB+8+(i%2)*15}" width="68" height="17" fill="rgba(0,0,0,0)"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?10:7}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}"/>
       <text x="${x.toFixed(1)}" y="${(y-13).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
       ${glyphs}
-      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":"#9fb0c5"}" class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()" style="cursor:pointer">${w.name.split(",")[0].split(" (")[0]}</text>`;
+      <text x="${x.toFixed(1)}" y="${H-padB+20+(i%2)*15}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}</text>
+    </g>`;
   }).join("");
   let walked="",gps="";
   if(g){
@@ -1674,14 +1685,14 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    <g transform="translate(${W-padR-306},18)" font-family="DM Mono, monospace" font-size="10">
+    <g transform="translate(${W-padR-330},18)" font-family="DM Mono, monospace" font-size="10">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
-      <rect x="58" y="-8" width="16" height="4" fill="#f2c230"/><text x="79" y="-3" fill="#5b6d85">3-6%</text>
-      <rect x="128" y="-8" width="16" height="4" fill="#ef8354"/><text x="149" y="-3" fill="#5b6d85">steep</text>
-      <path d="M 196 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="211" y="-3" fill="#5b6d85">bed</text>
-      <path d="M 246 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="257" y="-3" fill="#5b6d85">sight</text>
-      ${det?`<text x="196" y="-3" fill="#33455f">gpx terrain</text>`:""}
+      <rect x="56" y="-8" width="16" height="4" fill="#f2c230"/><text x="77" y="-3" fill="#5b6d85">3-6%</text>
+      <rect x="122" y="-8" width="16" height="4" fill="#ef8354"/><text x="143" y="-3" fill="#5b6d85">steep</text>
+      <path d="M 188 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="203" y="-3" fill="#5b6d85">bed</text>
+      <path d="M 240 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="251" y="-3" fill="#5b6d85">sight</text>
     </g>
+    ${det?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="10" fill="#33455f">gpx terrain</text>`:""}
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${walked}
@@ -2137,7 +2148,24 @@ pullShared().then(()=>{render();});
 openToday();
 document.getElementById("gpx-btn").addEventListener("click",()=>document.getElementById("gpx-input").click());
 document.getElementById("gpx-input").addEventListener("change",e=>{if(e.target.files[0])loadGpxFile(e.target.files[0]);e.target.value="";});
-if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js');}catch(e){}}
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    const showUpd=w=>{
+      if(document.getElementById('upd-banner'))return;
+      const b=document.createElement('div');b.id='upd-banner';
+      b.innerHTML='<span>New version ready</span><button id="upd-go">Refresh</button>';
+      document.body.appendChild(b);
+      document.getElementById('upd-go').addEventListener('click',()=>{b.remove();w.postMessage('skip-waiting');});
+    };
+    if(reg.waiting)showUpd(reg.waiting);
+    reg.addEventListener('updatefound',()=>{const nw=reg.installing;if(nw)nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)showUpd(nw);});});
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{});});
+    reg.update().catch(()=>{});
+  }).catch(()=>{});
+  let updReloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
+}
 </script>
+<div class="appver">camino-app \u00b7 v34</div>
 </body>
 </html>
