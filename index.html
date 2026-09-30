@@ -533,6 +533,24 @@
   .bl-alt,.bl-km{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--mute);text-align:right;white-space:nowrap}
   .bl-us{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.12em;color:var(--night-deep);background:var(--gold);border-radius:9px;padding:8px 12px;margin:8px 0;text-align:center;font-weight:700}
 
+
+  .big-main{flex:1;min-height:0;display:flex;gap:18px}
+  .big-side{width:360px;flex:none;display:flex;flex-direction:column;min-height:0;border:1px solid var(--night-border);border-radius:14px;padding:12px;background:var(--night)}
+  .bs-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+  .bs-filters button{padding:7px 13px;font-size:.62rem}
+  #bs-close{background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);border-radius:50px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+  .bs-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px}
+  .bl-det{grid-column:1/-1;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-soft);line-height:1.55;text-align:left}
+  .bl-det .d-poi{display:block;font-family:'Fraunces',serif;font-style:italic;font-size:.94rem;letter-spacing:0;color:var(--gold-bright)}
+  .bl-det .d-bed{display:block;color:#5fc2bb}
+  .bl-det a{color:var(--sea-shallow);text-decoration:none;border-bottom:1px dotted var(--sea-shallow)}
+  .bl-empty{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--mute);text-align:center;padding:26px 10px}
+  @media (min-width:1000px){ #big-list-btn{display:none} #bs-close{display:none} }
+  @media (max-width:999px){
+    .big-side{position:fixed;inset:0;z-index:260;width:auto;border-radius:0;border:0;background:var(--night-deep);display:none;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 14px)}
+    .big-side.open{display:flex}
+  }
+
 </style>
 </head>
 <body>
@@ -939,7 +957,16 @@
     <div class="big-stats" id="big-stats"></div>
     <div class="big-actions"><button id="big-prev" title="Previous stage">&larr;</button><button id="big-next-btn" title="Next stage">&rarr;</button><button id="big-list-btn">List</button><button id="big-locate">Refresh</button><button id="big-close">Close</button></div>
   </div>
-  <div class="bigview-svg" id="big-svg"></div>
+  <div class="big-main">
+    <div class="bigview-svg" id="big-svg"></div>
+    <aside class="big-side" id="big-side">
+      <div class="bs-head">
+        <div class="seg bs-filters" id="bs-filters"><button data-f="all" class="on">All</button><button data-f="beds">Beds</button><button data-f="sights">Sights</button></div>
+        <button id="bs-close">Close</button>
+      </div>
+      <div class="bs-list" id="bs-list"></div>
+    </aside>
+  </div>
   <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
   <div class="big-hint" id="big-hint">Rotate to landscape for the full ribbon.</div>
 </div>
@@ -1731,29 +1758,41 @@ function setBigCap(st){
   if(w.sleep&&w.sleep.length)out+=`<span class="cap-beds">Beds: ${w.sleep.map(a=>a[0]+" ("+a[2]+")").join(" \u00b7 ")}</span>`;
   el.innerHTML=out;
 }
-let bigMode="ribbon";
+let bigFilter="all";
 const BL_BED='<svg viewBox="0 0 12 12"><path d="M1 11 v-4.6 l5 -4.4 5 4.4 V11 z" fill="none" stroke="#5fc2bb" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 const BL_POI='<svg viewBox="0 0 12 12"><path d="M6 0.5 l1.6 3.9 3.9 1.6 -3.9 1.6 -1.6 3.9 -1.6 -3.9 -3.9 -1.6 3.9 -1.6 z" fill="#f2c230"/></svg>';
-function bigListHTML(st,g){
+function bigSideHTML(st,g){
   let gpsDone=false,rows="";
   st.seg.forEach((w,i)=>{
+    const beds=w.sleep&&w.sleep.length&&w.km>st.a.km;
+    if(bigFilter==="beds"&&!beds)return;
+    if(bigFilter==="sights"&&!w.poi)return;
     if(g&&!gpsDone&&g.km<=w.km&&w.km>st.a.km){gpsDone=true;rows+=`<div class="bl-us">${g.off?("WE ARE HERE \u00b7 "+g.off.toFixed(1)+" KM OFF THE PATH"):("WE ARE HERE \u00b7 KM "+(g.km-st.a.km).toFixed(1))}</div>`;}
     const on=i===bigSel;
-    const beds=w.sleep&&w.sleep.length&&w.km>st.a.km;
+    let det="";
+    if(on||bigFilter!=="all"){
+      const q=encodeURIComponent(w.q);
+      det=`<span class="bl-det">${w.poi?`<span class="d-poi">${w.poi}</span>`:""}${beds?w.sleep.map(a=>`<span class="d-bed">${a[0]} \u00b7 ${a[2]}</span>`).join(""):""}${on?`<a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open in Maps</a>`:""}</span>`;
+    }
     rows+=`<div class="bl-row ${on?"on":""}" onclick="selectBigWp(${i})">
       <span class="bl-eta">~${fmtT(etaMin(st,w.km))}</span>
       <span class="bl-name">${w.name.split(",")[0]}${beds?BL_BED:""}${w.poi?BL_POI:""}</span>
       <span class="bl-alt">${w.alt} m</span>
       <span class="bl-km">km ${(w.km-st.a.km).toFixed(1).replace(".0","")}</span>
+      ${det}
     </div>`;
   });
-  if(g&&!gpsDone)rows+=`<div class="bl-us">WE ARE HERE \u00b7 KM ${(g.km-st.a.km).toFixed(1)}</div>`;
-  return `<div class="big-list">${rows}</div>`;
+  if(g&&!gpsDone&&bigFilter==="all")rows+=`<div class="bl-us">WE ARE HERE \u00b7 KM ${(g.km-st.a.km).toFixed(1)}</div>`;
+  if(!rows)rows=`<div class="bl-empty">Nothing of this kind on this stage.</div>`;
+  return rows;
 }
 function bigRepaint(){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
-  document.getElementById("big-svg").innerHTML=bigMode==="list"?bigListHTML(st,bigG):bigProfileSVG(st,bigG);
+  document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);
+  const bl=document.getElementById("bs-list");if(bl)bl.innerHTML=bigSideHTML(st,bigG);
+  document.querySelectorAll("#bs-filters button").forEach(b=>b.classList.toggle("on",b.dataset.f===bigFilter));
   setBigCap(st);
+  const onRow=document.querySelector("#bs-list .bl-row.on");if(onRow)onRow.scrollIntoView({block:"nearest"});
 }
 function selectBigWp(i){bigSel=(bigSel===i)?null:i;bigRepaint();}
 function setBigStats(g,st){
@@ -1818,9 +1857,11 @@ function openBig(n){
   bigStart(st);
 }
 function bigLocate(){const st=STAGES.find(s=>s.n===bigN);if(st){stopBigWatch();bigStart(st);}}
-document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();});
+document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");document.getElementById("big-side").classList.remove("open");stopBigWatch();});
 document.getElementById("big-locate").addEventListener("click",bigLocate);
-document.getElementById("big-list-btn").addEventListener("click",()=>{bigMode=bigMode==="ribbon"?"list":"ribbon";document.getElementById("big-list-btn").textContent=bigMode==="ribbon"?"List":"Ribbon";bigRepaint();});
+document.getElementById("big-list-btn").addEventListener("click",()=>document.getElementById("big-side").classList.add("open"));
+document.getElementById("bs-close").addEventListener("click",()=>document.getElementById("big-side").classList.remove("open"));
+document.querySelectorAll("#bs-filters button").forEach(b=>b.addEventListener("click",()=>{bigFilter=b.dataset.f;bigRepaint();}));
 document.getElementById("big-prev").addEventListener("click",()=>openBig(bigN-1));
 let bigRsz=null;
 window.addEventListener("resize",()=>{
@@ -2215,6 +2256,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v35</div>
+<div class="appver">camino-app \u00b7 v36</div>
 </body>
 </html>
