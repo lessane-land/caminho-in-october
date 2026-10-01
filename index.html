@@ -1211,22 +1211,21 @@ function smoothPath(pts){
 /* shared terrain detail from the GPX track (real elevation), fallback: waypoints */
 function stageDetail(st,N){
   const g=store.get("camino-gpx",null);
-  if(!g||!g.P||!g.anchors||!st.a.id||!st.b.id)return null;
-  const ia=g.anchors[st.a.id],ib=g.anchors[st.b.id];
-  if(ia==null||ib==null)return null;
-  const lo=Math.min(ia,ib),hi=Math.max(ia,ib);
-  if(hi-lo<8)return null;
-  let ok=0;for(let i=lo;i<=hi;i++)if(g.P[i][2]!=null&&!isNaN(g.P[i][2]))ok++;
-  if(ok<(hi-lo)*0.6)return null;
-  const ca=g.cum[ia],cb=g.cum[ib];if(cb===ca)return null;
-  const step=Math.max(1,Math.floor((hi-lo)/N));
-  const out=[];
-  for(let i=lo;i<=hi;i+=step){
+  if(!g||!g.P||!g.pairs||g.pairs.length<2)return null;
+  const pts=[];
+  const covA=g.pairs[0][1],covB=g.pairs[g.pairs.length-1][1];
+  st.seg.forEach(w=>{if(w.km<covA-0.05||w.km>covB+0.05)pts.push([w.km,w.alt]);});
+  let got=0;
+  for(let i=0;i<g.P.length;i++){
+    const km=trackCumToKm(g,g.cum[i]);if(km==null||km<st.a.km||km>st.b.km)continue;
     const ele=g.P[i][2];if(ele==null||isNaN(ele))continue;
-    const f=Math.min(1,Math.max(0,(g.cum[i]-ca)/(cb-ca)));
-    out.push([st.a.km+f*st.km,Math.max(0,ele)]);
+    pts.push([km,Math.max(0,ele)]);got++;
   }
-  if(out.length<8)return null;
+  if(got<8)return null;
+  pts.sort((a,b)=>a[0]-b[0]);
+  const stride=Math.max(1,Math.floor(pts.length/N));
+  const out=pts.filter((_,i)=>i%stride===0);
+  if(out[out.length-1]!==pts[pts.length-1])out.push(pts[pts.length-1]);
   out[0]=[st.a.km,out[0][1]];out[out.length-1]=[st.b.km,out[out.length-1][1]];
   for(let i=1;i<out.length-1;i++)out[i][1]=(out[i-1][1]+out[i][1]+out[i+1][1])/3;
   return out;
@@ -1871,11 +1870,17 @@ function bigSideHTML(st,g){
 let BIGMAP=null,BIGLAYER=null,bigMapFitted=null,bigViewMode=store.get("camino-bigview","ribbon");
 function stageLatLngs(st){
   const g=store.get("camino-gpx",null);
-  if(g&&g.P&&g.anchors&&g.anchors[st.a.id]!=null&&g.anchors[st.b.id]!=null){
-    const ia=g.anchors[st.a.id],ib=g.anchors[st.b.id],lo=Math.min(ia,ib),hi=Math.max(ia,ib);
-    if(hi-lo>=2){const step=Math.max(1,Math.floor((hi-lo)/400));const out=[];for(let i=lo;i<=hi;i+=step)out.push([g.P[i][0],g.P[i][1]]);out.push([g.P[hi][0],g.P[hi][1]]);return out;}
-  }
-  return st.seg.filter(w=>w.lat&&w.lon).map(w=>[w.lat,w.lon]);
+  const wps=st.seg.filter(w=>w.lat&&w.lon);
+  if(!g||!g.P||!g.pairs||g.pairs.length<2)return wps.map(w=>[w.lat,w.lon]);
+  const covA=g.pairs[0][1],covB=g.pairs[g.pairs.length-1][1];
+  const out=[];
+  wps.forEach(w=>{if(w.km<covA-0.05)out.push([w.lat,w.lon]);});
+  const tr=[];
+  for(let i=0;i<g.P.length;i++){const km=trackCumToKm(g,g.cum[i]);if(km!=null&&km>=st.a.km&&km<=st.b.km)tr.push([g.P[i][0],g.P[i][1]]);}
+  const step=Math.max(1,Math.floor(tr.length/400));
+  tr.forEach((p,i)=>{if(i%step===0||i===tr.length-1)out.push(p);});
+  wps.forEach(w=>{if(w.km>covB+0.05)out.push([w.lat,w.lon]);});
+  return out.length>1?out:wps.map(w=>[w.lat,w.lon]);
 }
 function ensureBigMap(){
   if(BIGMAP||typeof L==="undefined")return;
@@ -2083,8 +2088,11 @@ function navUpdate(pos){
   if((heading==null||isNaN(heading))&&navLastFix&&hav(navLastFix[0],navLastFix[1],lat,lon)>0.015)heading=bearing(navLastFix,[lat,lon]);
   if(!navLastFix||hav(navLastFix[0],navLastFix[1],lat,lon)>0.015)navLastFix=[lat,lon];
   let html="";
-  if(bd>0.25){
-    html=`${navArrow("off")}<div class="nv-main"><b>Off the track</b><span>${Math.round(bd*1000)} m to the path \u00b7 head ${compass(bearing([lat,lon],nav.P[bi]))}</span></div>`;
+  const fmtD=d=>d>1?d.toFixed(1)+" km":Math.round(d*1000)+" m";
+  if(bd>0.25&&nav.cum[bi]<1.5){
+    html=`${navArrow("straight")}<div class="nv-main"><b>Before the track</b><span>the GPX starts in ${fmtD(hav(lat,lon,nav.P[0][0],nav.P[0][1]))} \u00b7 follow the arrows ${compass(bearing([lat,lon],nav.P[0]))}</span></div>`;
+  }else if(bd>0.25){
+    html=`${navArrow("off")}<div class="nv-main"><b>Off the track</b><span>${fmtD(bd)} to the path \u00b7 head ${compass(bearing([lat,lon],nav.P[bi]))}</span></div>`;
   }else{
     const trackB=bi<nav.P.length-1?bearing(nav.P[bi],nav.P[bi+1]):null;
     const moving=pos.coords.speed==null||isNaN(pos.coords.speed)||pos.coords.speed>0.5;
@@ -2101,7 +2109,8 @@ function navUpdate(pos){
       html=`${navArrow(k.k)}<div class="nv-main"><b>${k.t}</b><span>in ${m} m${afterTxt}</span></div>`;
     }
   }
-  const kmLeft=Math.max(0,160.5-(nav.cum[bi]/nav.cum[nav.cum.length-1])*160.5);
+  const gx=store.get("camino-gpx",null);const kmHere=gx&&gx.pairs?trackCumToKm(gx,nav.cum[bi]):null;
+  const kmLeft=Math.max(0,160.5-(kmHere!=null?kmHere:(nav.cum[bi]/nav.cum[nav.cum.length-1])*160.5));
   bar.innerHTML=html+`<span class="nv-mojon">${SHELL_S}<b>K. ${kmLeft.toFixed(1)}</b><i>to Vigo</i></span>`;
   bar.classList.add("show");
 }
@@ -2109,32 +2118,28 @@ function navUpdate(pos){
 /* haversine + GPX track */
 function hav(a,b,c,d){const R=6371,rad=Math.PI/180;const dLat=(c-a)*rad,dLon=(d-b)*rad;const x=Math.sin(dLat/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
 function locateOnRoute(lat,lon){const g=store.get("camino-gpx",null);if(g&&g.P&&g.P.length>10)return locateOnTrack(lat,lon,g);return locateOnWaypoints(lat,lon);}
+function trackCumToKm(g,t){
+  const pr=g.pairs;if(!pr||pr.length<2)return null;
+  if(t<pr[0][0]-0.3||t>pr[pr.length-1][0]+0.3)return null;
+  for(let i=0;i<pr.length-1;i++){const ca=pr[i][0],ka=pr[i][1],cb=pr[i+1][0],kb=pr[i+1][1];if(t>=ca&&t<=cb)return ka+(t-ca)/((cb-ca)||1)*(kb-ka);}
+  return t<pr[0][0]?pr[0][1]:pr[pr.length-1][1];
+}
+function buildPairs(P,cum){
+  const raw=[];
+  WPTS.forEach(w=>{if(w.lat==null)return;let b=0,bd=1e9;for(let i=0;i<P.length;i++){const d=hav(w.lat,w.lon,P[i][0],P[i][1]);if(d<bd){bd=d;b=i;}}if(bd<=1.2)raw.push([cum[b],w.km]);});
+  raw.sort((a,b)=>a[1]-b[1]);
+  const out=[];for(const p of raw){if(!out.length||p[0]>out[out.length-1][0]+0.05)out.push(p);}
+  return out;
+}
 function locateOnTrack(lat,lon,g){
   let bi=0,bd=1e9;
-  g.P.forEach((p,i)=>{const d=hav(lat,lon,p[0],p[1]);if(d<bd){bd=d;bi=i;}});
-  const t=g.cum[bi];let routeKm=null,alt=null;
-  for(let s=0;s<SLEEP_ORDER.length-1;s++){
-    const ia=g.anchors[SLEEP_ORDER[s]],ib=g.anchors[SLEEP_ORDER[s+1]];
-    const ca=g.cum[ia],cb=g.cum[ib];
-    if(cb!==ca&&t>=Math.min(ca,cb)&&t<=Math.max(ca,cb)){
-      const f=(t-ca)/(cb-ca);
-      const ra=WPTS[IDX[SLEEP_ORDER[s]]].km,rb=WPTS[IDX[SLEEP_ORDER[s+1]]].km;
-      routeKm=ra+f*(rb-ra);break;
-    }
-  }
-  if(routeKm==null)routeKm=t/(g.cum[g.cum.length-1]||1)*160.5;
+  for(let i=0;i<g.P.length;i++){const d=hav(lat,lon,g.P[i][0],g.P[i][1]);if(d<bd){bd=d;bi=i;}}
+  const wp=locateOnWaypoints(lat,lon);
+  const km=g.pairs?trackCumToKm(g,g.cum[bi]):null;
+  if(km==null||(wp&&wp.distKm+0.3<bd))return wp;
   const ele=g.P[bi][2];
-  if(ele!=null&&!isNaN(ele))alt=ele;
-  else{
-    for(let i=0;i<WPTS.length-1;i++){
-      if(routeKm>=WPTS[i].km&&routeKm<=WPTS[i+1].km){
-        const f=(routeKm-WPTS[i].km)/((WPTS[i+1].km-WPTS[i].km)||1);
-        alt=WPTS[i].alt+f*(WPTS[i+1].alt-WPTS[i].alt);break;
-      }
-    }
-    if(alt==null)alt=0;
-  }
-  return {km:routeKm,alt,distKm:bd};
+  const alt=(ele!=null&&!isNaN(ele))?ele:(wp?wp.alt:0);
+  return {km,alt,distKm:bd};
 }
 function parseGpxText(txt){
   try{
@@ -2155,7 +2160,7 @@ function buildTrack(raw,srcLen){
     P.forEach((p,i)=>{const d=hav(w.lat,w.lon,p[0],p[1]);if(d<bd){bd=d;b2=i;}});
     anchors[id]=b2;
   });
-  store.set("camino-gpx",{P,cum,anchors,srcLen:srcLen||0});
+  store.set("camino-gpx",{P,cum,anchors,pairs:buildPairs(P,cum),srcLen:srcLen||0});
   buildNav(raw);
   setTrackChip();if(MAP)drawRoute();
   return true;
@@ -2186,7 +2191,7 @@ async function autoLoadBundled(){
     if(!texts.length)return;
     const srcLen=texts.reduce((a,t)=>a+t.length,0);
     const cur=store.get("camino-gpx",null);
-    if(cur&&cur.srcLen===srcLen&&getNav())return;
+    if(cur&&cur.srcLen===srcLen&&cur.pairs&&getNav())return;
     let raw=[];
     texts.forEach(t=>{const p=parseGpxText(t);if(p)raw=raw.concat(p);});
     buildTrack(raw,srcLen);
@@ -2492,6 +2497,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v42</div>
+<div class="appver">camino-app \u00b7 v43</div>
 </body>
 </html>
