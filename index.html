@@ -423,7 +423,8 @@
   /* big live profile */
   .bigp-btn{margin:0 10px 10px;display:inline-flex;gap:7px;align-items:center;background:transparent;border:1px solid var(--sea-glow);color:var(--sea-shallow);padding:7px 14px;border-radius:50px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .2s}
   .bigp-btn:hover{background:var(--sea-deep);color:var(--paper)}
-  .bigview{position:fixed;inset:0;background:var(--night-deep);z-index:250;display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 12px)}
+  .bigview{position:fixed;top:0;left:0;right:0;bottom:0;height:100vh;height:100dvh;background:var(--night-deep);z-index:250;display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 8px);box-sizing:border-box;overscroll-behavior:none}
+  html.bigopen,body.bigopen{overflow:hidden!important;overscroll-behavior:none}
   .bigview.active{display:flex}
   .bigview-top{display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;margin-bottom:8px}
   #big-title{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--paper);font-weight:500}
@@ -596,10 +597,23 @@
   .big-main.listmax #bs-grow svg{transform:rotate(180deg)}
   @media (max-width:899px) and (orientation:portrait){
     #bs-grow{display:inline-flex}
-    .big-main .big-stage{flex:1}
-    .big-main .big-side{flex:1.5}
-    .big-main.listmax .big-stage{flex:0 0 196px}
+    .big-main .big-stage{flex:1.7}
+    .big-main .big-side{flex:1;min-height:150px}
+    .big-main.listmax .big-stage{flex:0 0 150px}
     .big-main.listmax .nav-bar{margin-bottom:6px}
+    .bigview-top{gap:8px 14px;margin-bottom:6px}
+    #big-title{font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+    .big-stats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:0 18px;width:100%;margin-left:0;padding-bottom:2px}
+    .big-stats::-webkit-scrollbar{display:none}
+    .big-stats>div{min-width:auto;flex:none}
+    .big-stats b{font-size:1.05rem}
+    .big-stats span{font-size:.48rem;white-space:nowrap}
+    .big-actions button,#big-modes button{padding:6px 10px;font-size:.56rem}
+    .nav-bar{padding:6px 10px 6px 8px;gap:10px;margin-bottom:6px}
+    .nv-ico{width:38px;height:38px}
+    .nv-ico svg{width:30px;height:30px}
+    .nv-main b{font-size:1rem}
+    .nv-mojon{padding:3px 8px}
   }
 
 </style>
@@ -1397,6 +1411,13 @@ function paceV(){return +store.get("camino-pace",4.2);}
 function t0Min(){const t=store.get("camino-t0","08:00"),p=t.split(":");return (+p[0])*60+(+p[1]);}
 function brkMin(){return +store.get("camino-brk",45);}
 function etaMin(st,km){const d=Math.max(0,km-st.a.km);return t0Min()+d/paceV()*60+brkMin()*(d/st.km);}
+function liveEtaMin(st,km){
+  if(typeof bigG!=="undefined"&&bigG&&!bigG.off&&bigN&&STAGES.find(s=>s.n===bigN)===st&&km>bigG.km){
+    const now=new Date();const d=km-bigG.km;
+    return now.getHours()*60+now.getMinutes()+d/paceV()*60+brkMin()*(d/st.km);
+  }
+  return etaMin(st,km);
+}
 function fmtT(m){m=Math.round(m);const h=Math.floor(m/60)%24;return String(h).padStart(2,"0")+":"+String(m%60).padStart(2,"0");}
 function timelineHTML(st,i){
   const arr=etaMin(st,st.b.km);
@@ -1732,9 +1753,10 @@ function bigProfileSVG(st,g){
   let W=1200,H=440;
   const holder=document.getElementById("big-svg");
   if(holder){const r=holder.getBoundingClientRect();
-    if(r.width>60&&r.height>60){W=Math.min(1800,Math.max(340,Math.round(r.width)));H=Math.min(820,Math.max(210,Math.round(r.height)));}}
+    if(r.width>60&&r.height>40){W=Math.min(1800,Math.max(300,Math.round(r.width)));H=Math.min(820,Math.max(90,Math.round(r.height)));}}
   const slim=H<360||W<560;
-  const padL=slim?44:56,padR=slim?18:30,padT=slim?30:40,padB=slim?76:84;
+  const strip=H<190;
+  const padL=strip?30:slim?44:56,padR=strip?14:slim?18:30,padT=strip?26:slim?30:40,padB=strip?22:slim?76:84;
   const nrows=W<560?3:2,rY=W<560?14:15,rTop=W<560?16:20;
   const det=stageDetail(st,200);
   const base=det||st.seg.map(w=>[w.km,w.alt]);
@@ -1747,16 +1769,16 @@ function bigProfileSVG(st,g){
   const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
   let grid="";
   const gstep=(H-padT-padB)/(nice/25)<16?50:25;
-  for(let a=0;a<=nice;a+=gstep){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
+  for(let a=0;a<=nice;a+=strip?nice:gstep){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
   let kmticks="";
-  for(let k=0;k<=Math.floor(st.km);k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k}</text>`;}
+  for(let k=0;k<=Math.floor(st.km)&&!strip;k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k}</text>`;}
   const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
     const x=X(w.km),y=Y(snapAlt(det,w.km,w.alt));const hi=w.alt===hiAlt;const on=i===bigSel;
     const nx=(i===0?Math.max(x-8,6):i===st.seg.length-1?Math.min(x+8,W-6):x).toFixed(1);
     const anch=i===0?"start":i===st.seg.length-1?"end":"middle";
-    const eta=fmtT(etaMin(st,w.km));
+    const eta=fmtT(liveEtaMin(st,w.km));
     const hasBed=w.sleep&&w.sleep.length&&w.km>st.a.km;
     const hasPoi=!!w.poi;
     const lift=(slim&&i>0&&(X(w.km)-X(st.seg[i-1].km))<58)?13:0;let glyphs="";const gy=y-29-lift-(slim?8:0);
@@ -1765,11 +1787,11 @@ function bigProfileSVG(st,g){
     if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
     return `<g class="big-wp" onclick="selectBigWp(${i});event.stopPropagation()">
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="30" fill="rgba(0,0,0,0)"/>
-      <rect x="${(x-34).toFixed(1)}" y="${H-padB+rTop-12+(i%nrows)*rY}" width="76" height="17" fill="rgba(0,0,0,0)"/>
+      ${strip?"":`<rect x="${(x-34).toFixed(1)}" y="${H-padB+rTop-12+(i%nrows)*rY}" width="76" height="17" fill="rgba(0,0,0,0)"/>`}
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?12:8}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}"/>
       <text x="${x.toFixed(1)}" y="${(y-15-lift).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${slim?(on?"#f6d35f":"#bfa14a"):(on?"#f6d35f":hi?"#f2c230":"#44536a")}">${slim?"~"+eta:w.alt}</text>
       ${glyphs}
-      <text x="${nx}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${anch}" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}${slim?"":`<tspan fill="${on?"#f6d35f":"#bfa14a"}" font-size="10.5"> \u00b7 ~${eta}</tspan>`}</text>
+      ${strip?"":`<text x="${nx}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${anch}" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}${slim?"":`<tspan fill="${on?"#f6d35f":"#bfa14a"}" font-size="10.5"> \u00b7 ~${eta}</tspan>`}</text>`}
     </g>`;
   }).join("");
   let walked="",gps="";
@@ -1783,7 +1805,7 @@ function bigProfileSVG(st,g){
                      :`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>`;
     gps=`<line x1="${gx.toFixed(1)}" y1="${padT}" x2="${gx.toFixed(1)}" y2="${H-padB}" stroke="#f2c230" stroke-dasharray="5 5" opacity=".5"/>
       ${usDot}
-      <text x="${gx.toFixed(1)}" y="${padT-12}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12" fill="#f6d35f">${usTag}</text>`;
+      ${strip?"":`<text x="${gx.toFixed(1)}" y="${padT-12}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12" fill="#f6d35f">${usTag}</text>`}`;
   }
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
     <defs>
@@ -1792,14 +1814,14 @@ function bigProfileSVG(st,g){
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
     </defs>
     ${grid}${kmticks}
-    ${W<680?"":`<g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
+    ${(W<680||strip)?"":`<g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="#5b6d85">flat</text>
       <rect x="56" y="-8" width="16" height="4" fill="#f2c230"/><text x="77" y="-3" fill="#5b6d85">3-6%</text>
       <rect x="122" y="-8" width="16" height="4" fill="#ef8354"/><text x="143" y="-3" fill="#5b6d85">steep</text>
       <path d="M 188 -3 v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/><text x="203" y="-3" fill="#5b6d85">bed</text>
       <path d="M 240 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="251" y="-3" fill="#5b6d85">sight</text>
     </g>`}
-    ${det?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="11" fill="#33455f">gpx terrain</text>`:""}
+    ${det&&!strip?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="11" fill="#33455f">gpx terrain</text>`:""}
     <path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${walked}
@@ -1824,7 +1846,7 @@ function bigSideHTML(st,g){
     const beds=w.sleep&&w.sleep.length&&w.km>st.a.km;
     if(bigFilter==="beds"&&!beds)return;
     if(bigFilter==="sights"&&!w.poi)return;
-    if(g&&!gpsDone&&g.km<=w.km&&w.km>st.a.km){gpsDone=true;rows+=`<div class="bl-us">${g.off?("WE ARE HERE \u00b7 "+g.off.toFixed(1)+" KM OFF THE PATH"):("WE ARE HERE \u00b7 KM "+(g.km-st.a.km).toFixed(1))}</div>`;}
+    if(g&&!gpsDone&&g.km<=w.km&&w.km>st.a.km){gpsDone=true;rows+=`<div class="bl-us">${g.off?("WE ARE HERE \u00b7 "+g.off.toFixed(1)+" KM OFF THE PATH"):("WE ARE HERE \u00b7 KM "+(g.km-st.a.km).toFixed(1)+" \u00b7 "+fmtT(new Date().getHours()*60+new Date().getMinutes())+" \u00b7 "+st.b.name.split(",")[0].toUpperCase()+" ~"+fmtT(liveEtaMin(st,st.b.km)))}</div>`;}
     const on=i===bigSel;
     let det="";
     if(on||bigFilter!=="all"){
@@ -1832,7 +1854,7 @@ function bigSideHTML(st,g){
       det=`<span class="bl-det">${w.poi?`<span class="d-poi">${w.poi}</span>`:""}${beds?w.sleep.map(a=>`<span class="d-bed">${a[0]} \u00b7 ${a[2]}</span>`).join(""):""}${on?`<a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open in Maps</a>`:""}</span>`;
     }
     rows+=`<div class="bl-row ${on?"on":""}" onclick="selectBigWp(${i})">
-      <span class="bl-eta">~${fmtT(etaMin(st,w.km))}</span>
+      <span class="bl-eta">~${fmtT(liveEtaMin(st,w.km))}</span>
       <span class="bl-name">${w.name.split(",")[0]}${beds?BL_BED:""}${w.poi?BL_POI:""}</span>
       <span class="bl-alt">${w.alt} m</span>
       <span class="bl-km">km ${(w.km-st.a.km).toFixed(1).replace(".0","")}</span>
@@ -1913,7 +1935,8 @@ function setBigStats(g,st){
     tiles+=`<div><b>${(g.km-st.a.km).toFixed(1)} km</b><span>walked</span></div>
       <div><b>${left.toFixed(1)} km</b><span>to ${st.b.name.split(",")[0]}</span></div>
       <div><b>${Math.round(g.alt)} m</b><span>altitude</span></div>
-      <div><b>~${fmtH(left/paceV())}</b><span>at our pace</span></div>`;
+      <div><b>~${fmtH(left/paceV())}</b><span>at our pace</span></div>
+      <div><b>~${fmtT(liveEtaMin(st,st.b.km))}</b><span>arrive ${st.b.name.split(",")[0]}</span></div>`;
     if(g.next)tiles+=`<div><b>${(g.next.km-g.km).toFixed(1)} km</b><span>${g.next.name.split(",")[0]}</span></div>`;
   }else{
     tiles+=`<div><b>${st.km} km</b><span>stage</span></div>
@@ -1942,24 +1965,36 @@ function bigApply(pos,st){
     return;
   }
   if(b.distKm>15){if(hint)hint.textContent="We are "+b.distKm.toFixed(0)+" km from the route right now.";return;}
-  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km),off:b.distKm>1.2?b.distKm:0,lat:pos.coords.latitude,lon:pos.coords.longitude};
+  bigG={km:b.km,alt:b.alt,next:st.seg.find(w=>w.km>b.km),off:b.distKm>0.4?b.distKm:0,lat:pos.coords.latitude,lon:pos.coords.longitude,acc:pos.coords.accuracy,ts:pos.timestamp||Date.now()};
   bigRepaint();
   setBigStats(bigG,st);
-  if(hint)hint.textContent=bigG.off?("Live \u00b7 "+bigG.off.toFixed(1)+" km off the path, the marker shows the nearest route point."):"Live \u00b7 updates as we walk.";
+  const accTxt=(bigG.acc?" \u00b7 \u00b1"+Math.round(bigG.acc)+" m":"")+" \u00b7 fix "+fmtT(new Date(bigG.ts).getHours()*60+new Date(bigG.ts).getMinutes());
+  if(hint)hint.textContent=(bigG.off?("Live \u00b7 "+bigG.off.toFixed(1)+" km off the path, marker at nearest route point"):"Live \u00b7 updates as we walk")+accTxt;
   setTimeout(bigResized,30);
 }
+function bigGeoErr(err){
+  const hint=document.getElementById("big-hint");if(!hint)return;
+  const code=err&&err.code;
+  hint.textContent=code===1?"Location blocked for this app. iPhone: Settings \u203a Privacy \u203a Location Services \u203a Safari Websites (or the Camino app) \u203a While Using."
+    :code===2?"No GPS fix yet, sky view helps. Tap Refresh."
+    :code===3?"GPS is slow to answer, tap Refresh.":"Location unavailable, tap Refresh.";
+}
 function bigStart(st){
-  if(!navigator.geolocation)return;
-  navigator.geolocation.getCurrentPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
-  try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,maximumAge:15000});}catch(e){}
+  const hint=document.getElementById("big-hint");
+  if(!navigator.geolocation){if(hint)hint.textContent="This browser has no location access.";return;}
+  if(hint)hint.textContent="Locating us\u2026";
+  navigator.geolocation.getCurrentPosition(p=>bigApply(p,st),bigGeoErr,{enableHighAccuracy:true,timeout:15000,maximumAge:5000});
+  try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,st),bigGeoErr,{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}catch(e){}
 }
 function stopBigWatch(){if(bigWatch!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(bigWatch);}catch(e){}bigWatch=null;}}
 let scrollLockY=0;
 function lockScroll(on){
-  const b=document.body;
-  if(on){scrollLockY=window.scrollY||0;b.style.position="fixed";b.style.top=(-scrollLockY)+"px";b.style.left="0";b.style.right="0";b.style.width="100%";}
-  else{b.style.position="";b.style.top="";b.style.left="";b.style.right="";b.style.width="";window.scrollTo(0,scrollLockY);}
+  document.documentElement.classList.toggle("bigopen",on);document.body.classList.toggle("bigopen",on);
 }
+document.getElementById("bigview").addEventListener("touchmove",e=>{
+  if(e.target.closest(".bs-list,#big-map,.big-stats"))return;
+  e.preventDefault();
+},{passive:false});
 function openBig(n){
   stopBigWatch();lockScroll(true);
   bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;bigSel=null;
@@ -2455,6 +2490,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v40</div>
+<div class="appver">camino-app \u00b7 v41</div>
 </body>
 </html>
