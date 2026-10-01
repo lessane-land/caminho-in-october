@@ -25,7 +25,9 @@
     --success:#7ab87a; --warn:#d4a672; --danger:#e07856;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
+  body{overflow-x:clip}
+  .panel{overflow-x:clip}
   body{
     font-family:'Inter Tight',system-ui,sans-serif;
     background:var(--night-deep); color:var(--ink); line-height:1.6;
@@ -73,7 +75,7 @@
   .sub-sub{font-family:'Fraunces',serif;font-style:italic;color:var(--mute);margin-bottom:20px;font-size:.92rem}
 
   /* invitation */
-  .invitation{position:relative;padding:16px 0 40px}
+  .invitation{position:relative;padding:16px 0 40px;overflow:hidden}
   .invitation::before{content:"";position:absolute;top:40px;right:0;width:340px;height:340px;background:radial-gradient(circle,var(--terracotta) 0%,transparent 70%);opacity:.22;border-radius:50%;filter:blur(70px);z-index:0;animation:float 7s ease-in-out infinite}
   .invitation::after{content:"";position:absolute;bottom:0;left:0;width:300px;height:300px;background:radial-gradient(circle,var(--sea-glow) 0%,transparent 70%);opacity:.18;border-radius:50%;filter:blur(60px);z-index:0;animation:float 9s ease-in-out infinite reverse}
   .stars-bg{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:
@@ -2490,6 +2492,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v41</div>
+<div class="appver">camino-app \u00b7 v42</div>
 </body>
 </html>
