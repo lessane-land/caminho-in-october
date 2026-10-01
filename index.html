@@ -25,7 +25,7 @@
     --success:#7ab87a; --warn:#d4a672; --danger:#e07856;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{
     font-family:'Inter Tight',system-ui,sans-serif;
     background:var(--night-deep); color:var(--ink); line-height:1.6;
@@ -438,7 +438,7 @@
   .bigview{touch-action:manipulation}
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center}
   .bigview-svg svg{width:100%;height:100%;display:block}
-  .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px}
+  .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 
   /* toolbar chips, boat form, sunset */
@@ -994,7 +994,6 @@
       <div class="bs-list" id="bs-list"></div>
     </aside>
   </div>
-  <div class="big-cap" id="big-cap">Tap a waypoint for details.</div>
   <div class="big-hint" id="big-hint">Rotate to landscape for the full ribbon.</div>
 </div>
 
@@ -1730,9 +1729,12 @@ function bigProfileSVG(st,g){
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
     const x=X(w.km),y=Y(snapAlt(det,w.km,w.alt));const hi=w.alt===hiAlt;const on=i===bigSel;
+    const nx=(i===0?Math.max(x-8,6):i===st.seg.length-1?Math.min(x+8,W-6):x).toFixed(1);
+    const anch=i===0?"start":i===st.seg.length-1?"end":"middle";
+    const eta=fmtT(etaMin(st,w.km));
     const hasBed=w.sleep&&w.sleep.length&&w.km>st.a.km;
     const hasPoi=!!w.poi;
-    let glyphs="";const gy=y-29;
+    const lift=(slim&&i>0&&(X(w.km)-X(st.seg[i-1].km))<58)?13:0;let glyphs="";const gy=y-29-lift-(slim?8:0);
     const bx=hasBed&&hasPoi?x-8:x;
     if(hasBed)glyphs+=`<path d="M ${(bx-5).toFixed(1)} ${(gy+4).toFixed(1)} v-5 l5 -4.5 l5 4.5 v5 z" fill="none" stroke="#5fc2bb" stroke-width="1.8" stroke-linejoin="round"/>`;
     if(hasPoi){const px=hasBed?x+8:x;glyphs+=`<path d="M ${px.toFixed(1)} ${(gy-5).toFixed(1)} l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/>`;}
@@ -1740,9 +1742,9 @@ function bigProfileSVG(st,g){
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="30" fill="rgba(0,0,0,0)"/>
       <rect x="${(x-34).toFixed(1)}" y="${H-padB+rTop-12+(i%nrows)*rY}" width="76" height="17" fill="rgba(0,0,0,0)"/>
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?12:8}" fill="${on?"#f6d35f":hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":"#0a111c"}" stroke-width="${on?4:2}"/>
-      <text x="${x.toFixed(1)}" y="${(y-15).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${on?"#f6d35f":hi?"#f2c230":"#44536a"}">${w.alt}</text>
+      <text x="${x.toFixed(1)}" y="${(y-15-lift).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${slim?(on?"#f6d35f":"#bfa14a"):(on?"#f6d35f":hi?"#f2c230":"#44536a")}">${slim?"~"+eta:w.alt}</text>
       ${glyphs}
-      <text x="${(i===0?Math.max(x-8,6):i===st.seg.length-1?Math.min(x+8,W-6):x).toFixed(1)}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${i===0?"start":i===st.seg.length-1?"end":"middle"}" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}</text>
+      <text x="${nx}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${anch}" font-family="DM Mono, monospace" font-size="12" fill="${on?"#f6d35f":"#9fb0c5"}">${w.name.split(",")[0].split(" (")[0]}${slim?"":`<tspan fill="${on?"#f6d35f":"#bfa14a"}" font-size="10.5"> \u00b7 ~${eta}</tspan>`}</text>
     </g>`;
   }).join("");
   let walked="",gps="";
@@ -1925,8 +1927,14 @@ function bigStart(st){
   try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,st),()=>{},{enableHighAccuracy:true,maximumAge:15000});}catch(e){}
 }
 function stopBigWatch(){if(bigWatch!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(bigWatch);}catch(e){}bigWatch=null;}}
+let scrollLockY=0;
+function lockScroll(on){
+  const b=document.body;
+  if(on){scrollLockY=window.scrollY||0;b.style.position="fixed";b.style.top=(-scrollLockY)+"px";b.style.left="0";b.style.right="0";b.style.width="100%";}
+  else{b.style.position="";b.style.top="";b.style.left="";b.style.right="";b.style.width="";window.scrollTo(0,scrollLockY);}
+}
 function openBig(n){
-  stopBigWatch();
+  stopBigWatch();lockScroll(true);
   bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;bigSel=null;
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("bigview").classList.add("active");
@@ -1941,7 +1949,7 @@ function openBig(n){
   bigStart(st);
 }
 function bigLocate(){const st=STAGES.find(s=>s.n===bigN);if(st){stopBigWatch();bigStart(st);}}
-document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();});
+document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();lockScroll(false);});
 document.getElementById("big-locate").addEventListener("click",bigLocate);
 document.querySelectorAll("#big-modes button").forEach(b=>b.addEventListener("click",()=>setBigMode(b.dataset.m)));
 document.querySelectorAll("#bs-filters button").forEach(b=>b.addEventListener("click",()=>{bigFilter=b.dataset.f;bigRepaint();}));
@@ -2346,6 +2354,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v38</div>
+<div class="appver">camino-app \u00b7 v39</div>
 </body>
 </html>
