@@ -489,6 +489,7 @@
   .big-stats{display:flex;flex-wrap:wrap;gap:12px 24px;margin-left:auto}
   .big-stats>div{min-width:74px}
   .big-actions button{min-width:42px}
+  .big-actions button:disabled{opacity:.3;cursor:default}
 
 
   .big-cap{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--ink-soft);text-align:center;margin-top:8px;min-height:48px;line-height:1.5;padding:0 10px}
@@ -1757,12 +1758,12 @@ function bigProfileSVG(st,g){
     if(r.width>60&&r.height>40){W=Math.min(1800,Math.max(300,Math.round(r.width)));H=Math.min(820,Math.max(90,Math.round(r.height)));}}
   const slim=H<360||W<560;
   const strip=H<190;
-  const padL=strip?30:slim?44:56,padR=strip?14:slim?18:30,padT=strip?26:slim?30:40,padB=strip?22:slim?76:84;
+  const padL=strip?30:slim?44:56,padR=strip?14:slim?18:30,padT=strip?26:slim?58:64,padB=strip?22:slim?76:84;
   const nrows=W<560?3:2,rY=W<560?14:15,rTop=W<560?16:20;
   const det=stageDetail(st,200);
   const base=det||st.seg.map(w=>[w.km,w.alt]);
   const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.map(w=>w.alt),20);
-  const nice=Math.max(25,Math.ceil(maxAlt/25)*25);
+  const nice=Math.max(25,Math.ceil((maxAlt*1.22)/25)*25);
   const X=km=>padL+((km-st.a.km)/st.km)*(W-padL-padR);
   const Y=a=>padT+(1-a/nice)*(H-padT-padB);
   const pts=base.map(p=>[X(p[0]),Y(p[1])]);
@@ -1773,7 +1774,7 @@ function bigProfileSVG(st,g){
   for(let a=0;a<=nice;a+=strip?nice:gstep){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
   let kmticks="";
   for(let k=0;k<=Math.floor(st.km)&&!strip;k+=5){const x=X(st.b.km-k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k===0?"0":k}</text>`;}
-  if(!strip)kmticks+=`<text x="${padL}" y="${H-10}" text-anchor="start" font-family="DM Mono, monospace" font-size="9.5" fill="#33455f">km to ${st.b.name.split(",")[0].split(" (")[0]}</text>`;
+  if(!strip)kmticks+=`<text x="${padL}" y="${H-24}" text-anchor="start" font-family="DM Mono, monospace" font-size="9.5" fill="#33455f">${nrows===3?"":"km to "+st.b.name.split(",")[0].split(" (")[0]}</text>`;
   const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
@@ -1803,8 +1804,9 @@ function bigProfileSVG(st,g){
       <path d="${area}" fill="url(#goldfill)" clip-path="url(#wclip)"/>
       <path d="${line}" fill="none" stroke="#f2c230" stroke-width="4" stroke-linecap="round" clip-path="url(#wclip)" opacity=".85"/>`;
     const usTag=g.off?("US \u00b7 "+g.off.toFixed(1)+" km off"):("US \u00b7 "+(st.b.km-g.km).toFixed(1)+" km left");
-    const usDot=g.off?`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="11" fill="#0a111c" stroke="#f2c230" stroke-width="3" stroke-dasharray="4 3"/>`
-                     :`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>`;
+    const gyv=Y(snapAlt(det,Math.min(Math.max(g.km,st.a.km),st.b.km),Math.max(0,g.alt)));
+    const usDot=g.off?`<circle cx="${gx.toFixed(1)}" cy="${gyv.toFixed(1)}" r="11" fill="#0a111c" stroke="#f2c230" stroke-width="3" stroke-dasharray="4 3"/>`
+                     :`<circle cx="${gx.toFixed(1)}" cy="${gyv.toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>`;
     gps=`<line x1="${gx.toFixed(1)}" y1="${padT}" x2="${gx.toFixed(1)}" y2="${H-padB}" stroke="#f2c230" stroke-dasharray="5 5" opacity=".5"/>
       ${usDot}
       ${strip?"":`<text x="${gx.toFixed(1)}" y="${padT-12}" text-anchor="middle" font-family="DM Mono, monospace" font-size="12" fill="#f6d35f">${usTag}</text>`}`;
@@ -1964,6 +1966,7 @@ function setBigStats(g,st){
   el.innerHTML=tiles;
 }
 function bigApply(pos,st){
+  bigLastPos=pos;
   try{navUpdate(pos);}catch(e){}
   const b=locateOnRoute(pos.coords.latitude,pos.coords.longitude);if(!b)return;
   const hint=document.getElementById("big-hint");
@@ -1991,8 +1994,9 @@ function bigStart(st){
   const hint=document.getElementById("big-hint");
   if(!navigator.geolocation){if(hint)hint.textContent="This browser has no location access.";return;}
   if(hint)hint.textContent="Locating us\u2026";
-  navigator.geolocation.getCurrentPosition(p=>bigApply(p,st),bigGeoErr,{enableHighAccuracy:true,timeout:15000,maximumAge:5000});
-  try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,st),bigGeoErr,{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}catch(e){}
+  const cur=()=>STAGES.find(s=>s.n===bigN)||st;
+  navigator.geolocation.getCurrentPosition(p=>bigApply(p,cur()),bigGeoErr,{enableHighAccuracy:true,timeout:15000,maximumAge:5000});
+  try{bigWatch=navigator.geolocation.watchPosition(p=>bigApply(p,cur()),bigGeoErr,{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}catch(e){}
 }
 function stopBigWatch(){if(bigWatch!=null&&navigator.geolocation){try{navigator.geolocation.clearWatch(bigWatch);}catch(e){}bigWatch=null;}}
 let scrollLockY=0;
@@ -2003,11 +2007,14 @@ document.getElementById("bigview").addEventListener("touchmove",e=>{
   if(e.target.closest(".bs-list,#big-map,.big-stats"))return;
   e.preventDefault();
 },{passive:false});
-function openBig(n){
-  stopBigWatch();lockScroll(true);
+let bigLastPos=null;
+function openBig(n,keepWatch){
+  if(!keepWatch)stopBigWatch();
+  lockScroll(true);
   bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;bigSel=null;
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("bigview").classList.add("active");
+  document.getElementById("big-prev").disabled=bigN<=1;document.getElementById("big-next-btn").disabled=bigN>=STAGES.length;
   document.getElementById("big-title").innerHTML=st.a.name.split(",")[0]+" "+FLECHA_S+" "+st.b.name.split(",")[0]+" \u00b7 "+stageDateLabel(bigN-1)+" \u00b7 K. "+(160.5-st.b.km).toFixed(1).replace(".0","");
   bigMapFitted=null;
   setBigMode(bigViewMode);
@@ -2016,7 +2023,8 @@ function openBig(n){
   const wx=store.get("camino-wx-"+st.b.id,null);
   if(wx&&wx.d&&wx.d.daily)hint+="  \u00b7 today at "+st.b.name.split(",")[0]+": rain "+wx.d.daily.precipitation_probability_max[0]+"% \u00b7 wind "+Math.round(wx.d.daily.wind_speed_10m_max[0])+" km/h";
   document.getElementById("big-hint").textContent=hint;
-  bigStart(st);
+  if(keepWatch&&bigLastPos){bigApply(bigLastPos,st);}
+  else bigStart(st);
 }
 function bigLocate(){const st=STAGES.find(s=>s.n===bigN);if(st){stopBigWatch();bigStart(st);}}
 document.getElementById("big-close").addEventListener("click",()=>{document.getElementById("bigview").classList.remove("active");stopBigWatch();lockScroll(false);});
@@ -2029,7 +2037,7 @@ document.querySelectorAll("#bs-filters button").forEach(b=>b.addEventListener("c
   main.classList.toggle("listmax",!!store.get("camino-listmax",false));
   g.addEventListener("click",()=>{const on=!main.classList.contains("listmax");main.classList.toggle("listmax",on);store.set("camino-listmax",on);setTimeout(bigResized,30);});
 })();
-document.getElementById("big-prev").addEventListener("click",()=>openBig(bigN-1));
+document.getElementById("big-prev").addEventListener("click",()=>openBig(bigN-1,true));
 let bigRsz=null;
 function bigResized(){
   if(!document.getElementById("bigview").classList.contains("active"))return;
@@ -2042,7 +2050,7 @@ if(window.ResizeObserver){
   const h1=document.getElementById("big-svg"),h2=document.getElementById("big-map");
   if(h1)bro.observe(h1);if(h2)bro.observe(h2);
 }
-document.getElementById("big-next-btn").addEventListener("click",()=>openBig(bigN+1));
+document.getElementById("big-next-btn").addEventListener("click",()=>openBig(bigN+1,true));
 
 
 /* turn-by-turn from the GPX (approximate, yellow arrows win) */
@@ -2498,6 +2506,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v44</div>
+<div class="appver">camino-app \u00b7 v45</div>
 </body>
 </html>
