@@ -1442,11 +1442,11 @@ function render(){
     const rows=st.seg.map((w,j)=>{
       const q=encodeURIComponent(w.q);
       return `<tr class="${w.alt===hiAlt?"hi":""}" data-s="${st.n}" data-i="${j}" onclick="selectWp(${st.n},${j})">
-        <td>${(w.km-st.a.km).toFixed(1).replace(".0","")}</td><td>${w.name}</td><td class="eta">~${fmtT(etaMin(st,w.km))}</td><td class="alt">~${w.alt} m</td>
+        <td>${(st.b.km-w.km).toFixed(1).replace(".0","")}</td><td>${w.name}</td><td class="eta">~${fmtT(etaMin(st,w.km))}</td><td class="alt">~${w.alt} m</td>
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
     const midStops=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
-    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 km ${(w.km-st.a.km).toFixed(1).replace(".0","")} of the stage</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
+    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 ${(st.b.km-w.km).toFixed(1).replace(".0","")} km before ${st.b.name.split(",")[0]}</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
     const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
     return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
@@ -1475,7 +1475,7 @@ function render(){
             <div class="wx-head"><span>Weather at ${st.b.name.split(",")[0]}</span><span class="wx-age"></span></div>
             <div class="wx-body"><div class="wx-day">Loading forecast\u2026</div></div>
           </div>
-          <div class="alt-table"><table><tr><th>km</th><th>Waypoint</th><th style="text-align:right">~ETA</th><th style="text-align:right">Alt.</th><th></th></tr>${rows}</table></div>
+          <div class="alt-table"><table><tr><th>km left</th><th>Waypoint</th><th style="text-align:right">~ETA</th><th style="text-align:right">Alt.</th><th></th></tr>${rows}</table></div>
           <p class="note">${st.notes}</p>
           <div class="fieldnote"><span>Field note</span><p>${FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ")}</p></div>
           <div class="blk"><h4>Where we sleep tonight</h4><ul>${sleep}</ul></div>
@@ -1498,7 +1498,7 @@ function selectWp(n,i){
   });
   const cap=document.getElementById("cap-"+n);
   if(sel[n]==null)cap.innerHTML="Tap a waypoint (dot or row) to locate it. The pin opens Maps.";
-  else{const st=STAGES.find(x=>x.n===n),w=st.seg[sel[n]];cap.innerHTML=`<b>${w.name}</b>, km ${(w.km-st.a.km).toFixed(1)} of the stage \u00b7 ~${w.alt} m`;}
+  else{const st=STAGES.find(x=>x.n===n),w=st.seg[sel[n]];cap.innerHTML=`<b>${w.name}</b>, ${(st.b.km-w.km).toFixed(1)} km to ${st.b.name.split(",")[0]} \u00b7 ~${w.alt} m`;}
 }
 function toggle(n){
   const art=document.querySelector(`.stage[data-n="${n}"]`);
@@ -1772,7 +1772,8 @@ function bigProfileSVG(st,g){
   const gstep=(H-padT-padB)/(nice/25)<16?50:25;
   for(let a=0;a<=nice;a+=strip?nice:gstep){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="#16233a"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="#5b6d85">${a}</text>`;}
   let kmticks="";
-  for(let k=0;k<=Math.floor(st.km)&&!strip;k+=5){const x=X(st.a.km+k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k}</text>`;}
+  for(let k=0;k<=Math.floor(st.km)&&!strip;k+=5){const x=X(st.b.km-k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="#33455f"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#44536a">${k===0?"0":k}</text>`;}
+  if(!strip)kmticks+=`<text x="${padL}" y="${H-10}" text-anchor="start" font-family="DM Mono, monospace" font-size="9.5" fill="#33455f">km to ${st.b.name.split(",")[0].split(" (")[0]}</text>`;
   const stops=steepStops(base,X,padL,W-padL-padR);
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
@@ -1801,7 +1802,7 @@ function bigProfileSVG(st,g){
     walked=`<clipPath id="wclip"><rect x="0" y="0" width="${gx.toFixed(1)}" height="${H}"/></clipPath>
       <path d="${area}" fill="url(#goldfill)" clip-path="url(#wclip)"/>
       <path d="${line}" fill="none" stroke="#f2c230" stroke-width="4" stroke-linecap="round" clip-path="url(#wclip)" opacity=".85"/>`;
-    const usTag=g.off?("US \u00b7 "+g.off.toFixed(1)+" km off"):("US \u00b7 km "+(g.km-st.a.km).toFixed(1));
+    const usTag=g.off?("US \u00b7 "+g.off.toFixed(1)+" km off"):("US \u00b7 "+(st.b.km-g.km).toFixed(1)+" km left");
     const usDot=g.off?`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="11" fill="#0a111c" stroke="#f2c230" stroke-width="3" stroke-dasharray="4 3"/>`
                      :`<circle cx="${gx.toFixed(1)}" cy="${Y(Math.max(0,g.alt)).toFixed(1)}" r="10" fill="#fff" stroke="#f2c230" stroke-width="4"/>`;
     gps=`<line x1="${gx.toFixed(1)}" y1="${padT}" x2="${gx.toFixed(1)}" y2="${H-padB}" stroke="#f2c230" stroke-dasharray="5 5" opacity=".5"/>
@@ -1833,7 +1834,7 @@ function setBigCap(st){
   if(bigSel==null){el.innerHTML="Tap a waypoint for details.";return;}
   const w=st.seg[bigSel];if(!w){el.innerHTML="";return;}
   const q=encodeURIComponent(w.q);
-  let out=`<b>${w.name}</b> \u00b7 km ${(w.km-st.a.km).toFixed(1)} of the stage \u00b7 ~${w.alt} m \u00b7 K. ${(160.5-w.km).toFixed(1).replace(".0","")} to Vigo \u00b7 <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">Open in Maps</a>`;
+  let out=`<b>${w.name}</b> \u00b7 ${(st.b.km-w.km).toFixed(1)} km to ${st.b.name.split(",")[0]} \u00b7 ~${w.alt} m \u00b7 K. ${(160.5-w.km).toFixed(1).replace(".0","")} to Vigo \u00b7 <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">Open in Maps</a>`;
   if(w.poi)out+=`<span class="cap-poi">${w.poi}</span>`;
   if(w.sleep&&w.sleep.length)out+=`<span class="cap-beds">Beds: ${w.sleep.map(a=>a[0]+" ("+a[2]+")").join(" \u00b7 ")}</span>`;
   el.innerHTML=out;
@@ -1847,7 +1848,7 @@ function bigSideHTML(st,g){
     const beds=w.sleep&&w.sleep.length&&w.km>st.a.km;
     if(bigFilter==="beds"&&!beds)return;
     if(bigFilter==="sights"&&!w.poi)return;
-    if(g&&!gpsDone&&g.km<=w.km&&w.km>st.a.km){gpsDone=true;rows+=`<div class="bl-us">${g.off?("WE ARE HERE \u00b7 "+g.off.toFixed(1)+" KM OFF THE PATH"):("WE ARE HERE \u00b7 KM "+(g.km-st.a.km).toFixed(1)+" \u00b7 "+fmtT(new Date().getHours()*60+new Date().getMinutes())+" \u00b7 "+st.b.name.split(",")[0].toUpperCase()+" ~"+fmtT(liveEtaMin(st,st.b.km)))}</div>`;}
+    if(g&&!gpsDone&&g.km<=w.km&&w.km>st.a.km){gpsDone=true;rows+=`<div class="bl-us">${g.off?("WE ARE HERE \u00b7 "+g.off.toFixed(1)+" KM OFF THE PATH"):("WE ARE HERE \u00b7 "+(st.b.km-g.km).toFixed(1)+" KM TO "+st.b.name.split(",")[0].toUpperCase()+" \u00b7 "+fmtT(new Date().getHours()*60+new Date().getMinutes())+" \u00b7 ARRIVE ~"+fmtT(liveEtaMin(st,st.b.km)))}</div>`;}
     const on=i===bigSel;
     let det="";
     if(on||bigFilter!=="all"){
@@ -1858,11 +1859,11 @@ function bigSideHTML(st,g){
       <span class="bl-eta">~${fmtT(liveEtaMin(st,w.km))}</span>
       <span class="bl-name">${w.name.split(",")[0]}${beds?BL_BED:""}${w.poi?BL_POI:""}</span>
       <span class="bl-alt">${w.alt} m</span>
-      <span class="bl-km">km ${(w.km-st.a.km).toFixed(1).replace(".0","")}</span>
+      <span class="bl-km">${(st.b.km-w.km).toFixed(1).replace(".0","")} km left</span>
       ${det}
     </div>`;
   });
-  if(g&&!gpsDone&&bigFilter==="all")rows+=`<div class="bl-us">WE ARE HERE \u00b7 KM ${(g.km-st.a.km).toFixed(1)}</div>`;
+  if(g&&!gpsDone&&bigFilter==="all")rows+=`<div class="bl-us">WE ARE HERE \u00b7 ${(st.b.km-g.km).toFixed(1)} KM TO ${st.b.name.split(",")[0].toUpperCase()}</div>`;
   if(!rows)rows=`<div class="bl-empty">Nothing of this kind on this stage.</div>`;
   return rows;
 }
@@ -1939,8 +1940,8 @@ function setBigStats(g,st){
   const i=bigN-1;let tiles="";
   if(g){
     const left=st.b.km-g.km;
-    tiles+=`<div><b>${(g.km-st.a.km).toFixed(1)} km</b><span>walked</span></div>
-      <div><b>${left.toFixed(1)} km</b><span>to ${st.b.name.split(",")[0]}</span></div>
+    tiles+=`<div><b>${left.toFixed(1)} km</b><span>to ${st.b.name.split(",")[0]}</span></div>
+      <div><b>${(g.km-st.a.km).toFixed(1)} km</b><span>walked today</span></div>
       <div><b>${Math.round(g.alt)} m</b><span>altitude</span></div>
       <div><b>~${fmtH(left/paceV())}</b><span>at our pace</span></div>
       <div><b>~${fmtT(liveEtaMin(st,st.b.km))}</b><span>arrive ${st.b.name.split(",")[0]}</span></div>`;
@@ -2497,6 +2498,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v43</div>
+<div class="appver">camino-app \u00b7 v44</div>
 </body>
 </html>
