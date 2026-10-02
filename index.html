@@ -467,7 +467,9 @@
   .bigview,.bigview *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .bigview{touch-action:manipulation}
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;position:relative;touch-action:none}
-  .bigview-svg svg{width:100%;height:100%;display:block}
+  .rib-wrap{position:absolute;inset:0}
+  .rib-wrap svg{width:100%;height:100%;display:block}
+  .rib-touch{position:absolute;inset:0;z-index:2;touch-action:none;-webkit-touch-callout:none}
   .bigview-svg.zoomed{cursor:grab}
   .rib-zoom{position:absolute;right:6px;top:4px;display:flex;gap:6px;z-index:3;opacity:.92}
   .rib-zoom button.rz-reset{opacity:.45}
@@ -2063,7 +2065,7 @@ function setBigMode(m){
 function bigRepaint(){
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   if(bigViewMode==="map")paintBigMap(st,bigG);
-  else{document.getElementById("big-svg").innerHTML=bigProfileSVG(st,bigG);ribEnsureUI();ribApply();}
+  else{ribEnsureUI();document.getElementById("big-svg").querySelector(".rib-wrap").innerHTML=bigProfileSVG(st,bigG);ribApply();}
   const bl=document.getElementById("bs-list");if(bl)bl.innerHTML=bigSideHTML(st,bigG);
   document.querySelectorAll("#bs-filters button").forEach(b=>b.classList.toggle("on",b.dataset.f===bigFilter));
   setBigCap(st);
@@ -2148,7 +2150,7 @@ let ribRAF=0;
 function ribRender(){
   if(ribRAF)return;ribRAF=requestAnimationFrame(()=>{ribRAF=0;
     const st=STAGES.find(x=>x.n===bigN),h=document.getElementById("big-svg");if(!st||!h||bigViewMode==="map")return;
-    h.innerHTML=bigProfileSVG(st,bigG);ribEnsureUI();ribApply();});
+    ribEnsureUI();h.querySelector(".rib-wrap").innerHTML=bigProfileSVG(st,bigG);ribApply();});
 }
 function ribApply(){
   const h=document.getElementById("big-svg");if(!h)return;
@@ -2166,6 +2168,8 @@ function ribPanKm(dkm){const st=STAGES.find(x=>x.n===bigN);if(!st)return;RZ.f+=d
 function ribReset(){RZ.s=1;RZ.f=0;ribApply();ribRender();}
 function ribEnsureUI(){
   const h=document.getElementById("big-svg");if(!h||h.querySelector(".rib-zoom"))return;
+  h.innerHTML='<div class="rib-wrap"></div><div class="rib-touch"></div>';
+  ribBindGestures(h.querySelector(".rib-touch"));
   const d=document.createElement("div");d.className="rib-zoom";
   d.innerHTML='<button data-z="in" title="Zoom in">+</button><button data-z="out" title="Zoom out">&minus;</button><button class="rz-reset" data-z="reset" title="Whole stage"><span class="rz-lab">fit</span></button>';
   d.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;e.stopPropagation();
@@ -2173,43 +2177,52 @@ function ribEnsureUI(){
     if(b.dataset.z==="in")ribZoomAt(1.6,mid);else if(b.dataset.z==="out")ribZoomAt(1/1.6,mid);else ribReset();});
   h.appendChild(d);
 }
-(function(){
-  const h=document.getElementById("big-svg");if(!h)return;
-  /* Safari: block page zoom inside the ribbon, pointer events still arrive */
-  ["touchstart","touchmove"].forEach(t=>h.addEventListener(t,e=>{if(e.touches.length>1)e.preventDefault();},{passive:false}));
-  ["gesturestart","gesturechange","gestureend"].forEach(t=>h.addEventListener(t,e=>e.preventDefault(),{passive:false}));
-  const pts=new Map();let pinch=null,drag=null,lastTap=0,moved=false;
-  const relX=e=>e.clientX-h.getBoundingClientRect().left;
-  const relP=e=>{const r=h.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
-  const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
-  h.addEventListener("pointerdown",e=>{
-    if(e.target.closest(".rib-zoom"))return;
-    if(pts.size>=2)pts.clear(); /* never let a ghost finger survive */
-    pts.set(e.pointerId,relP(e));moved=false;
-    try{h.setPointerCapture(e.pointerId);}catch(_){}
-    if(pts.size===2){const [a,b]=[...pts.values()];const c=(a[0]+b[0])/2;pinch={d:Math.max(20,dist(a,b)),s:RZ.s,kmC:ribKmAt(c)};drag=null;}
-    else if(pts.size===1&&RZ.s>1.001){drag={px:e.clientX,kmA:RZ.kmA};}
-  });
-  h.addEventListener("pointermove",e=>{
-    if(!pts.has(e.pointerId))return;pts.set(e.pointerId,relP(e));
-    const st=STAGES.find(x=>x.n===bigN);if(!st)return;
-    if(pinch&&pts.size===2){const [a,b]=[...pts.values()];const d=Math.max(20,dist(a,b));const c=(a[0]+b[0])/2;
+function ribBindGestures(t){
+  /* touch events on a layer that is never re-rendered: Safari keeps delivering a touch to the element it started on */
+  const h=t.parentNode;
+  let pinch=null,drag=null,lastTap=0,moved=false,tapAt=null,lastTouch=0;
+  const rel=(x,y)=>{const r=h.getBoundingClientRect();return [x-r.left,y-r.top];};
+  const dist=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  const forwardTap=(cx,cy)=>{t.style.pointerEvents="none";const el=document.elementFromPoint(cx,cy);t.style.pointerEvents="";
+    const wp=el&&el.closest?el.closest(".big-wp"):null;if(wp)wp.dispatchEvent(new MouseEvent("click",{bubbles:true,cancelable:true}));};
+  const stage=()=>STAGES.find(x=>x.n===bigN);
+  t.addEventListener("touchstart",e=>{lastTouch=Date.now();
+    if(e.touches.length>=2){e.preventDefault();const [a,b]=[e.touches[0],e.touches[1]];const c=rel((a.clientX+b.clientX)/2,0)[0];
+      pinch={d:Math.max(20,dist(a,b)),s:RZ.s,kmC:ribKmAt(c)};drag=null;moved=true;}
+    else if(e.touches.length===1){const a=e.touches[0];moved=false;tapAt=[a.clientX,a.clientY];pinch=null;
+      drag=RZ.s>1.001?{px:a.clientX,kmA:RZ.kmA}:null;}
+  },{passive:false});
+  t.addEventListener("touchmove",e=>{
+    const st=stage();if(!st)return;e.preventDefault();
+    if(pinch&&e.touches.length>=2){const [a,b]=[e.touches[0],e.touches[1]];const d=Math.max(20,dist(a,b));const c=rel((a.clientX+b.clientX)/2,0)[0];
       let ns=Math.max(1,Math.min(8,pinch.s*Math.pow(d/pinch.d,0.9)));if(ns<1.12)ns=1;const nl=st.km/ns;
-      const kmA=pinch.kmC-(c-RZ.padL)/RZ.plotW*nl;RZ.s=ns;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();moved=true;e.preventDefault();}
-    else if(drag){const dx=e.clientX-drag.px;if(Math.abs(dx)>4)moved=true;
-      const kmA=drag.kmA-dx/RZ.plotW*RZ.kmL;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();e.preventDefault();}
-  });
-  const up=e=>{pts.delete(e.pointerId);
-    if(pts.size<2)pinch=null;if(pts.size===0){drag=null;
-      if(!moved&&e.pointerType==="touch"){const t=Date.now();if(t-lastTap<320){if(RZ.s>1.001)ribReset();else ribZoomAt(2.5,relX(e));lastTap=0;}else lastTap=t;}
-    }};
-  h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up);h.addEventListener("lostpointercapture",e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;});
-  window.addEventListener("pointerup",e=>{if(pts.has(e.pointerId))up(e);},true);window.addEventListener("pointercancel",e=>{if(pts.has(e.pointerId))up(e);},true);
-  ["touchend","touchcancel"].forEach(t=>h.addEventListener(t,e=>{if(e.touches.length===0){pts.clear();pinch=null;drag=null;}},{passive:true}));
-  h.addEventListener("click",e=>{if(moved&&!e.target.closest(".rib-zoom")){e.stopPropagation();e.preventDefault();}moved=false;},true);
-  h.addEventListener("wheel",e=>{if(!e.ctrlKey&&RZ.s<=1.001)return;e.preventDefault();
-    if(e.ctrlKey)ribZoomAt(e.deltaY<0?1.15:1/1.15,relX(e));else ribPanKm((e.deltaX||e.deltaY)/RZ.plotW*RZ.kmL);},{passive:false});
-})();
+      const kmA=pinch.kmC-(c-RZ.padL)/RZ.plotW*nl;RZ.s=ns;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();}
+    else if(drag&&e.touches.length===1){const a=e.touches[0];const dx=a.clientX-drag.px;if(Math.abs(dx)>4)moved=true;
+      const kmA=drag.kmA-dx/RZ.plotW*RZ.kmL;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();}
+    else if(tapAt&&e.touches.length===1){const a=e.touches[0];if(Math.hypot(a.clientX-tapAt[0],a.clientY-tapAt[1])>8)moved=true;}
+  },{passive:false});
+  const end=e=>{lastTouch=Date.now();
+    if(e.touches.length>=2)return;
+    if(e.touches.length===1){ /* one finger left after a pinch: continue as a drag, never as a tap */
+      const a=e.touches[0];pinch=null;moved=true;drag=RZ.s>1.001?{px:a.clientX,kmA:RZ.kmA}:null;return;}
+    pinch=null;drag=null;
+    if(!moved&&tapAt){const now=Date.now();
+      if(now-lastTap<320){lastTap=0;if(RZ.s>1.001)ribReset();else ribZoomAt(2.5,rel(tapAt[0],0)[0]);}
+      else{lastTap=now;forwardTap(tapAt[0],tapAt[1]);}}
+    tapAt=null;moved=false;
+  };
+  t.addEventListener("touchend",end,{passive:true});t.addEventListener("touchcancel",end,{passive:true});
+  ["gesturestart","gesturechange","gestureend"].forEach(n=>t.addEventListener(n,e=>e.preventDefault(),{passive:false}));
+  /* desktop */
+  let mdrag=null;
+  t.addEventListener("mousedown",e=>{if(e.button!==0||Date.now()-lastTouch<700)return;mdrag={px:e.clientX,kmA:RZ.kmA,moved:false,x:e.clientX,y:e.clientY};e.preventDefault();});
+  window.addEventListener("mousemove",e=>{if(!mdrag)return;const st=stage();if(!st)return;const dx=e.clientX-mdrag.px;if(Math.abs(dx)>4)mdrag.moved=true;
+    if(RZ.s>1.001&&mdrag.moved){const kmA=mdrag.kmA-dx/RZ.plotW*RZ.kmL;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();}});
+  window.addEventListener("mouseup",e=>{if(!mdrag)return;const m=mdrag;mdrag=null;if(!m.moved)forwardTap(m.x,m.y);});
+  t.addEventListener("dblclick",e=>{e.preventDefault();if(Date.now()-lastTouch<700)return;if(RZ.s>1.001)ribReset();else ribZoomAt(2.5,rel(e.clientX,0)[0]);});
+  t.addEventListener("wheel",e=>{if(!e.ctrlKey&&RZ.s<=1.001)return;e.preventDefault();
+    if(e.ctrlKey)ribZoomAt(e.deltaY<0?1.15:1/1.15,rel(e.clientX,0)[0]);else ribPanKm((e.deltaX||e.deltaY)/RZ.plotW*RZ.kmL);},{passive:false});
+}
 function openBig(n,keepWatch){
   if(!keepWatch)stopBigWatch();
   lockScroll(true);
@@ -2722,6 +2735,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v56</div>
+<div class="appver">camino-app · v57</div>
 </body>
 </html>
