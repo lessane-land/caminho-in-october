@@ -469,10 +469,11 @@
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;position:relative;touch-action:none}
   .bigview-svg svg{width:100%;height:100%;display:block}
   .bigview-svg.zoomed{cursor:grab}
-  .rib-zoom{position:absolute;right:8px;top:8px;display:flex;gap:4px;z-index:3;opacity:0;pointer-events:none;transition:opacity .2s}
-  .bigview-svg.zoomed .rib-zoom{opacity:1;pointer-events:auto}
-  .rib-zoom button{width:30px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--glass);color:var(--fg);font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.06em;padding:0;cursor:pointer;backdrop-filter:blur(6px)}
-  .rib-zoom button.rz-reset{width:auto;padding:0 8px;min-width:44px}
+  .rib-zoom{position:absolute;right:6px;top:4px;display:flex;gap:6px;z-index:3;opacity:.92}
+  .rib-zoom button.rz-reset{opacity:.45}
+  .bigview-svg.zoomed .rib-zoom button.rz-reset{opacity:1;border-color:var(--terracotta);color:var(--terracotta-bright)}
+  .rib-zoom button{width:40px;height:36px;border-radius:7px;border:1px solid var(--line);background:var(--glass);color:var(--fg);font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.06em;padding:0;cursor:pointer;backdrop-filter:blur(6px)}
+  .rib-zoom button.rz-reset{width:auto;padding:0 10px;min-width:58px}
   .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 
@@ -1949,7 +1950,7 @@ function bigProfileSVG(st,g){
       <clipPath id="plotclip"><rect x="${padL}" y="0" width="${plotW}" height="${H-padB}"/></clipPath>
     </defs>
     ${grid}${kmticks}
-    ${(W<680||strip||zoomed)?"":`<g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
+    ${(W<680||strip||zoomed)?"":`<g transform="translate(${W-padR-346-160},20)" font-family="DM Mono, monospace" font-size="11">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="${CH("lbl")}">flat</text>
       <rect x="56" y="-8" width="16" height="4" fill="#f2c230"/><text x="77" y="-3" fill="${CH("lbl")}">3-6%</text>
       <rect x="122" y="-8" width="16" height="4" fill="#ef8354"/><text x="143" y="-3" fill="${CH("lbl")}">steep</text>
@@ -2153,7 +2154,7 @@ function ribApply(){
   const h=document.getElementById("big-svg");if(!h)return;
   RZ.s=Math.max(1,Math.min(8,RZ.s));RZ.f=Math.min(Math.max(RZ.f,0),1-1/RZ.s);
   h.classList.toggle("zoomed",RZ.s>1.001);
-  const lab=h.querySelector(".rz-lab");if(lab)lab.textContent=RZ.s>1.001?RZ.kmL.toFixed(1)+" km":"fit";
+  const lab=h.querySelector(".rz-lab");if(lab)lab.textContent=RZ.s>1.001?"fit \u00b7 "+RZ.kmL.toFixed(1).replace(".0","")+" km":"fit";
 }
 function ribKmAt(px){return RZ.kmA+(px-RZ.padL)/RZ.plotW*RZ.kmL;}
 function ribZoomAt(f,px){ /* zoom by factor f keeping the km under px fixed */
@@ -2179,17 +2180,19 @@ function ribEnsureUI(){
   ["gesturestart","gesturechange","gestureend"].forEach(t=>h.addEventListener(t,e=>e.preventDefault(),{passive:false}));
   const pts=new Map();let pinch=null,drag=null,lastTap=0,moved=false;
   const relX=e=>e.clientX-h.getBoundingClientRect().left;
+  const relP=e=>{const r=h.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
+  const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
   h.addEventListener("pointerdown",e=>{
     if(e.target.closest(".rib-zoom"))return;
-    pts.set(e.pointerId,relX(e));moved=false;
-    if(pts.size===2){const [a,b]=[...pts.values()];const c=(a+b)/2;pinch={d:Math.max(12,Math.abs(a-b)),s:RZ.s,kmC:ribKmAt(c),frac:(c-RZ.padL)/RZ.plotW};drag=null;}
+    pts.set(e.pointerId,relP(e));moved=false;
+    if(pts.size===2){const [a,b]=[...pts.values()];const c=(a[0]+b[0])/2;pinch={d:Math.max(20,dist(a,b)),s:RZ.s,kmC:ribKmAt(c)};drag=null;}
     else if(pts.size===1&&RZ.s>1.001){drag={px:e.clientX,kmA:RZ.kmA};try{h.setPointerCapture(e.pointerId);}catch(_){}}
   });
   h.addEventListener("pointermove",e=>{
-    if(!pts.has(e.pointerId))return;pts.set(e.pointerId,relX(e));
+    if(!pts.has(e.pointerId))return;pts.set(e.pointerId,relP(e));
     const st=STAGES.find(x=>x.n===bigN);if(!st)return;
-    if(pinch&&pts.size===2){const [a,b]=[...pts.values()];const d=Math.max(12,Math.abs(a-b));const c=(a+b)/2;
-      const ns=Math.max(1,Math.min(8,pinch.s*d/pinch.d));const nl=st.km/ns;
+    if(pinch&&pts.size===2){const [a,b]=[...pts.values()];const d=Math.max(20,dist(a,b));const c=(a[0]+b[0])/2;
+      let ns=Math.max(1,Math.min(8,pinch.s*Math.pow(d/pinch.d,0.9)));if(ns<1.12)ns=1;const nl=st.km/ns;
       const kmA=pinch.kmC-(c-RZ.padL)/RZ.plotW*nl;RZ.s=ns;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();moved=true;e.preventDefault();}
     else if(drag){const dx=e.clientX-drag.px;if(Math.abs(dx)>4)moved=true;
       const kmA=drag.kmA-dx/RZ.plotW*RZ.kmL;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();e.preventDefault();}
@@ -2715,6 +2718,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v54</div>
+<div class="appver">camino-app · v55</div>
 </body>
 </html>
