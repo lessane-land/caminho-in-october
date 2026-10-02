@@ -2184,9 +2184,11 @@ function ribEnsureUI(){
   const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
   h.addEventListener("pointerdown",e=>{
     if(e.target.closest(".rib-zoom"))return;
+    if(pts.size>=2)pts.clear(); /* never let a ghost finger survive */
     pts.set(e.pointerId,relP(e));moved=false;
+    try{h.setPointerCapture(e.pointerId);}catch(_){}
     if(pts.size===2){const [a,b]=[...pts.values()];const c=(a[0]+b[0])/2;pinch={d:Math.max(20,dist(a,b)),s:RZ.s,kmC:ribKmAt(c)};drag=null;}
-    else if(pts.size===1&&RZ.s>1.001){drag={px:e.clientX,kmA:RZ.kmA};try{h.setPointerCapture(e.pointerId);}catch(_){}}
+    else if(pts.size===1&&RZ.s>1.001){drag={px:e.clientX,kmA:RZ.kmA};}
   });
   h.addEventListener("pointermove",e=>{
     if(!pts.has(e.pointerId))return;pts.set(e.pointerId,relP(e));
@@ -2201,7 +2203,9 @@ function ribEnsureUI(){
     if(pts.size<2)pinch=null;if(pts.size===0){drag=null;
       if(!moved&&e.pointerType==="touch"){const t=Date.now();if(t-lastTap<320){if(RZ.s>1.001)ribReset();else ribZoomAt(2.5,relX(e));lastTap=0;}else lastTap=t;}
     }};
-  h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up);
+  h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up);h.addEventListener("lostpointercapture",e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;});
+  window.addEventListener("pointerup",e=>{if(pts.has(e.pointerId))up(e);},true);window.addEventListener("pointercancel",e=>{if(pts.has(e.pointerId))up(e);},true);
+  ["touchend","touchcancel"].forEach(t=>h.addEventListener(t,e=>{if(e.touches.length===0){pts.clear();pinch=null;drag=null;}},{passive:true}));
   h.addEventListener("click",e=>{if(moved&&!e.target.closest(".rib-zoom")){e.stopPropagation();e.preventDefault();}moved=false;},true);
   h.addEventListener("wheel",e=>{if(!e.ctrlKey&&RZ.s<=1.001)return;e.preventDefault();
     if(e.ctrlKey)ribZoomAt(e.deltaY<0?1.15:1/1.15,relX(e));else ribPanKm((e.deltaX||e.deltaY)/RZ.plotW*RZ.kmL);},{passive:false});
@@ -2718,6 +2722,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v55</div>
+<div class="appver">camino-app · v56</div>
 </body>
 </html>
