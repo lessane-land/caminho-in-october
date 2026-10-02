@@ -574,12 +574,14 @@
 
 
   .big-list{height:100%;width:100%;max-width:880px;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 2px}
-  .bl-row{display:grid;grid-template-columns:66px 1fr auto auto;gap:12px;align-items:center;padding:12px;border-bottom:1px solid var(--night-border);cursor:pointer;border-radius:10px}
+  .bl-row{display:grid;grid-template-columns:62px minmax(0,1fr) auto auto;gap:9px;align-items:center;padding:12px;border-bottom:1px solid var(--night-border);cursor:pointer;border-radius:10px}
   .bl-row.on{background:var(--night-soft)}
   .bl-eta{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--gold-bright)}
-  .bl-name{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--paper);display:flex;align-items:center;gap:8px;min-width:0}
+  .bl-name{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--paper);display:flex;align-items:center;gap:7px;min-width:0}
+  .bl-name>span{min-width:0;line-height:1.15}
   .bl-name svg{width:13px;height:13px;flex:none}
   .bl-alt,.bl-km{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--mute);text-align:right;white-space:nowrap}
+  @media (max-width:960px) and (orientation:landscape){.bl-alt{display:none}.bl-row{grid-template-columns:58px minmax(0,1fr) auto}.bl-name{font-size:.98rem}}
   .bl-us{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.12em;color:var(--night-deep);background:var(--gold);border-radius:9px;padding:8px 12px;margin:8px 0;text-align:center;font-weight:700}
 
 
@@ -2018,7 +2020,7 @@ function bigSideHTML(st,g){
     }
     rows+=`<div class="bl-row ${on?"on":""}" onclick="selectBigWp(${i})">
       <span class="bl-eta">~${fmtT(liveEtaMin(st,w.km))}</span>
-      <span class="bl-name">${w.name.split(",")[0]}${beds?BL_BED:""}${w.poi?BL_POI:""}</span>
+      <span class="bl-name"><span>${w.name.split(",")[0]}</span>${beds?BL_BED:""}${w.poi?BL_POI:""}</span>
       <span class="bl-alt">${w.alt} m</span>
       <span class="bl-km">${(st.b.km-w.km).toFixed(1).replace(".0","")} km left</span>
       ${det}
@@ -2781,6 +2783,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v58</div>
+<div class="appver">camino-app · v59</div>
 </body>
 </html>
