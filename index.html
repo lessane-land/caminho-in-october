@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{color-scheme:dark;
+    --glass:rgba(10,14,26,.92); --glass-soft:rgba(10,14,26,.85); --plaque:#0a111c; --plaque-ink:#f6d35f; --plaque-mute:#9fb0c5;
     --ch-bg:#0a111c; --ch-grid:#16233a; --ch-axis:#1f2740; --ch-tick:#33455f; --ch-dim:#44536a; --ch-lbl:#5b6d85; --ch-name:#9fb0c5; --ch-hi:#f6d35f; --ch-eta:#bfa14a;
     --night-deep:#0a111c; --night:#0f1826; --night-soft:#131f31; --night-card:#182842;
     --night-border:rgba(63,167,160,0.16);
@@ -32,15 +33,16 @@
     --terracotta:#1f6e68; --terracotta-bright:#2a8a82; --gold:#c9931a; --gold-bright:#b2800f;
     --sea-glow:#2f6f94; --sea-deep:#d7ebe9; --sea-shallow:#1f6e68;
     --success:#4f8f4f; --warn:#b07a2a; --danger:#c25a3a;
+    --glass:rgba(250,246,238,.92); --glass-soft:rgba(244,239,228,.88); --plaque:#1b2430; --plaque-ink:#f6d35f; --plaque-mute:#c9d2de;
     --ch-bg:#f4efe4; --ch-grid:#e4dcc9; --ch-axis:#d6cdb7; --ch-tick:#b7ad97; --ch-dim:#9c9480; --ch-lbl:#7a8599; --ch-name:#3f4b5c; --ch-hi:#9c7108; --ch-eta:#8a6d10;
   }
   :root[data-theme="light"] body{background-image:none}
+  :root[data-theme="light"] .invitation::before,:root[data-theme="light"] .invitation::after{opacity:.09}
+  :root[data-theme="light"] .stars-bg{opacity:.12}
   :root[data-theme="light"] .leaflet-tile-pane .osm-dark{filter:saturate(.9) contrast(.97)}
   :root[data-theme="light"] .leaflet-container{background:#e9e2d2}
   :root[data-theme="light"] .map-wrap{background:#efe7d6}
   :root[data-theme="light"] .nav-bar{background:linear-gradient(90deg,rgba(201,147,26,.14),var(--night-soft) 55%);border-color:rgba(201,147,26,.45)}
-  :root[data-theme="light"] .nv-ico,:root[data-theme="light"] .nv-mojon{background:#1b2430;border-color:#1b2430}
-  :root[data-theme="light"] .nv-mojon b{color:#f6d35f}:root[data-theme="light"] .nv-mojon i{color:#9fb0c5}:root[data-theme="light"] .nv-mojon svg{color:#f6d35f}
   :root[data-theme="light"] .bl-us{background:#c9931a;color:#fff}
   :root[data-theme="light"] .stamp{filter:saturate(.9)}
   .theme-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--night-border);background:transparent;color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;margin-left:8px}
@@ -70,7 +72,7 @@
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01s !important}}
 
   /* header */
-  .header-wrap{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--night-border);padding-top:env(safe-area-inset-top)}
+  .header-wrap{position:sticky;top:0;z-index:100;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--night-border);padding-top:env(safe-area-inset-top)}
   .header-top{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;max-width:1000px;margin:0 auto;border-bottom:1px solid var(--night-border)}
   .logo{font-family:'Fraunces',serif;font-size:.98rem;color:var(--gold-bright);font-style:italic;font-weight:400;display:flex;align-items:center;gap:10px}
   .logo-icon{width:18px;height:18px;color:var(--terracotta);flex:none}
@@ -82,7 +84,8 @@
   .tab{background:none;border:none;cursor:pointer;padding:14px 16px;position:relative;font-family:'Fraunces',serif;font-size:.95rem;font-weight:400;font-style:italic;color:var(--mute);white-space:nowrap;transition:color .2s}
   .tab .tab-num{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute-dim);display:block;margin-bottom:3px;font-style:normal}
   .tab:hover{color:var(--ink-soft)} .tab:hover .tab-num{color:var(--terracotta-bright)}
-  .tab.active{color:var(--paper)} .tab.active .tab-num{color:var(--terracotta-bright)}
+  .tab.active{color:var(--paper);font-weight:500} .tab.active .tab-num{color:var(--terracotta-bright)}
+  :root[data-theme="light"] .tab{color:var(--mute)} :root[data-theme="light"] .tab.active{color:var(--terracotta)}
   .tab.active::after{content:"";position:absolute;bottom:0;left:16px;right:16px;height:2px;background:linear-gradient(90deg,var(--terracotta),var(--gold));border-radius:2px 2px 0 0}
 
   .panel{display:none;min-height:70vh;padding:44px 0 90px}
@@ -217,7 +220,7 @@
   .detail .max{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-soft);padding:13px 0 0;letter-spacing:.04em}
   .miniprofile{margin-top:12px;background:var(--night-deep);border:1px solid var(--night-border);border-radius:8px;padding:8px 6px 2px}
   .miniprofile svg{width:100%;height:auto;display:block}
-  .wp-dot{fill:var(--sea-glow);stroke:#0a0e1a;stroke-width:1.5;cursor:pointer}
+  .wp-dot{fill:var(--sea-glow);stroke:var(--night-deep);stroke-width:1.5;cursor:pointer}
   .wp-dot.hi{fill:var(--gold)}
   .wp-dot.sel{fill:var(--gold-bright);stroke:var(--gold);stroke-opacity:.4;stroke-width:8}
   .gps-dot{fill:#fff;stroke:var(--terracotta);stroke-width:3;pointer-events:none}
@@ -391,10 +394,10 @@
   .journal-entry-date{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--terracotta-bright);margin-bottom:6px}
   .journal-entry-title{font-family:'Fraunces',serif;font-size:1rem;color:var(--paper);margin-bottom:5px;font-weight:500}
   .journal-entry-note{font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);font-size:.8rem;line-height:1.5}
-  .journal-entry-del{position:absolute;top:10px;right:10px;background:rgba(10,14,26,.9);border:none;color:var(--ink-soft);width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .2s;backdrop-filter:blur(8px)}
+  .journal-entry-del{position:absolute;top:10px;right:10px;background:var(--glass);border:none;color:var(--ink-soft);width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .2s;backdrop-filter:blur(8px)}
   .journal-entry:hover .journal-entry-del{opacity:1}
   .journal-entry-del:hover{color:var(--danger)}
-  .modal-bg{position:fixed;inset:0;background:rgba(10,14,26,.85);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease}
+  .modal-bg{position:fixed;inset:0;background:var(--glass-soft);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease}
   .modal-bg.active{display:flex}
   .modal{background:var(--night-soft);border:1px solid var(--gold);border-radius:14px;padding:26px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
   .modal-title{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--paper);margin-bottom:16px;font-weight:500}
@@ -477,13 +480,13 @@
 
   /* real map */
   .route-map{height:460px;border-radius:8px;overflow:hidden;border:1px solid var(--night-border);z-index:1}
-  .leaflet-container{background:#0a111c;font-family:'Inter Tight',sans-serif}
+  .leaflet-container{background:var(--night-deep);font-family:'Inter Tight',sans-serif}
   .leaflet-popup-content-wrapper{background:var(--night-soft);color:var(--paper);border:1px solid var(--night-border);border-radius:8px;font-family:'Inter Tight',sans-serif}
   .leaflet-popup-content{font-size:.82rem;line-height:1.45}
   .leaflet-popup-tip{background:var(--night-soft)}
   .leaflet-bar a{background:var(--night-soft);color:var(--gold-bright);border-color:var(--night-border)}
   .leaflet-bar a:hover{background:var(--night-card)}
-  .leaflet-control-attribution{background:rgba(10,17,28,.75) !important;color:#5b6d85 !important}
+  .leaflet-control-attribution{background:var(--glass) !important;color:var(--mute) !important}
   .leaflet-control-attribution a{color:#5b6d85 !important}
   .map-note{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
   .map-note i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
@@ -564,9 +567,10 @@
 
   .big-main{flex:1;min-height:0;display:flex;gap:16px}
   .big-stage{flex:1.35;min-width:0;min-height:0;display:flex;flex-direction:column}
-  #big-map{flex:1;min-height:0;display:none;border-radius:14px;overflow:hidden;border:1px solid var(--night-border);background:#0a111c}
+  #big-map{flex:1;min-height:0;display:none;border-radius:14px;overflow:hidden;border:1px solid var(--night-border);background:var(--night-deep)}
   .big-stage.mode-map #big-map{display:block}
   .big-stage.mode-map .bigview-svg{display:none}
+  :root[data-theme="light"] .leaflet-bar a{background:#fff;color:#1b2430;border-color:#d6cdb7}
   .bm-tip{background:var(--night-card);border:1px solid var(--night-border);color:var(--paper);font-family:'DM Mono',monospace;font-size:.68rem;border-radius:8px;padding:4px 8px}
   .bm-tip::before{display:none}
   .bm-tip.bm-us{color:var(--night-deep);background:var(--gold);border-color:var(--gold);font-weight:700}
@@ -609,16 +613,16 @@
 
   .nav-bar{display:none;align-items:center;gap:14px;padding:9px 12px 9px 10px;margin-bottom:8px;border:1px solid rgba(242,194,48,.35);border-left:4px solid #f2c230;border-radius:12px;background:linear-gradient(90deg,rgba(242,194,48,.10),var(--night-soft) 55%);flex:none}
   .nav-bar.show{display:flex}
-  .nv-ico{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#0a111c;border:1px solid var(--night-border)}
+  .nv-ico{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--plaque);border:1px solid var(--night-border)}
   .nv-ico svg{width:34px;height:34px;transition:transform .35s cubic-bezier(.16,1,.3,1)}
   .nv-ico.off{color:#ef8354}
   .nv-main{min-width:0}
   .nv-main b{display:block;font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;color:var(--paper);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .nv-main span{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:2px}
-  .nv-mojon{margin-left:auto;flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 10px;border-radius:8px;background:#0a111c;border:1px solid var(--night-border);font-family:'DM Mono',monospace}
-  .nv-mojon svg{width:14px;height:14px;color:var(--gold-bright)}
-  .nv-mojon b{font-size:.78rem;color:var(--gold-bright);font-weight:500;letter-spacing:.04em}
-  .nv-mojon i{font-style:normal;font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+  .nv-mojon{margin-left:auto;flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 10px;border-radius:8px;background:var(--plaque);border:1px solid var(--night-border);font-family:'DM Mono',monospace}
+  .nv-mojon svg{width:14px;height:14px;color:var(--plaque-ink)}
+  .nv-mojon b{font-size:.78rem;color:var(--plaque-ink);font-weight:500;letter-spacing:.04em}
+  .nv-mojon i{font-style:normal;font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:var(--plaque-mute)}
   #bs-grow{display:none;background:transparent;border:1px solid var(--night-border);color:var(--ink-soft);border-radius:50px;width:34px;height:34px;padding:0;cursor:pointer;align-items:center;justify-content:center;flex:none}
   #bs-grow svg{width:16px;height:16px;transition:transform .25s}
   .big-main.listmax #bs-grow svg{transform:rotate(180deg)}
@@ -675,13 +679,13 @@
       <p class="inv-to">Manal &amp; Vane &middot; October 2026</p>
       <h1 class="inv-headline">We walk <em>to Vigo</em>.</h1>
       <p class="inv-prose">
-        The Atlantic in October. Wooden boardwalks that go on for kilometres, eucalyptus hills, a river you cross by boat because there is no bridge, cliffs where the ocean argues with Galicia and loses. And us, <em>amor</em>, with backpacks and nowhere to be except the next albergue.
+        The Atlantic in October. Wooden boardwalks that go on for kilometres, eucalyptus hills, a river you cross by boat because there is no bridge, cliffs where the Atlantic meets Galicia head on. And us, <em>amor</em>, with backpacks and nowhere to be except the next albergue.
       </p>
       <p class="inv-prose">
-        So we gave ourselves a walk. <strong>160 kilometres. Porto to Vigo. Boots on October 2nd.</strong> Two countries, one coastline, seven-ish days, depending on how our legs vote. Anchovy-grade seafood on the Portuguese side, oysters waiting at the finish line.
+        So we gave ourselves a walk. <strong>160 kilometres. Porto to Vigo. Boots on October 2nd.</strong> Two countries, one coastline, seven days or so, depending on the legs. Grilled fish on the Portuguese side, oysters waiting at the end.
       </p>
       <div class="inv-dare">
-        You. Me. The ocean, every single day. <span>Let's lace up.</span><br>
+        You. Me. The ocean, every single day. <span>Let's go.</span><br>
         Let's <em>walk it together</em>.
       </div>
       <div class="flecha-row" aria-hidden="true"><svg viewBox="0 0 44 18" fill="none"><path d="M3 9.5c8-1 16-1 25-.5" stroke="#f2c230" stroke-width="5.5" stroke-linecap="round"/><path d="M26 2.5 41 9l-15 6.8c1.6-4.6 1.6-9.2 0-13.3z" fill="#f2c230"/></svg></div>
@@ -700,7 +704,7 @@
         </div>
         <div>
           <div class="inv-detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Walkers</div>
-          <div class="inv-detail-value">Just us, 2</div>
+          <div class="inv-detail-value">The two of us</div>
         </div>
         <div>
           <div class="inv-detail-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M2 12s4-8 10-8 10 8 10 8"/></svg>Theme</div>
@@ -708,11 +712,11 @@
         </div>
       </div>
       <div class="inv-secret">
-        <strong>P.S.</strong> If we walk the classic seven stages, we arrive in Vigo on <strong>October 8th</strong>. Which, if we're counting right (and we are), is ten years since the first time. We didn't plan it. The camino did. 160 kilometres on foot to arrive at a decade, on the exact day, at the ocean. Some coincidences are just the universe showing off.
+        <strong>P.S.</strong> If we walk the classic seven stages, we arrive in Vigo on <strong>October 8th</strong>. Which, if we're counting right (and we are), is ten years since the first time. We didn't plan it. The camino did. 160 kilometres on foot to arrive at a decade, on the exact day, at the ocean. Some coincidences deserve to be walked towards.
       </div>
       <div class="inv-secret pps">
         <strong>P.P.S.</strong> Miami. October 2016. <em>"May I kiss you."</em><br>
-        Vigo. October 2026. Same question stands, but this time over oysters, with 160 km in our legs.
+        Vigo. October 2026. Same question, this time over oysters, with 160 km behind us.
       </div>
       <div class="inv-secret" style="margin-top:18px">
         <strong>P.P.P.S.</strong> Santiago already has our January footsteps. From Vigo it is only 90 km more, and every shell on this coast points north. Next next time.
@@ -727,7 +731,7 @@
     <div class="panel-header">
       <div class="panel-eyebrow">02 &middot; A viaxe</div>
       <h2>How we <em>get there</em>.</h2>
-      <p class="panel-intro">Madrid to Porto by air. Porto to Vigo on foot. Vigo to Madrid by rail. The middle part is the point.</p>
+      <p class="panel-intro">Madrid to Porto by air. Porto to Vigo on foot. Vigo to Madrid by rail. The part in the middle is the reason.</p>
     </div>
 
     <div class="sub-section">
@@ -853,7 +857,7 @@
     <div class="panel-header">
       <div class="panel-eyebrow">03 &middot; As etapas</div>
       <h2>Day <em>by day</em>, km by km.</h2>
-      <p class="panel-intro">Tap a stage to open it. Tap a waypoint to find it. Tap the locate button to find us.</p>
+      <p class="panel-intro">Tap a stage to open it, a waypoint to see it on the map, or the locate button to find where we are.</p>
     </div>
     <div class="sub-section">
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l4-7 4 4 6-10 4 13"/></svg>Our stages &middot; <em>sliced our way</em></h3>
@@ -890,8 +894,8 @@
   <div class="container">
     <div class="panel-header">
       <div class="panel-eyebrow">04 &middot; Os sentidos</div>
-      <h2>The <em>senses</em>.</h2>
-      <p class="panel-intro">Porto before, Vigo after, music between, and enough Portuguese and Galego to make locals smile.</p>
+      <h2>Porto, Vigo <em>and the in-between</em>.</h2>
+      <p class="panel-intro">Where to eat in Porto and Vigo, music for the boardwalks, and enough Portuguese and Galego to be polite in two countries.</p>
     </div>
 
     <div class="sub-section">
@@ -907,11 +911,11 @@
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M5 8h14v7a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8zM7 8V6a5 5 0 0 1 10 0v2"/></svg>Port wine in 60 seconds</div>
-          <p class="food-desc">All port is fortified mid-ferment, that's why it's sweet and 20%. <strong>Ruby</strong>: vat-aged, fruity. <strong>Tawny</strong>: barrel-aged, caramel and walnut ("10-year" = average age, not vintage). <strong>Vintage</strong>: one great year, decades of patience. Order: white port + tonic, then a 10-year tawny. Now we out-order the sommelier.</p><div class="food-links"><a href="https://maps.apple.com/?q=Cais%20de%20Gaia" target="_blank" rel="noopener" class="food-link">Gaia lodges<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
+          <p class="food-desc">All port is fortified mid-ferment, that's why it's sweet and 20%. <strong>Ruby</strong>: vat-aged, fruity. <strong>Tawny</strong>: barrel-aged, caramel and walnut ("10-year" = average age, not vintage). <strong>Vintage</strong>: one great year, decades of patience. Order: white port + tonic, then a 10-year tawny. Enough to order with confidence.</p><div class="food-links"><a href="https://maps.apple.com/?q=Cais%20de%20Gaia" target="_blank" rel="noopener" class="food-link">Gaia lodges<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>Caf&eacute; Santiago &middot; the francesinha ruling</div>
-          <p class="food-desc">Porto's most famous francesinha house. One sandwich, <strong>split between two people</strong>, it is a weapon, not a dinner, and we walk 28 km on Friday.</p>
+          <p class="food-desc">Porto's most famous francesinha house. One sandwich, <strong>split between two people</strong>, it is a serious plate, and we walk 28 km on Friday.</p>
           <a href="https://maps.apple.com/?q=Caf%C3%A9%20Santiago%20Porto" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
       </div>
@@ -922,7 +926,7 @@
       <div class="food-list">
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6z"/></svg>R&uacute;a da Pedra &middot; the oysters</div>
-          <p class="food-desc">The ostreiras have shucked oysters on this street for generations. From ~11:00. <strong>The contractual finish line</strong>, and with the 17:25 AVE, a whole victory morning for it.</p>
+          <p class="food-desc">The ostreiras have shucked oysters on this street for generations. From ~11:00. <strong>Where this walk ends</strong>, and with the 17:25 AVE, a whole last morning for it.</p>
           <a href="https://maps.apple.com/?q=R%C3%BAa%20da%20Pedra%20Vigo" target="_blank" rel="noopener" class="food-link">On the map<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
         <div class="food-card">
@@ -932,7 +936,7 @@
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l4-7 4 4 6-10 4 13"/></svg>Monte do Castro</div>
-          <p class="food-desc">The panorama over the r&iacute;a and the C&iacute;es. A 20-minute climb our legs will find <strong>hilarious</strong>, but worth every complaint.</p><div class="food-links"><a href="https://maps.apple.com/?q=Monte%20do%20Castro%20Vigo" target="_blank" rel="noopener" class="food-link">Monte do Castro<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
+          <p class="food-desc">The panorama over the r&iacute;a and the C&iacute;es. A 20-minute climb at the end of a week of walking, and <strong>worth it</strong>.</p><div class="food-links"><a href="https://maps.apple.com/?q=Monte%20do%20Castro%20Vigo" target="_blank" rel="noopener" class="food-link">Monte do Castro<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>
         <div class="food-card">
           <div class="food-name"><svg class="food-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18s2-2 6-2 6 2 10 2 4-2 4-2M2 14s2-2 6-2 6 2 10 2 4-2 4-2"/></svg>C&iacute;es islands &middot; if the stars align</div>
@@ -943,7 +947,7 @@
 
     <div class="sub-section">
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music &middot; <em>for the boardwalks</em></h3>
-      <p class="sub-sub">Two to queue before we leave the wifi. Headphones optional; the ocean brings its own track.</p>
+      <p class="sub-sub">Two to download before we leave the wifi. The ocean does the rest.</p>
       <div class="playlist-grid">
         <div class="playlist-card">
           <div class="playlist-label"><svg class="playlist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Portugal side</div>
@@ -962,7 +966,7 @@
 
     <div class="sub-section">
       <h3><svg class="sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Two languages &middot; <em>fala comigo</em></h3>
-      <p class="sub-sub">Portuguese until the boat, Galego after. Tap the speaker. Locals melt when you try.</p>
+      <p class="sub-sub">Portuguese until the boat, Galego after. Tap the speaker to hear it. People appreciate the effort.</p>
       <div class="phrase-cats">
         <button class="phrase-cat-btn active" data-cat="essentials">Essentials</button>
         <button class="phrase-cat-btn" data-cat="trail">On the trail</button>
@@ -979,8 +983,8 @@
   <div class="container">
     <div class="panel-header">
       <div class="panel-eyebrow">05 &middot; O que levamos</div>
-      <h2>What we <em>carry</em>.</h2>
-      <p class="panel-intro">Ten percent of body weight, and everything earns its grams. Plus a shared diary that writes itself on both phones.</p>
+      <h2>What we <em>bring</em>.</h2>
+      <p class="panel-intro">Ten percent of body weight, nothing we will not use. Plus a shared diary on both phones.</p>
     </div>
 
     <div class="sub-section">
@@ -1147,15 +1151,15 @@ const SEG_ELEV={"porto>vilacha":[75,130],"vilacha>vdc":[30,35],"vdc>apulia":[55,
 const SLEEP_ORDER=["porto","vilacha","vdc","apulia","esposende","cneiva","viana","ancora","caminha","aguarda","oia","mougas","baiona","vigo"];
 const NOTES=[
  [0,28,"Boardwalks hug the ocean from Matosinhos onwards; metro line A skips the 9 urban km out of Porto if we want mercy on day one."],
- [28,52,"P\u00f3voa, endless beaches, the Ap\u00falia windmills and the C\u00e1vado dunes. Cobblestone: the silent enemy of our soles."],
- [52,77,"The Portuguese climb: the Neiva river dip (muddy after rain), Castelo do Neiva, and Chaf\u00e9 at 145 m. We enter Viana over Eiffel's iron bridge; the funicular to Santa Luzia is earned machinery."],
+ [28,52,"P\u00f3voa, endless beaches, the Ap\u00falia windmills and the C\u00e1vado dunes. Cobblestones are hard on the feet, plan the breaks."],
+ [52,77,"The Portuguese climb: the Neiva river dip (muddy after rain), Castelo do Neiva, and Chaf\u00e9 at 145 m. We enter Viana over Eiffel's iron bridge; the funicular up to Santa Luzia is well earned."],
  [77,104,"Rolling coast past the Montedor lighthouse; Vila Praia de \u00c2ncora is a highly defensible seafood stop. Book the boat the evening we reach Caminha at the latest."],
- [104,122.5,"Boat across the Mi\u00f1o (clocks +1 h in Spain). Then the queen stretch: cliff paths from A Guarda to the Oia monastery, poles welcome. Side quest: Monte Santa Trega hillfort, 341 m of criminal views."],
- [122.5,135.5,"One gentle rise above Cabo Silleiro, then downhill into Baiona bay, where the Pinta docked returning from America. Arrival at vermouth o'clock: planning, not coincidence."],
+ [104,122.5,"Boat across the Mi\u00f1o (clocks +1 h in Spain). Then the queen stretch: cliff paths from A Guarda to the Oia monastery, poles welcome. Side quest: Monte Santa Trega hillfort, 341 m, and the best view on the Portuguese side."],
+ [122.5,135.5,"One gentle rise above Cabo Silleiro, then downhill into Baiona bay, where the Pinta docked returning from America. Arrival in time for a vermouth by the harbour."],
  [135.5,160.5,"At A Ramallosa the route splits: yellow arrows climb inland via Priegue (~150 m); green arrows hug the flat coast past Panx\u00f3n, Patos and Samil. Mandatory finish: oysters on R\u00faa da Pedra."]
 ];
 const SVCS=[
- [0,28,"Caf\u00e9s every 2-4 km on the promenades; zero shade, sunscreen from minute one."],
+ [0,28,"Caf\u00e9s every 2-4 km on the promenades; the boardwalks have no shade, sunscreen from minute one."],
  [28,52,"P\u00f3voa (early on) has everything; the Ap\u00falia\u2013F\u00e3o dunes have nothing, carry water."],
  [52,77,"After Castelo do Neiva, ~8 km with little service until Anha."],
  [77,104,"Between Carre\u00e7o and \u00c2ncora: nothing. In \u00c2ncora: supermarket, pharmacy, ATM."],
@@ -1167,25 +1171,25 @@ const FIELD=[
  [0,28,"Vila do Conde's Santa Clara aqueduct ran 999 arches and nearly 5 km, one of Iberia's longest, to feed one convent. The Ave shipyards below it built ships for the Age of Discoveries."],
  [28,52,"The sunken fields behind the Ap\u00falia dunes are masseiras: crops dug below dune level so the sand walls trap heat and block wind, desert agriculture, invented on a rainy coast."],
  [52,77,"Viana's iron bridge is an Eiffel company work (1878). The town is the heart of Portuguese gold filigree, the cora\u00e7\u00e3o de Viana heart in every jewellery window."],
- [77,104,"The Camarido pine forest before Caminha was planted centuries ago on royal orders to pin down the marching dunes, medieval geoengineering. Offshore at Moledo sits the \u00cdnsua fort on a tidal islet."],
- [104,122.5,"Monte Santa Trega holds a Celtic castro where ~5,000 people lived around 100 BC. And Oia's Cistercian monastery fired cannons at pirates in 1624: the artillery monks."],
+ [77,104,"The Camarido pine forest before Caminha was planted centuries ago on royal orders to pin down the marching dunes, an early piece of landscape engineering. Offshore at Moledo sits the \u00cdnsua fort on a tidal islet."],
+ [104,122.5,"Monte Santa Trega holds a Celtic castro where ~5,000 people lived around 100 BC. And Oia's Cistercian monastery fired cannons at pirates in 1624: monks with artillery."],
  [122.5,135.5,"On 1 March 1493 the caravel Pinta limped into Baiona bay, the first place in Europe to hear that Columbus had reached land. A full-size replica floats in the harbour."],
  [135.5,160.5,"Vigo's r\u00eda hides the treasure wrecks of Rande (1702). Jules Verne loved the legend so much that Captain Nemo funds the Nautilus from these very wrecks, Vigo thanked him with a statue."]
 ];
 const EVENINGS={
- vilacha:"A quiet fishing village evening: dinner at the harbour tasca, early night, we chose the gentle plan.",
+ vilacha:"A quiet fishing village evening: dinner at the harbour tasca, early night, the gentle plan.",
  vdc:"Walk the aqueduct arches to the Santa Clara convent at dusk; see the replica caravel by the Ave; grilled fish on the riverfront.",
  apulia:"Windmill silhouettes at sunset over the dunes; seafood rice at a beach restaurant.",
  esposende:"Sunset walk to the C\u00e1vado sandspit lighthouse; arroz de marisco somewhere warm.",
  cneiva:"Parish albergue calm; the church above the village bears the oldest known inscription naming Santiago pilgrims in Portugal.",
  viana:"Funicular up to Santa Luzia for the coast we just walked, laid out like a map. Gold filigree windows on the way down.",
  ancora:"Harbour seafood with the boats that caught it. Tomorrow is short, linger.",
- caminha:"Confirm the boat, then Pra\u00e7a Conselheiro Silva Torres under the clock tower: our farewell-to-Portugal dinner. Vinho verde is mandatory.",
+ caminha:"Confirm the boat, then Pra\u00e7a Conselheiro Silva Torres under the clock tower: our farewell-to-Portugal dinner. Vinho verde with dinner.",
  aguarda:"If legs allow, taxi or climb Santa Trega for sunset over two countries and one r\u00eda. Lobster-pot harbour below for dinner.",
- oia:"The monastery faces due west, sit on the sea wall for the best sunset of the trip. One bar, no rush; that is the point.",
- mougas:"Communal dinner at the albergue, the camino's best social hour, then step outside: darkest sky of the route, actual stars.",
+ oia:"The monastery faces due west, sit on the sea wall for the best sunset of the trip. One bar, no rush.",
+ mougas:"Communal dinner at the albergue, the best hour of the camino, then step outside: darkest sky of the route, actual stars.",
  baiona:"Monterreal fortress walls at golden hour, vermouth at the harbour, the Pinta replica. One stage left.",
- vigo:"We made it. Oysters, then everything else."
+ vigo:"We made it. Oysters first, then everything else."
 };
 const PLANS={
  A:{label:"A \u00b7 Classic \u00b7 7d",stops:["porto","vdc","esposende","viana","caminha","mougas","baiona","vigo"]},
@@ -1383,7 +1387,7 @@ function showGps(){
     const next=st.seg.find(w=>w.km>b.km);
     let txt;
     if(b.distKm>3)txt=`We are <b>${b.distKm.toFixed(1)} km off the route</b>, nearest point: km ${kmIn} of stage ${st.n}.`;
-    else txt=`We are at <b>~km ${kmIn}</b> of stage ${st.n} (\u2248${Math.round(b.alt)} m)`+(next?` \u00b7 next: ${next.name} in ${(next.km-b.km).toFixed(1)} km`:` \u00b7 the end is near`);
+    else txt=`We are at <b>~km ${kmIn}</b> of stage ${st.n} (\u2248${Math.round(b.alt)} m)`+(next?` \u00b7 next: ${next.name} in ${(next.km-b.km).toFixed(1)} km`:` \u00b7 almost there`);
     const msg=document.getElementById("gpsmsg-"+st.n);
     document.querySelectorAll(".gps-msg").forEach(e=>e.classList.remove("show"));
     window.LASTPOS=txt.replace(/<[^>]+>/g,"")+" (Porto\u2192Vigo camino, via our app)";
@@ -1475,7 +1479,7 @@ function render(){
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
     const midStops=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
-    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case legs vote differently</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 ${(st.b.km-w.km).toFixed(1).replace(".0","")} km before ${st.b.name.split(",")[0]}</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
+    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case we stop early or carry on</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 ${(st.b.km-w.km).toFixed(1).replace(".0","")} km before ${st.b.name.split(",")[0]}</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. October: call ahead, some close for the season.</p></div>`:"";
     const sleep=(st.b.sleep||[]).map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
     return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
@@ -1511,7 +1515,7 @@ function render(){
           ${midSleepHtml}
           <div class="blk"><h4>Services along the way</h4><p class="svc">${st.svc}</p></div>
           <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"We pick, it is our route."}</p></div>
-          <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Walked, tap to undo":"Mark stage as walked"}</button>
+          <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Walked \u00b7 tap to undo":"Mark stage as walked"}</button>
         </div>
       </div>
     </article>`;
@@ -1570,9 +1574,9 @@ function updateProgress(){
   const fin=done.length===STAGES.length&&STAGES.length>0;
   document.getElementById("progress").classList.toggle("fin",fin);
   const sub=document.getElementById("progress-sub");
-  if(done.length===0)sub.textContent=STAGES.length+" stages ahead. Tap one to open it; mark it walked when our feet confirm it.";
+  if(done.length===0)sub.textContent=STAGES.length+" stages ahead. Tap one to open it, mark it walked at the end of the day.";
   else if(fin)sub.textContent=Math.round(total)+" km of ocean, walked together. Ten years. Happy anniversary to us. The oysters are waiting.";
-  else sub.textContent=done.length+" of "+STAGES.length+" stages walked. Keep going, the ocean is not moving.";
+  else sub.textContent=done.length+" of "+STAGES.length+" stages walked. The coast is waiting.";
 }
 function updateTrip(){
   const el=document.getElementById("trip-arrival");
@@ -1651,15 +1655,15 @@ const PHRASES={
  ],
  trail:[
   {en:'The trail greeting',ca:'Bom caminho',lang:'PT',phon:'bong kah-MEEN-yoo'},
-  {en:'The trail greeting',ca:'Bo cami\u00f1o',lang:'GAL',phon:'boh kah-MEEN-yoh',note:'Switch the moment you step off the boat.'},
+  {en:'The trail greeting',ca:'Bo cami\u00f1o',lang:'GAL',phon:'boh kah-MEEN-yoh',note:'Switch to this one after the boat.'},
   {en:'Stamp my credencial, please',ca:'Pode carimbar, por favor?',lang:'PT',phon:'POH-deh kah-reem-BAR'},
   {en:'A stamp, please',ca:'Un selo, por favor',lang:'GAL',phon:'oon SEH-loh'},
   {en:'How far to...?',ca:'Canto queda ata...?',lang:'GAL',phon:'KAN-toh KEH-dah AH-tah'},
   {en:'Two beds, please',ca:'Duas camas, por favor',lang:'PT',phon:'DOO-ash KAH-mash'}
  ],
  food:[
-  {en:'Milky coffee + custard tart',ca:'Um gal\u00e3o e uma nata, por favor',lang:'PT',phon:'oong gah-LOWNG ee OO-mah NAH-tah',note:'The Portuguese breakfast of champions.'},
-  {en:'The victory order',ca:'Unha raci\u00f3n de polbo, por favor',lang:'GAL',phon:'OO-nyah rah-thee-ON deh POL-boh',note:'Octopus. Galicia will judge us if we skip it.'},
+  {en:'Milky coffee + custard tart',ca:'Um gal\u00e3o e uma nata, por favor',lang:'PT',phon:'oong gah-LOWNG ee OO-mah NAH-tah',note:'The Portuguese breakfast.'},
+  {en:'The victory order',ca:'Unha raci\u00f3n de polbo, por favor',lang:'GAL',phon:'OO-nyah rah-thee-ON deh POL-boh',note:'Octopus, the Galician classic.'},
   {en:'A glass of vinho verde',ca:'Um copo de vinho verde',lang:'PT',phon:'oong KOH-poo deh VEEN-yoo VER-deh'},
   {en:'A glass of albari\u00f1o',ca:'Unha copa de albari\u00f1o',lang:'GAL',phon:'OO-nyah KOH-pah deh al-bah-REE-nyoh'},
   {en:'The bill, please',ca:'A conta, por favor',lang:'PT\u00b7GAL',phon:'ah KON-tah'},
@@ -1667,9 +1671,9 @@ const PHRASES={
  ],
  charm:[
   {en:'It is very beautiful',ca:'\u00c9 moi bonito',lang:'GAL',phon:'eh moy boh-NEE-toh'},
-  {en:'My love',ca:'Meu amor',lang:'PT\u00b7GAL',phon:'MEH-oo ah-MOR',note:'For the Oia sunset, obviously.'},
-  {en:'Ten years',ca:'Dez anos',lang:'GAL',phon:'deth AH-nos',note:'For October 8th. Say it slowly.'},
-  {en:'We walked from Porto',ca:'Vi\u00f1emos andando desde Porto',lang:'GAL',phon:'vee-NYEH-mos an-DAN-doh',note:'Earned bragging rights.'},
+  {en:'My love',ca:'Meu amor',lang:'PT\u00b7GAL',phon:'MEH-oo ah-MOR',note:'For the Oia sunset.'},
+  {en:'Ten years',ca:'Dez anos',lang:'GAL',phon:'deth AH-nos',note:'For October 8th. For October 8th.'},
+  {en:'We walked from Porto',ca:'Vi\u00f1emos andando desde Porto',lang:'GAL',phon:'vee-NYEH-mos an-DAN-doh',note:'Worth saying out loud in Vigo.'},
   {en:'See you tomorrow',ca:'Ata ma\u00f1\u00e1',lang:'GAL',phon:'AH-tah mah-NYAH'},
   {en:'It is perfect',ca:'\u00c9 perfecto',lang:'GAL',phon:'eh per-FEK-toh'}
  ]
@@ -1718,22 +1722,22 @@ if('speechSynthesis' in window)speechSynthesis.getVoices();
 /* packing */
 const PACK_DATA={
  'Trail':{icon:'M3 21l4-7 4 4 6-10 4 13',items:[
-  {l:'Worn-in shoes',n:'blisters are a choice'},{l:'Hiking socks x3'},{l:'Poles',n:'Oia cliffs'},{l:'Rain jacket',n:'October Atlantic'},{l:'Cap + sunglasses'},{l:'Sunscreen SPF 50',n:'zero shade'},{l:'Blister kit',n:'apply at warm spot'},{l:'Water bottles 1L each'}
+  {l:'Worn-in shoes',n:'break them in first'},{l:'Hiking socks x3'},{l:'Poles',n:'for the Oia cliffs'},{l:'Rain jacket',n:'October Atlantic'},{l:'Cap + sunglasses'},{l:'Sunscreen SPF 50',n:'zero shade'},{l:'Blister kit',n:'use at the first hot spot'},{l:'Water bottles 1L each'}
  ]},
  'Albergue kit':{icon:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',items:[
-  {l:'Sleeping bag liner'},{l:'Quick-dry towel'},{l:'Earplugs + eye mask',n:'snorers never rest'},{l:'Flip flops',n:'shower armour'},{l:'Laundry soap sheet'},{l:'Safety pins',n:'sock-drying tech'}
+  {l:'Sleeping bag liner'},{l:'Quick-dry towel'},{l:'Earplugs + eye mask',n:'albergue nights'},{l:'Flip flops',n:'for the showers'},{l:'Laundry soap sheet'},{l:'Safety pins',n:'to hang socks on the pack'}
  ]},
  'Clothing':{icon:'M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z',items:[
-  {l:'2 walking sets'},{l:'Evening set'},{l:'Fleece / light down',n:'albergue evenings'},{l:'One nice-ish outfit',n:'anniversary dinner, Vigo'},{l:'Underwear x4'},{l:'Buff / scarf'}
+  {l:'2 walking sets'},{l:'Evening set'},{l:'Fleece / light down',n:'albergue evenings'},{l:'One nice-ish outfit',n:'for the dinner in Vigo'},{l:'Underwear x4'},{l:'Buff / scarf'}
  ]},
  'Tech':{icon:'M5 2h14v20H5z',items:[
-  {l:'Phone + cable'},{l:'Power bank',n:'the app needs its host alive'},{l:'EU plug (just one)'},{l:'Headlamp',n:'October sunsets at 19:30'},{l:'Earbuds'},{l:'iPad',n:'four hours of AVE home'}
+  {l:'Phone + cable'},{l:'Power bank',n:'for the app and the camera'},{l:'EU plug (just one)'},{l:'Headlamp',n:'sunset is around 19:00'},{l:'Earbuds'},{l:'iPad',n:'four hours of AVE home'}
  ]},
  'Documents':{icon:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z',items:[
-  {l:'Manal: passport \u00b7 Vane: DNI',n:'two flags, one credencial rhythm'},{l:'Credencial x2',n:'no stamp, no bed'},{l:'Cash 50-80\u20ac small notes'},{l:'Cards'},{l:'Boat booking confirmation'},{l:'AVE tickets Thu Oct 8'}
+  {l:'Manal: passport \u00b7 Vane: DNI',n:'two flags, one credencial rhythm'},{l:'Credencial x2',n:'needed for the albergues'},{l:'Cash 50-80\u20ac small notes'},{l:'Cards'},{l:'Boat booking confirmation'},{l:'AVE tickets Thu Oct 8'}
  ]},
  'Extras':{icon:'M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z',items:[
-  {l:'Tiny notebook',n:'or use the journal tab'},{l:'Trail snacks day 1'},{l:'Small first aid'},{l:'Ziplock for the credencial',n:'rain-proofing'}
+  {l:'Tiny notebook',n:'or the journal tab'},{l:'Trail snacks day 1'},{l:'Small first aid'},{l:'Ziplock for the credencial',n:'to keep the credencial dry'}
  ]}
 };
 function buildPacking(){
@@ -2208,7 +2212,7 @@ function loadGpxFile(file){
     if(!raw||raw.length<10){alert("No track points found in that GPX.");return;}
     if(buildTrack(raw,txt.length)){
       const g=store.get("camino-gpx",null);
-      alert("Track loaded: "+g.P.length+" points along "+g.cum[g.cum.length-1].toFixed(1)+" km. GPS is now surgical.");
+      alert("Track loaded: "+g.P.length+" points along "+g.cum[g.cum.length-1].toFixed(1)+" km. Position tracking now follows the track.");
     }
   });
 }
@@ -2548,6 +2552,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v46</div>
+<div class="appver">camino-app \u00b7 v47</div>
 </body>
 </html>
