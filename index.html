@@ -650,6 +650,13 @@
   .bed-closed .name{text-decoration:line-through;color:var(--mute)}
   .bed-closed .meta{color:var(--danger)}
   .bed-closed .price{opacity:.5}
+  .bed-acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .bed-act{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.04em;color:var(--sea-shallow);text-decoration:none;border:1px solid var(--night-border);border-radius:50px;padding:3px 9px}
+  .bed-act svg{width:11px;height:11px}
+  .bed-closed .bed-act{opacity:.6}
+  .pushon-town{display:block;padding:8px 0 2px;border-top:1px dashed var(--night-border);margin-top:4px}
+  .pushon-town:first-child{border-top:0;margin-top:0;padding-top:2px}
+  .blk.pushon h4{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -1111,26 +1118,26 @@ const WPTS=[
  {km:15,name:"Lavra boardwalks",alt:10,q:"Lavra, Matosinhos, Portugal",lat:41.2586,lon:-8.7183},
  {id:"vilacha",km:20,name:"Vila Ch\u00e3",alt:15,q:"Vila Ch\u00e3, Vila do Conde, Portugal",lat:41.2947,lon:-8.7359,sleep:[["Albergue S\u00e3o Mamede de Vila Ch\u00e3","municipal, 250 m off the path","~10 \u20ac"],["Casa Largo dos Pescadores","private bunks on the path","~25 \u20ac"]]},
  {id:"vdc",km:28,name:"Vila do Conde",alt:8,q:"Vila do Conde, Portugal",poi:"999-arch Santa Clara aqueduct, replica caravel by the Ave",lat:41.3517,lon:-8.7479,sleep:[["Albergue Casa da Laura","private, central, on the path","~20 \u20ac"],["Pousada de Juventude","youth hostel, breakfast included","~18 \u20ac"],["Venceslau Wine Boutique Hostel","200 m off the path","~20 \u20ac"]]},
- {km:32,name:"P\u00f3voa de Varzim",alt:10,q:"P\u00f3voa de Varzim, Portugal",lat:41.3830,lon:-8.7639,sleep:[["Albergue S\u00e3o Jos\u00e9 de Ribamar","municipal, central \u00b7 +351 252 622 314","~10 \u20ac"],["Sardines & Friends Hostel","private, 50 m off the path","~18 \u20ac"]]},
+ {km:32,name:"P\u00f3voa de Varzim",alt:10,q:"P\u00f3voa de Varzim, Portugal",lat:41.3830,lon:-8.7639,sleep:[["Albergue S\u00e3o Jos\u00e9 de Ribamar","municipal, central","~10 \u20ac","+351252622314"],["Sardines & Friends Hostel","private, 50 m off the path","~18 \u20ac"]]},
  {km:39,name:"Agu\u00e7adoura",alt:15,q:"Agu\u00e7adoura, Portugal",lat:41.4275,lon:-8.7803},
  {id:"apulia",km:43,name:"Ap\u00falia (windmills)",alt:10,q:"Ap\u00falia, Esposende, Portugal",poi:"working windmills on the dunes, masseiras sunken fields",lat:41.4870,lon:-8.7770,sleep:[["Albergue Santiago da Costa","municipal, 700 m off the path","~16 \u20ac"],["Home of Pilgrims d'Ap\u00falia","private","~25 \u20ac"]]},
  {km:48,name:"F\u00e3o bridge, C\u00e1vado river",alt:5,q:"F\u00e3o, Esposende, Portugal",poi:"iron bridge over the C\u00e1vado, dune boardwalks",lat:41.5104,lon:-8.7743},
- {id:"esposende",km:52,name:"Esposende",alt:8,q:"Esposende, Portugal",lat:41.5320,lon:-8.7827,sleep:[["Hostel Eleven","private, on the path \u00b7 no municipal albergue in town","~15 \u20ac"],["Hostel Sleep&Go","private, 200 m off","~16 \u20ac"],["InnEsposende Sports Hostel","private, central","~14 \u20ac"]]},
- {km:55,name:"Marinhas",alt:25,q:"Marinhas, Esposende, Portugal",lat:41.5560,lon:-8.7830,sleep:[["Albergue S\u00e3o Miguel de Marinhas","the municipal one, 3 km past Esposende \u00b7 +351 967 611 200","~14 \u20ac"],["Hostel Costa Selvagem","private, on the path","~18 \u20ac"]]},
+ {id:"esposende",km:52,name:"Esposende",alt:8,q:"Esposende, Portugal",lat:41.5320,lon:-8.7827,sleep:[["Hostel Eleven","private, on the path \u00b7 no municipal albergue in town","~15 \u20ac","+351962651485"],["Hostel Sleep&Go","private, 200 m off","~16 \u20ac","+351932005800"],["InnEsposende Sports Hostel","private, central","~14 \u20ac","+351932466542"]]},
+ {km:55,name:"Marinhas",alt:25,q:"Marinhas, Esposende, Portugal",lat:41.5560,lon:-8.7830,sleep:[["Albergue S\u00e3o Miguel de Marinhas","the municipal one, 3 km past Esposende","~14 \u20ac","+351967611204"],["Hostel Costa Selvagem","private, on the path","~18 \u20ac"]]},
  {km:59,name:"Belinho",alt:45,q:"Belinho, Esposende, Portugal",lat:41.5900,lon:-8.7860},
  {km:61,name:"Neiva river crossing (steep dip)",alt:15,q:"Rio Neiva, Portugal",poi:"steep river dip, muddy after rain, take it slow",lat:41.6080,lon:-8.7870},
  {id:"cneiva",km:63,name:"Castelo do Neiva",alt:70,q:"Castelo do Neiva, Portugal",lat:41.6290,lon:-8.7980,sleep:[["Albergue Dom Nausti","private, facing the church","~15 \u20ac"]]},
  {km:66,name:"Chaf\u00e9",alt:145,q:"Chaf\u00e9, Viana do Castelo, Portugal",lat:41.6600,lon:-8.7860},
  {km:69,name:"Anha",alt:95,q:"Vila Nova de Anha, Portugal",lat:41.6730,lon:-8.8000},
  {km:74,name:"Darque / Eiffel bridge",alt:10,q:"Darque, Viana do Castelo, Portugal",poi:"Eiffel company iron bridge into Viana (1878)",lat:41.6860,lon:-8.8140},
- {id:"viana",km:77,name:"Viana do Castelo",alt:10,q:"Viana do Castelo, Portugal",lat:41.6946,lon:-8.8329,sleep:[["S\u00e3o Jo\u00e3o da Cruz dos Caminhos","Carmelite albergue at the entrance \u00b7 +351 962 254 107","~15 \u20ac"],["Pousada de Juventude","youth hostel, 200 m off","~23 \u20ac"],["Albergue de Santa Luzia","private, breakfast included","~20 \u20ac"]]},
+ {id:"viana",km:77,name:"Viana do Castelo",alt:10,q:"Viana do Castelo, Portugal",lat:41.6946,lon:-8.8329,sleep:[["S\u00e3o Jo\u00e3o da Cruz dos Caminhos","Carmelite albergue at the entrance","~15 \u20ac","+351962254107"],["Pousada de Juventude","youth hostel, 200 m off","~23 \u20ac"],["Albergue de Santa Luzia","private, breakfast included","~20 \u20ac"]]},
  {km:81,name:"Areosa",alt:20,q:"Areosa, Viana do Castelo, Portugal",lat:41.7180,lon:-8.8570},
  {km:85,name:"Carre\u00e7o",alt:55,q:"Carre\u00e7o, Portugal",lat:41.7450,lon:-8.8710,sleep:[["Albergue Casa do Sard\u00e3o","private, at the exit of the village","~21 \u20ac"],["Hostel Casa do Adro","private, central","~24 \u20ac"]]},
  {km:87,name:"Above Montedor lighthouse",alt:90,q:"Farol de Montedor, Portugal",poi:"clifftop lighthouse and old windmill",lat:41.7502,lon:-8.8752},
  {km:89,name:"Afife",alt:40,q:"Afife, Portugal",lat:41.7780,lon:-8.8600},
  {id:"ancora",km:93,name:"Vila Praia de \u00c2ncora",alt:5,q:"Vila Praia de \u00c2ncora, Portugal",lat:41.8130,lon:-8.8580,sleep:[["Hostel D'Avenida","private, central, on the path","~20 \u20ac"],["Hostel Aqui H\u00e1 Gato","private, central","~25 \u20ac"],["Bombarda 51 Hostel","200 m off","~22 \u20ac"]]},
  {km:96,name:"Moledo",alt:8,q:"Moledo, Caminha, Portugal",lat:41.8400,lon:-8.8630,sleep:[["Casa dos Seixos","small guesthouse, central, book ahead","varies"]]},
- {id:"caminha",km:104,name:"Caminha",alt:5,q:"Caminha, Portugal",poi:"clock-tower square, farewell-to-Portugal dinner, confirm the boat",lat:41.8760,lon:-8.8390,sleep:[["Albergue Bom Caminha","private, on the path \u00b7 300 m from the centre","~16 \u20ac"],["Albergue Santiago de Caminha","private, central","~21 \u20ac"],["Arca Nova Hostel","300 m from the centre","~18 \u20ac"],["Municipal albergue","CLOSED for works, expected to reopen early October \u00b7 call +351 914 290 431 before counting on it","~10 \u20ac"]]},
+ {id:"caminha",km:104,name:"Caminha",alt:5,q:"Caminha, Portugal",poi:"clock-tower square, farewell-to-Portugal dinner, confirm the boat",lat:41.8760,lon:-8.8390,sleep:[["Albergue Bom Caminha","private, on the path \u00b7 300 m from the centre","~16 \u20ac"],["Albergue Santiago de Caminha","private, central","~21 \u20ac"],["Arca Nova Hostel","300 m from the centre","~18 \u20ac"],["Municipal albergue","CLOSED for works, expected to reopen early Octoberbefore counting on it","~10 \u20ac","+351914290431"]]},
  {km:104.2,name:"Camposancos dock (boat landing)",alt:0,q:"Camposancos, A Guarda, Spain",poi:"boat landing, Spain begins, clocks jump +1 h",lat:41.8950,lon:-8.8670},
  {id:"aguarda",km:106.5,name:"A Guarda",alt:35,q:"A Guarda, Pontevedra, Spain",poi:"Santa Trega Celtic hillfort above town, 341 m side quest",lat:41.9020,lon:-8.8740,sleep:[["Albergue de A Guarda","public (Xunta), central","~10 \u20ac"],["Albergue O Peirao","private, 200 m from the square","~18 \u20ac"]]},
  {km:112,name:"Portecelo",alt:40,q:"Portecelo, O Rosal, Spain",lat:41.9560,lon:-8.8830},
@@ -1467,6 +1474,20 @@ function timelineHTML(st,i){
   if(late)out+=`<span class="tl-warn">Arrival hugs the dusk, leave earlier or walk brisker.</span>`;
   return `<div class="tl ${late?"late":""}">${out}</div>`;
 }
+function bedLI(a,w){
+  const closed=/^(CLOSED|No albergue)/.test(a[1]+a[0]);
+  const q=encodeURIComponent(a[0].replace(/^(Municipal albergue|No albergue in Oia itself)$/,"albergue")+", "+w.name.split(",")[0]+", "+(w.km>104?"Spain":"Portugal"));
+  const tel=a[3]?`<a class="bed-act" href="tel:${a[3]}">${PHONE_S} ${a[3].replace(/^(\+\d{2,3})(\d{3})(\d{3})(\d{3})$/,"$1 $2 $3 $4")}</a>`:"";
+  const maps=closed&&/^No albergue/.test(a[0])?"":`<a class="bed-act" href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">${PIN_SVG} Maps</a>`;
+  return `<li class="${closed?"bed-closed":""}"><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span><span class="bed-acts">${maps}${tel}</span></span><span class="price">${a[2]}</span></li>`;
+}
+const PHONE_S=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2z"/></svg>`;
+function pushOnHTML(st,i){
+  const nx=STAGES[i+1];if(!nx)return "";
+  const cands=nx.seg.filter(w=>w.km>nx.a.km&&w.km<=nx.b.km&&w.sleep&&w.sleep.length&&!/^No albergue/.test(w.sleep[0][0])).slice(0,2);
+  if(!cands.length)return "";
+  return `<div class="blk pushon"><h4>Push on \u00b7 first beds of the next stage</h4><ul>${cands.map(w=>`<li class="pushon-town"><span class="meta">${w.name.split(",")[0]} \u00b7 +${(w.km-st.b.km).toFixed(1).replace(".0","")} km past ${st.b.name.split(",")[0]} \u00b7 arrive ~${fmtT(etaMin(st,st.b.km)+(w.km-st.b.km)/paceV()*60)}</span></li>${w.sleep.map(a=>bedLI(a,w)).join("")}`).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Shortens tomorrow by the same distance. Check sunset before deciding.</p></div>`;
+}
 function render(){
   const done=store.get(doneKey(),[]);
   document.getElementById("panel-stages").innerHTML=STAGES.map((st,i)=>{
@@ -1482,8 +1503,8 @@ function render(){
         <td class="pin"><a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Open in Maps">${PIN_SVG}</a></td></tr>`;
     }).join("");
     const midStops=st.seg.filter(w=>w.km>st.a.km&&w.km<st.b.km&&w.sleep&&w.sleep.length);
-    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case we stop early or carry on</h4><ul>${midStops.map(w=>w.sleep.map(a=>`<li><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${w.name.split(",")[0]} \u00b7 ${(st.b.km-w.km).toFixed(1).replace(".0","")} km before ${st.b.name.split(",")[0]}</span></span><span class="price">${a[2]}</span></li>`).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. Checked against Gronze on 2 Oct 2026. October is shoulder season: a quick call before counting on a bed never hurts.</p></div>`:"";
-    const sleep=(st.b.sleep||[]).map(a=>`<li class="${/^(CLOSED|No albergue)/.test(a[1]+a[0])?"bed-closed":""}"><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="price">${a[2]}</span></li>`).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
+    const midSleepHtml=midStops.length?`<div class="blk"><h4>Beds along the way \u00b7 in case we stop early or carry on</h4><ul>${midStops.map(w=>`<li class="pushon-town"><span class="meta">${w.name.split(",")[0]} \u00b7 ${(st.b.km-w.km).toFixed(1).replace(".0","")} km before ${st.b.name.split(",")[0]}</span></li>`+w.sleep.map(a=>bedLI(a,w)).join("")).join("")}</ul><p class="svc" style="margin-top:6px;font-size:.76rem;color:var(--mute)">Stop early or push past tonight's bed, the plan survives either way. Checked against Gronze on 2 Oct 2026. October is shoulder season: a quick call before counting on a bed never hurts.</p></div>`:"";
+    const sleep=(st.b.sleep||[]).map(a=>bedLI(a,st.b)).join("")||`<li><span class="meta">End of the road, we pick the celebration venue.</span></li>`;
     return `${st.ferry?ferryHTML():""}
     <article class="stage ${isDone?"done":""} ${isAnn?"ann":""}" data-n="${st.n}">
       <div class="node">${isDone?"\u2713":st.n}</div>
@@ -1516,6 +1537,7 @@ function render(){
           <div class="fieldnote"><span>Field note</span><p>${FIELD.filter(x=>x[0]<st.b.km&&x[1]>st.a.km).map(x=>x[2]).join(" ")}</p></div>
           <div class="blk"><h4>Where we sleep tonight</h4><ul>${sleep}</ul></div>
           ${midSleepHtml}
+          ${pushOnHTML(st,i)}
           <div class="blk"><h4>Services along the way</h4><p class="svc">${st.svc}</p></div>
           <div class="blk"><h4>Tonight in ${st.b.name.split(",")[0]}</h4><p class="svc">${EVENINGS[st.b.id]||"We pick, it is our route."}</p></div>
           <button class="done-btn" onclick="markDone(${st.n});event.stopPropagation()">${isDone?"\u2713 Walked \u00b7 tap to undo":"Mark stage as walked"}</button>
@@ -1908,7 +1930,7 @@ function bigSideHTML(st,g){
     let det="";
     if(on||bigFilter!=="all"){
       const q=encodeURIComponent(w.q);
-      det=`<span class="bl-det">${w.poi?`<span class="d-poi">${w.poi}</span>`:""}${beds?w.sleep.map(a=>`<span class="d-bed">${a[0]} \u00b7 ${a[2]}</span>`).join(""):""}${on?`<a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open in Maps</a>`:""}</span>`;
+      det=`<span class="bl-det">${w.poi?`<span class="d-poi">${w.poi}</span>`:""}${beds?w.sleep.map(a=>`<span class="d-bed">${a[0]} \u00b7 ${a[2]}${a[3]?` \u00b7 <a href="tel:${a[3]}">${a[3]}</a>`:""}</span>`).join(""):""}${on?`<a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open in Maps</a>`:""}</span>`;
     }
     rows+=`<div class="bl-row ${on?"on":""}" onclick="selectBigWp(${i})">
       <span class="bl-eta">~${fmtT(liveEtaMin(st,w.km))}</span>
@@ -2573,6 +2595,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v48</div>
+<div class="appver">camino-app \u00b7 v49</div>
 </body>
 </html>
