@@ -467,12 +467,12 @@
   .bigview,.bigview *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .bigview{touch-action:manipulation}
   .bigview-svg{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;position:relative;touch-action:none}
-  .bigview-svg svg{width:100%;height:100%;display:block;transform-origin:0 0;will-change:transform}
+  .bigview-svg svg{width:100%;height:100%;display:block}
   .bigview-svg.zoomed{cursor:grab}
   .rib-zoom{position:absolute;right:8px;top:8px;display:flex;gap:4px;z-index:3;opacity:0;pointer-events:none;transition:opacity .2s}
   .bigview-svg.zoomed .rib-zoom{opacity:1;pointer-events:auto}
   .rib-zoom button{width:30px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--glass);color:var(--fg);font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.06em;padding:0;cursor:pointer;backdrop-filter:blur(6px)}
-  .rib-zoom button.rz-reset{width:auto;padding:0 8px}
+  .rib-zoom button.rz-reset{width:auto;padding:0 8px;min-width:44px}
   .big-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:center;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 
@@ -1862,21 +1862,31 @@ function bigProfileSVG(st,g){
   const padL=strip?30:slim?44:56,padR=strip?14:slim?18:30,padT=strip?26:slim?58:64,padB=strip?22:slim?76:84;
   const nrows=W<560?3:2,rY=W<560?14:15,rTop=W<560?16:20;
   const det=stageDetail(st,200);
-  const base=det||st.seg.map(w=>[w.km,w.alt]);
-  const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.map(w=>w.alt),20);
+  const full=det||st.seg.map(w=>[w.km,w.alt]);
+  /* zoom window in km: RZ.s = magnification, RZ.f = start as a fraction of the stage */
+  const zs=Math.max(1,RZ.s||1),kmL=st.km/zs,kmA=st.a.km+Math.min(Math.max(RZ.f||0,0),1-1/zs)*st.km,kmB=kmA+kmL;
+  const plotW=W-padL-padR;RZ.padL=padL;RZ.plotW=plotW;RZ.kmA=kmA;RZ.kmL=kmL;
+  const zoomed=zs>1.001;
+  let i0=0,i1=full.length-1;
+  if(zoomed){i0=full.findIndex(p=>p[0]>=kmA);if(i0<0)i0=full.length-1;i0=Math.max(0,i0-1);
+    i1=full.findIndex(p=>p[0]>kmB);i1=i1<0?full.length-1:Math.min(full.length-1,i1);}
+  const base=full.slice(i0,i1+1);
+  const inWin=w=>w.km>=kmA-0.01&&w.km<=kmB+0.01;
+  const maxAlt=Math.max(...base.map(p=>p[1]),...st.seg.filter(inWin).map(w=>w.alt),20);
   const nice=Math.max(25,Math.ceil((maxAlt*1.22)/25)*25);
-  const X=km=>padL+((km-st.a.km)/st.km)*(W-padL-padR);
+  const X=km=>padL+((km-kmA)/kmL)*plotW;
   const Y=a=>padT+(1-a/nice)*(H-padT-padB);
   const pts=base.map(p=>[X(p[0]),Y(p[1])]);
   const line=smoothPath(pts);
-  const area=line+` L${W-padR} ${H-padB} L${padL} ${H-padB} Z`;
+  const area=line+` L${X(base[base.length-1][0]).toFixed(1)} ${H-padB} L${X(base[0][0]).toFixed(1)} ${H-padB} Z`;
   let grid="";
   const gstep=(H-padT-padB)/(nice/25)<16?50:25;
   for(let a=0;a<=nice;a+=strip?nice:gstep){grid+=`<line x1="${padL}" y1="${Y(a)}" x2="${W-padR}" y2="${Y(a)}" stroke="${CH("grid")}"/><text x="${padL-8}" y="${Y(a)+4}" text-anchor="end" font-family="DM Mono, monospace" font-size="12" fill="${CH("lbl")}">${a}</text>`;}
   let kmticks="";
-  for(let k=0;k<=Math.floor(st.km)&&!strip;k+=5){const x=X(st.b.km-k);kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="${CH("tick")}"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="${CH("dim")}">${k===0?"0":k}</text>`;}
+  const kstep=kmL>=15?5:kmL>=7?2:kmL>=3?1:0.5;
+  for(let k=Math.ceil((st.b.km-kmB)/kstep)*kstep;k<=st.b.km-kmA+1e-6&&!strip;k+=kstep){const x=X(st.b.km-k);if(x<padL-1||x>W-padR+1)continue;kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="${CH("tick")}"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="${CH("dim")}">${kstep<1?k.toFixed(1).replace(".0",""):Math.round(k)}</text>`;}
   if(!strip)kmticks+=`<text x="${padL}" y="${H-24}" text-anchor="start" font-family="DM Mono, monospace" font-size="9.5" fill="${CH("tick")}">${nrows===3?"":"km to "+st.b.name.split(",")[0].split(" (")[0]}</text>`;
-  const stops=steepStops(base,X,padL,W-padL-padR);
+  const stops=steepStops(base,X,padL,plotW);
   let grades="";
   if(!strip&&det){
     let i=0;
@@ -1889,16 +1899,18 @@ function bigProfileSVG(st,g){
       if(dist>=0.3&&gain>=18){
         const pct=Math.round(gain/dist/10);const mx=X((base[i][0]+base[j][0])/2);const top=Math.min(...base.slice(i,j+1).map(p=>Y(p[1])));
         const up=sgn>0;
-        grades+=`<g><rect x="${(mx-21).toFixed(1)}" y="${(top-36).toFixed(1)}" width="42" height="16" rx="8" fill="#ef8354"/><text x="${mx.toFixed(1)}" y="${(top-24.5).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" font-weight="700" fill="#0a111c">${up?"\u25b2":"\u25bc"} ${pct}%</text></g>`;
+        if(mx>=padL&&mx<=W-padR)grades+=`<g><rect x="${(mx-21).toFixed(1)}" y="${(top-36).toFixed(1)}" width="42" height="16" rx="8" fill="#ef8354"/><text x="${mx.toFixed(1)}" y="${(top-24.5).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" font-weight="700" fill="#0a111c">${up?"\u25b2":"\u25bc"} ${pct}%</text></g>`;
       }
       i=Math.max(j,i+1);
     }
   }
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
   const dots=st.seg.map((w,i)=>{
+    if(!inWin(w))return "";
     const x=X(w.km),y=Y(snapAlt(det,w.km,w.alt));const hi=w.alt===hiAlt;const on=i===bigSel;
-    const nx=(i===0?Math.max(x-8,6):i===st.seg.length-1?Math.min(x+8,W-6):x).toFixed(1);
-    const anch=i===0?"start":i===st.seg.length-1?"end":"middle";
+    const edgeL=x<padL+30,edgeR=x>W-padR-30;
+    const nx=(edgeL?Math.max(x-8,6):edgeR?Math.min(x+8,W-6):x).toFixed(1);
+    const anch=edgeL?"start":edgeR?"end":"middle";
     const eta=fmtT(liveEtaMin(st,w.km));
     const hasBed=w.sleep&&w.sleep.length&&w.km>st.a.km;
     const hasPoi=!!w.poi;
@@ -1916,9 +1928,9 @@ function bigProfileSVG(st,g){
     </g>`;
   }).join("");
   let walked="",gps="";
-  if(g){
-    const gx=X(Math.min(Math.max(g.km,st.a.km),st.b.km));
-    walked=`<clipPath id="wclip"><rect x="0" y="0" width="${gx.toFixed(1)}" height="${H}"/></clipPath>
+  if(g&&g.km>=kmA-0.05&&g.km<=kmB+0.05){
+    const gx=X(Math.min(Math.max(g.km,kmA),kmB));
+    walked=`<clipPath id="wclip"><rect x="${padL}" y="0" width="${Math.max(0,gx-padL).toFixed(1)}" height="${H}"/></clipPath>
       <path d="${area}" fill="url(#goldfill)" clip-path="url(#wclip)"/>
       <path d="${line}" fill="none" stroke="#f2c230" stroke-width="4" stroke-linecap="round" clip-path="url(#wclip)" opacity=".85"/>`;
     const usTag=g.off?("US \u00b7 "+g.off.toFixed(1)+" km off"):("US \u00b7 "+(st.b.km-g.km).toFixed(1)+" km left");
@@ -1934,9 +1946,10 @@ function bigProfileSVG(st,g){
       <linearGradient id="bigfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a90b8" stop-opacity=".28"/><stop offset="1" stop-color="#4a90b8" stop-opacity="0"/></linearGradient>
       <linearGradient id="goldfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c230" stop-opacity=".3"/><stop offset="1" stop-color="#f2c230" stop-opacity="0"/></linearGradient>
       <linearGradient id="steep" x1="0" y1="0" x2="1" y2="0">${stops}</linearGradient>
+      <clipPath id="plotclip"><rect x="${padL}" y="0" width="${plotW}" height="${H-padB}"/></clipPath>
     </defs>
     ${grid}${kmticks}
-    ${(W<680||strip)?"":`<g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
+    ${(W<680||strip||zoomed)?"":`<g transform="translate(${W-padR-346},20)" font-family="DM Mono, monospace" font-size="11">
       <rect x="0" y="-8" width="16" height="4" fill="#4a90b8"/><text x="21" y="-3" fill="${CH("lbl")}">flat</text>
       <rect x="56" y="-8" width="16" height="4" fill="#f2c230"/><text x="77" y="-3" fill="${CH("lbl")}">3-6%</text>
       <rect x="122" y="-8" width="16" height="4" fill="#ef8354"/><text x="143" y="-3" fill="${CH("lbl")}">steep</text>
@@ -1944,9 +1957,9 @@ function bigProfileSVG(st,g){
       <path d="M 240 -12 l1.8 3.2 3.2 1.8 -3.2 1.8 -1.8 3.2 -1.8 -3.2 -3.2 -1.8 3.2 -1.8 z" fill="#f2c230"/><text x="251" y="-3" fill="${CH("lbl")}">sight</text>
     </g>`}
     ${det&&!strip?`<text x="${padL}" y="16" font-family="DM Mono, monospace" font-size="11" fill="${CH("tick")}">gpx terrain</text>`:""}
-    <path d="${area}" fill="url(#bigfill)"/>
+    <g clip-path="url(#plotclip)"><path d="${area}" fill="url(#bigfill)"/>
     <path d="${line}" fill="none" stroke="url(#steep)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
-    ${walked}
+    ${walked}</g>
     ${grades}
     ${dots}${gps}</svg>`;
 }
@@ -2128,30 +2141,35 @@ document.getElementById("bigview").addEventListener("touchmove",e=>{
   e.preventDefault();
 },{passive:false});
 let bigLastPos=null;
-/* ribbon pinch zoom: uniform scale 1-4x, pan clamped to the drawing, double-tap resets */
-const RZ={s:1,x:0,y:0};
+/* ribbon zoom: a km window, re-rendered on every gesture frame so ticks, altitude scale and labels stay true */
+const RZ={s:1,f:0,padL:0,plotW:1,kmA:0,kmL:1};
+let ribRAF=0;
+function ribRender(){
+  if(ribRAF)return;ribRAF=requestAnimationFrame(()=>{ribRAF=0;
+    const st=STAGES.find(x=>x.n===bigN),h=document.getElementById("big-svg");if(!st||!h||bigViewMode==="map")return;
+    h.innerHTML=bigProfileSVG(st,bigG);ribEnsureUI();ribApply();});
+}
 function ribApply(){
-  const h=document.getElementById("big-svg"),svg=h&&h.querySelector("svg");if(!svg)return;
-  const W=h.clientWidth,H=h.clientHeight;
-  RZ.s=Math.max(1,Math.min(4,RZ.s));
-  RZ.x=Math.min(0,Math.max(W-W*RZ.s,RZ.x));RZ.y=Math.min(0,Math.max(H-H*RZ.s,RZ.y));
-  if(RZ.s<1.02){RZ.s=1;RZ.x=0;RZ.y=0;}
-  svg.style.transform=RZ.s===1?"":`translate(${RZ.x}px,${RZ.y}px) scale(${RZ.s})`;
-  h.classList.toggle("zoomed",RZ.s>1);
-  const lab=h.querySelector(".rz-lab");if(lab)lab.textContent=RZ.s.toFixed(1).replace(".0","")+"x";
+  const h=document.getElementById("big-svg");if(!h)return;
+  RZ.s=Math.max(1,Math.min(8,RZ.s));RZ.f=Math.min(Math.max(RZ.f,0),1-1/RZ.s);
+  h.classList.toggle("zoomed",RZ.s>1.001);
+  const lab=h.querySelector(".rz-lab");if(lab)lab.textContent=RZ.s>1.001?RZ.kmL.toFixed(1)+" km":"fit";
 }
-function ribZoomAt(f,cx,cy){ /* zoom by factor f keeping the point under (cx,cy) fixed */
-  const ns=Math.max(1,Math.min(4,RZ.s*f));const k=ns/RZ.s;
-  RZ.x=cx-(cx-RZ.x)*k;RZ.y=cy-(cy-RZ.y)*k;RZ.s=ns;ribApply();
+function ribKmAt(px){return RZ.kmA+(px-RZ.padL)/RZ.plotW*RZ.kmL;}
+function ribZoomAt(f,px){ /* zoom by factor f keeping the km under px fixed */
+  const st=STAGES.find(x=>x.n===bigN);if(!st)return;
+  const kmC=ribKmAt(px);const ns=Math.max(1,Math.min(8,RZ.s*f));const nl=st.km/ns;
+  const kmA=kmC-(px-RZ.padL)/RZ.plotW*nl;RZ.s=ns;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();
 }
-function ribReset(){RZ.s=1;RZ.x=0;RZ.y=0;ribApply();}
+function ribPanKm(dkm){const st=STAGES.find(x=>x.n===bigN);if(!st)return;RZ.f+=dkm/st.km;ribApply();ribRender();}
+function ribReset(){RZ.s=1;RZ.f=0;ribApply();ribRender();}
 function ribEnsureUI(){
   const h=document.getElementById("big-svg");if(!h||h.querySelector(".rib-zoom"))return;
   const d=document.createElement("div");d.className="rib-zoom";
-  d.innerHTML='<button data-z="in" title="Zoom in">+</button><button data-z="out" title="Zoom out">&minus;</button><button class="rz-reset" data-z="reset" title="Fit stage"><span class="rz-lab">1x</span></button>';
+  d.innerHTML='<button data-z="in" title="Zoom in">+</button><button data-z="out" title="Zoom out">&minus;</button><button class="rz-reset" data-z="reset" title="Whole stage"><span class="rz-lab">fit</span></button>';
   d.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;e.stopPropagation();
-    const W=h.clientWidth,H=h.clientHeight;
-    if(b.dataset.z==="in")ribZoomAt(1.5,W/2,H/2);else if(b.dataset.z==="out")ribZoomAt(1/1.5,W/2,H/2);else ribReset();});
+    const mid=RZ.padL+RZ.plotW/2;
+    if(b.dataset.z==="in")ribZoomAt(1.6,mid);else if(b.dataset.z==="out")ribZoomAt(1/1.6,mid);else ribReset();});
   h.appendChild(d);
 }
 (function(){
@@ -2160,35 +2178,35 @@ function ribEnsureUI(){
   ["touchstart","touchmove"].forEach(t=>h.addEventListener(t,e=>{if(e.touches.length>1)e.preventDefault();},{passive:false}));
   ["gesturestart","gesturechange","gestureend"].forEach(t=>h.addEventListener(t,e=>e.preventDefault(),{passive:false}));
   const pts=new Map();let pinch=null,drag=null,lastTap=0,moved=false;
-  const rel=e=>{const r=h.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
+  const relX=e=>e.clientX-h.getBoundingClientRect().left;
   h.addEventListener("pointerdown",e=>{
     if(e.target.closest(".rib-zoom"))return;
-    pts.set(e.pointerId,rel(e));moved=false;
-    if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),s:RZ.s,cx:(a[0]+b[0])/2,cy:(a[1]+b[1])/2,x:RZ.x,y:RZ.y};drag=null;}
-    else if(pts.size===1&&RZ.s>1){drag={px:e.clientX,py:e.clientY,x:RZ.x,y:RZ.y};h.setPointerCapture(e.pointerId);}
+    pts.set(e.pointerId,relX(e));moved=false;
+    if(pts.size===2){const [a,b]=[...pts.values()];const c=(a+b)/2;pinch={d:Math.max(12,Math.abs(a-b)),s:RZ.s,kmC:ribKmAt(c),frac:(c-RZ.padL)/RZ.plotW};drag=null;}
+    else if(pts.size===1&&RZ.s>1.001){drag={px:e.clientX,kmA:RZ.kmA};try{h.setPointerCapture(e.pointerId);}catch(_){}}
   });
   h.addEventListener("pointermove",e=>{
-    if(!pts.has(e.pointerId))return;pts.set(e.pointerId,rel(e));
-    if(pinch&&pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);
-      const ns=Math.max(1,Math.min(4,pinch.s*d/pinch.d));const k=ns/pinch.s;
-      const cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
-      RZ.x=cx-(pinch.cx-pinch.x)*k;RZ.y=cy-(pinch.cy-pinch.y)*k;RZ.s=ns;ribApply();moved=true;e.preventDefault();}
-    else if(drag){const dx=e.clientX-drag.px,dy=e.clientY-drag.py;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
-      RZ.x=drag.x+dx;RZ.y=drag.y+dy;ribApply();e.preventDefault();}
+    if(!pts.has(e.pointerId))return;pts.set(e.pointerId,relX(e));
+    const st=STAGES.find(x=>x.n===bigN);if(!st)return;
+    if(pinch&&pts.size===2){const [a,b]=[...pts.values()];const d=Math.max(12,Math.abs(a-b));const c=(a+b)/2;
+      const ns=Math.max(1,Math.min(8,pinch.s*d/pinch.d));const nl=st.km/ns;
+      const kmA=pinch.kmC-(c-RZ.padL)/RZ.plotW*nl;RZ.s=ns;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();moved=true;e.preventDefault();}
+    else if(drag){const dx=e.clientX-drag.px;if(Math.abs(dx)>4)moved=true;
+      const kmA=drag.kmA-dx/RZ.plotW*RZ.kmL;RZ.f=(kmA-st.a.km)/st.km;ribApply();ribRender();e.preventDefault();}
   });
   const up=e=>{pts.delete(e.pointerId);
     if(pts.size<2)pinch=null;if(pts.size===0){drag=null;
-      if(!moved&&e.pointerType==="touch"){const t=Date.now();if(t-lastTap<320){if(RZ.s>1)ribReset();else{const [x,y]=rel(e);ribZoomAt(2.2,x,y);}lastTap=0;}else lastTap=t;}
+      if(!moved&&e.pointerType==="touch"){const t=Date.now();if(t-lastTap<320){if(RZ.s>1.001)ribReset();else ribZoomAt(2.5,relX(e));lastTap=0;}else lastTap=t;}
     }};
   h.addEventListener("pointerup",up);h.addEventListener("pointercancel",up);
   h.addEventListener("click",e=>{if(moved&&!e.target.closest(".rib-zoom")){e.stopPropagation();e.preventDefault();}moved=false;},true);
-  h.addEventListener("wheel",e=>{if(!e.ctrlKey&&RZ.s===1)return;e.preventDefault();const [x,y]=rel(e);
-    if(e.ctrlKey)ribZoomAt(e.deltaY<0?1.15:1/1.15,x,y);else{RZ.x-=e.deltaX;RZ.y-=e.deltaY;ribApply();}},{passive:false});
+  h.addEventListener("wheel",e=>{if(!e.ctrlKey&&RZ.s<=1.001)return;e.preventDefault();
+    if(e.ctrlKey)ribZoomAt(e.deltaY<0?1.15:1/1.15,relX(e));else ribPanKm((e.deltaX||e.deltaY)/RZ.plotW*RZ.kmL);},{passive:false});
 })();
 function openBig(n,keepWatch){
   if(!keepWatch)stopBigWatch();
   lockScroll(true);
-  bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;bigSel=null;RZ.s=1;RZ.x=0;RZ.y=0;
+  bigN=Math.max(1,Math.min(STAGES.length,n));bigG=null;bigSel=null;RZ.s=1;RZ.f=0;
   const st=STAGES.find(s=>s.n===bigN);if(!st)return;
   document.getElementById("bigview").classList.add("active");
   document.getElementById("big-prev").disabled=bigN<=1;document.getElementById("big-next-btn").disabled=bigN>=STAGES.length;
@@ -2697,6 +2715,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v53</div>
+<div class="appver">camino-app · v54</div>
 </body>
 </html>
