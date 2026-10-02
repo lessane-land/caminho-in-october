@@ -581,8 +581,7 @@
   .bs-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px}
   .bl-det{grid-column:1/-1;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--ink-soft);line-height:1.55;text-align:left}
   .bl-det .d-poi{display:block;font-family:'Fraunces',serif;font-style:italic;font-size:.94rem;letter-spacing:0;color:var(--gold-bright)}
-  .bl-det .d-bed{display:block;color:#5fc2bb}
-  .bl-det a{color:var(--sea-shallow);text-decoration:none;border-bottom:1px dotted var(--sea-shallow)}
+  .bl-det a{color:var(--sea-shallow);text-decoration:none}
   .bl-empty{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--mute);text-align:center;padding:26px 10px}
   @media (max-width:899px){
     .big-cap{display:none}
@@ -657,6 +656,19 @@
   .pushon-town{display:block;padding:8px 0 2px;border-top:1px dashed var(--night-border);margin-top:4px}
   .pushon-town:first-child{border-top:0;margin-top:0;padding-top:2px}
   .blk.pushon h4{color:var(--gold)}
+  .ico-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;border:1px solid var(--night-border);color:var(--sea-shallow);background:transparent;text-decoration:none;flex:none}
+  .ico-btn svg{width:14px;height:14px}
+  .ico-btn+.ico-btn{margin-left:6px}
+  .bed-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;padding-left:10px;flex:none}
+  .bed-side .price{margin-left:0;padding-left:0}
+  .bed-acts{display:flex}
+  .d-bed{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px dashed var(--night-border);color:#5fc2bb}
+  .d-bed:first-of-type{border-top:0}
+  .d-bed-t{min-width:0}
+  .d-bed-t .name{color:var(--paper);font-weight:500}
+  .d-bed-a{display:flex;flex:none}
+  .bl-det .d-bed .ico-btn{width:32px;height:32px}
+  :root[data-theme="light"] .d-bed{color:var(--terracotta)}
 </style>
 </head>
 <body>
@@ -1454,9 +1466,21 @@ function toggleStop(id){
 function paceV(){return +store.get("camino-pace",4.2);}
 function t0Min(){const t=store.get("camino-t0","08:00"),p=t.split(":");return (+p[0])*60+(+p[1]);}
 function brkMin(){return +store.get("camino-brk",45);}
-function etaMin(st,km){const d=Math.max(0,km-st.a.km);return t0Min()+d/paceV()*60+brkMin()*(d/st.km);}
+function stageStartKm(st){
+  const g=typeof bigG!=="undefined"?bigG:null;
+  if(g&&!g.off&&g.km>st.a.km+0.5&&g.km<st.b.km-1&&bigN&&STAGES.find(s=>s.n===bigN)===st){
+    const now=new Date();const todayISO=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    if(stageISO(STAGES.indexOf(st))!==todayISO||now.getHours()<6||now.getHours()>=21)return g.km;
+  }
+  return st.a.km;
+}
+function etaMin(st,km){const s0=stageStartKm(st);const d=Math.max(0,km-s0);return t0Min()+d/paceV()*60+brkMin()*(d/(st.b.km-s0));}
 function liveEtaMin(st,km){
-  if(typeof bigG!=="undefined"&&bigG&&!bigG.off&&bigN&&STAGES.find(s=>s.n===bigN)===st&&km>bigG.km){
+  const now=new Date();
+  const todayISO=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  const isToday=stageISO(STAGES.indexOf(st))===todayISO;
+  const walkingHours=now.getHours()>=6&&now.getHours()<21;
+  if(isToday&&walkingHours&&typeof bigG!=="undefined"&&bigG&&!bigG.off&&bigN&&STAGES.find(s=>s.n===bigN)===st&&km>bigG.km){
     const now=new Date();const d=km-bigG.km;
     return now.getHours()*60+now.getMinutes()+d/paceV()*60+brkMin()*(d/st.km);
   }
@@ -1474,12 +1498,17 @@ function timelineHTML(st,i){
   if(late)out+=`<span class="tl-warn">Arrival hugs the dusk, leave earlier or walk brisker.</span>`;
   return `<div class="tl ${late?"late":""}">${out}</div>`;
 }
+function bedRow(a,w){
+  const closed=/^(CLOSED|No albergue)/.test(a[1]+a[0]);
+  const q=encodeURIComponent(a[0].replace(/^(Municipal albergue|No albergue in Oia itself)$/,"albergue")+", "+w.name.split(",")[0]+", "+(w.km>104?"Spain":"Portugal"));
+  return `<span class="d-bed ${closed?"bed-closed":""}"><span class="d-bed-t"><span class="name">${a[0]}</span> \u00b7 ${a[2]}</span><span class="d-bed-a">${/^No albergue/.test(a[0])?"":`<a class="ico-btn" href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Open in Maps">${PIN_SVG}</a>`}${a[3]?`<a class="ico-btn" href="tel:${a[3]}" onclick="event.stopPropagation()" title="Call ${a[3]}">${PHONE_S}</a>`:""}</span></span>`;
+}
 function bedLI(a,w){
   const closed=/^(CLOSED|No albergue)/.test(a[1]+a[0]);
   const q=encodeURIComponent(a[0].replace(/^(Municipal albergue|No albergue in Oia itself)$/,"albergue")+", "+w.name.split(",")[0]+", "+(w.km>104?"Spain":"Portugal"));
-  const tel=a[3]?`<a class="bed-act" href="tel:${a[3]}">${PHONE_S} ${a[3].replace(/^(\+\d{2,3})(\d{3})(\d{3})(\d{3})$/,"$1 $2 $3 $4")}</a>`:"";
-  const maps=closed&&/^No albergue/.test(a[0])?"":`<a class="bed-act" href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">${PIN_SVG} Maps</a>`;
-  return `<li class="${closed?"bed-closed":""}"><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span><span class="bed-acts">${maps}${tel}</span></span><span class="price">${a[2]}</span></li>`;
+  const tel=a[3]?`<a class="ico-btn" href="tel:${a[3]}" title="Call ${a[3]}">${PHONE_S}</a>`:"";
+  const maps=/^No albergue/.test(a[0])?"":`<a class="ico-btn" href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" title="Open in Maps">${PIN_SVG}</a>`;
+  return `<li class="${closed?"bed-closed":""}"><span><span class="name">${a[0]}</span> <span class="meta">\u00b7 ${a[1]}</span></span><span class="bed-side"><span class="price">${a[2]}</span><span class="bed-acts">${maps}${tel}</span></span></li>`;
 }
 const PHONE_S=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2z"/></svg>`;
 function pushOnHTML(st,i){
@@ -1930,7 +1959,7 @@ function bigSideHTML(st,g){
     let det="";
     if(on||bigFilter!=="all"){
       const q=encodeURIComponent(w.q);
-      det=`<span class="bl-det">${w.poi?`<span class="d-poi">${w.poi}</span>`:""}${beds?w.sleep.map(a=>`<span class="d-bed">${a[0]} \u00b7 ${a[2]}${a[3]?` \u00b7 <a href="tel:${a[3]}">${a[3]}</a>`:""}</span>`).join(""):""}${on?`<a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open in Maps</a>`:""}</span>`;
+      det=`<span class="bl-det">${w.poi?`<span class="d-poi">${w.poi}</span>`:""}${beds?w.sleep.map(a=>bedRow(a,w)).join(""):""}${on&&!beds?`<a class="ico-btn" href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Open in Maps">${PIN_SVG}</a>`:""}</span>`;
     }
     rows+=`<div class="bl-row ${on?"on":""}" onclick="selectBigWp(${i})">
       <span class="bl-eta">~${fmtT(liveEtaMin(st,w.km))}</span>
@@ -2595,6 +2624,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app \u00b7 v49</div>
+<div class="appver">camino-app \u00b7 v50</div>
 </body>
 </html>
