@@ -1,4 +1,4 @@
-const CACHE = "camino-v50";
+const CACHE = "camino-v51";
 const TILE_CACHE = "camino-tiles";   // offline map tiles; persists across app updates, only cleared on demand
 const ASSETS = ["./", "./index.html", "./manifest.json", "./config.js", "./icon-192.png", "./icon-512.png", "./icon-180.png"];
 
