@@ -1951,7 +1951,9 @@ function bigProfileSVG(st,g){
     /* a phone at full-stage zoom only has room for the big ones; zoom in and they all show */
     let show=runs;const narrow=W<560;
     if(narrow&&!zoomed)show=[]; /* the colour of the line carries it; pinch in for the numbers */
-    else if(narrow)show=runs.slice().sort((a,b)=>b.gain-a.gain).slice(0,4).sort((a,b)=>a.i-b.i);
+    else if(narrow){ /* the biggest climb and the biggest descent, nothing else */
+      const big=runs.filter(r=>r.gain>=35);const upR=big.filter(r=>r.sgn>0).sort((a,b)=>b.gain-a.gain)[0],dnR=big.filter(r=>r.sgn<0).sort((a,b)=>b.gain-a.gain)[0];
+      show=[upR,dnR].filter(Boolean).sort((a,b)=>a.i-b.i);}
     const dotXY=st.seg.map(w=>[X(w.km),Y(snapAlt(det,w.km,w.alt))]);
     for(const r of show){
       const {i,j,sgn,pct}=r;const mx0=X((base[i][0]+base[j][0])/2);
@@ -1962,7 +1964,7 @@ function bigProfileSVG(st,g){
         const top=yAt(mx);
         for(const cand of (narrow?[top-36,top-58]:[top-36,top-58,top-80])){
           if(cand<8)break;
-          if(dotXY.some(d=>Math.abs(d[0]-mx)<34&&cand>d[1]-46))continue; /* on top of a dot or its time label */
+          if(dotXY.some(d=>Math.abs(d[0]-mx)<36&&cand>d[1]-62))continue; /* on top of a dot or its time label */
           if(!placed.some(b=>Math.abs(mx-b[0])<50&&Math.abs(cand-b[1])<20)){spot=[mx,cand];break;}
         }
         if(spot)break;
@@ -2892,6 +2894,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v63</div>
+<div class="appver">camino-app · v64</div>
 </body>
 </html>
