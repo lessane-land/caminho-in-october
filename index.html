@@ -1914,7 +1914,7 @@ function bigProfileSVG(st,g){
   for(let k=Math.ceil((st.b.km-kmB)/kstep)*kstep;k<=st.b.km-kmA+1e-6&&!strip;k+=kstep){const x=X(st.b.km-k);if(x<padL-1||x>W-padR+1)continue;kmticks+=`<line x1="${x.toFixed(1)}" y1="${H-padB}" x2="${x.toFixed(1)}" y2="${H-padB+6}" stroke="${CH("tick")}"/><text x="${x.toFixed(1)}" y="${H-10}" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="${CH("dim")}">${kstep<1?k.toFixed(1).replace(".0",""):Math.round(k)}</text>`;}
   if(!strip)kmticks+=`<text x="${padL}" y="${H-24}" text-anchor="start" font-family="DM Mono, monospace" font-size="9.5" fill="${CH("tick")}">${nrows===3?"":"km to "+st.b.name.split(",")[0].split(" (")[0]}</text>`;
   const stops=steepStops(base,X,padL,plotW);
-  let grades="";
+  let grades="",placed=[];
   if(!strip&&det){
     let i=0;
     while(i<base.length-1){
@@ -1924,9 +1924,15 @@ function bigProfileSVG(st,g){
       let j=i,gain=0,dist=0,sgn=Math.sign(base[i+1][1]-base[i][1]);
       while(j<base.length-1){const dv=base[j+1][1]-base[j][1],k=base[j+1][0]-base[j][0];if(k<=0)break;const gr=Math.abs(dv)/k/10;if(gr<3.5||gr>25||Math.sign(dv)!==sgn)break;gain+=Math.abs(dv);dist+=k;j++;}
       if(dist>=0.3&&gain>=18){
-        const pct=Math.round(gain/dist/10);const mx=X((base[i][0]+base[j][0])/2);const top=Math.min(...base.slice(i,j+1).map(p=>Y(p[1])));
+        const pct=Math.round(gain/dist/10);let mx=X((base[i][0]+base[j][0])/2);
+        /* keep clear of waypoint dots and their labels: slide the badge 82 px away from a dot closer than 46 px */
+        const dotX=st.seg.map(w=>X(w.km)).filter(x=>Math.abs(x-mx)<46);if(dotX.length){const dx=dotX[0];mx=mx<=dx?dx-82:dx+82;}
+        let top=Math.min(...base.slice(i,j+1).map(p=>Y(p[1])));
+        {let bi2=i,bdx=1e9;for(let q=Math.max(0,i-40);q<Math.min(base.length,j+40);q++){const dx=Math.abs(X(base[q][0])-mx);if(dx<bdx){bdx=dx;bi2=q;}}top=Math.min(top,Y(base[bi2][1]));}
         const up=sgn>0;
-        if(mx>=padL&&mx<=W-padR)grades+=`<g><rect x="${(mx-21).toFixed(1)}" y="${(top-36).toFixed(1)}" width="42" height="16" rx="8" fill="#ef8354"/><text x="${mx.toFixed(1)}" y="${(top-24.5).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" font-weight="700" fill="#0a111c">${up?"\u25b2":"\u25bc"} ${pct}%</text></g>`;
+        let by=null;for(const cand of [top-36,top-58,top-80]){if(cand<8)break;if(!placed.some(b=>Math.abs(mx-b[0])<50&&Math.abs(cand-b[1])<20)){by=cand;break;}}
+        const lift=0;
+        if(by!=null&&mx>=padL&&mx<=W-padR){placed.push([mx,by]);grades+=`<g><rect x="${(mx-21).toFixed(1)}" y="${by.toFixed(1)}" width="42" height="16" rx="8" fill="#ef8354"/><text x="${mx.toFixed(1)}" y="${(by+11.5).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" font-weight="700" fill="#0a111c">${up?"\u25b2":"\u25bc"} ${pct}%</text></g>`;}
       }
       i=Math.max(j,i+1);
     }
@@ -2325,8 +2331,8 @@ function getNav(){if(!NAV)NAV=store.get("camino-nav",null);return NAV;}
 function buildNav(raw){
   if(!raw||raw.length<20)return;
   const P=[];let last=null;
-  for(const p of raw){if(!last||hav(last[0],last[1],p[0],p[1])>=0.012){P.push([+(+p[0]).toFixed(5),+(+p[1]).toFixed(5)]);last=p;}}
-  const stride=Math.max(1,Math.ceil(P.length/6000));
+  for(const p of raw){if(!last||hav(last[0],last[1],p[0],p[1])>=0.008){P.push([+(+p[0]).toFixed(5),+(+p[1]).toFixed(5)]);last=p;}}
+  const stride=Math.max(1,Math.ceil(P.length/14000));
   const Q=stride>1?P.filter((_,i)=>i%stride===0):P;
   const cum=[0];for(let i=1;i<Q.length;i++)cum.push(+(cum[i-1]+hav(Q[i-1][0],Q[i-1][1],Q[i][0],Q[i][1])).toFixed(4));
   const turns=[],LOOK=0.04;
@@ -2355,22 +2361,23 @@ function navUpdate(pos){
   const bar=document.getElementById("nav-bar");if(!bar)return;
   const nav=getNav();if(!nav||!nav.P||nav.P.length<20){bar.classList.remove("show");return;}
   const lat=pos.coords.latitude,lon=pos.coords.longitude;
-  let bi=0,bd=1e9;for(let i=0;i<nav.P.length;i++){const p=nav.P[i];const d=hav(lat,lon,p[0],p[1]);if(d<bd){bd=d;bi=i;}}
+  const pj=projectOnLine(lat,lon,nav.P,nav.cum);const bi=pj.i,bd=pj.d,hereCum=pj.cum;
   let heading=pos.coords.heading;
   if((heading==null||isNaN(heading))&&navLastFix&&hav(navLastFix[0],navLastFix[1],lat,lon)>0.015)heading=bearing(navLastFix,[lat,lon]);
   if(!navLastFix||hav(navLastFix[0],navLastFix[1],lat,lon)>0.015)navLastFix=[lat,lon];
   let html="";
   const fmtD=d=>d>1?d.toFixed(1)+" km":Math.round(d*1000)+" m";
-  if(bd>0.25&&nav.cum[bi]<1.5){
+  const acc=pos.coords.accuracy||0;const offLim=Math.max(0.12,Math.min(0.3,0.08+acc/1000*1.5));
+  if(bd>offLim&&hereCum<1.5){
     html=`${navArrow("straight")}<div class="nv-main"><b>Before the track</b><span>the GPX starts in ${fmtD(hav(lat,lon,nav.P[0][0],nav.P[0][1]))} \u00b7 follow the arrows ${compass(bearing([lat,lon],nav.P[0]))}</span></div>`;
-  }else if(bd>0.25){
-    html=`${navArrow("off")}<div class="nv-main"><b>Off the track</b><span>${fmtD(bd)} to the path \u00b7 head ${compass(bearing([lat,lon],nav.P[bi]))}</span></div>`;
+  }else if(bd>offLim){
+    html=`${navArrow("off")}<div class="nv-main"><b>Off the track</b><span>${fmtD(bd)} to the path \u00b7 head ${compass(bearing([lat,lon],nav.P[bi]))} \u00b7 the painted arrows win</span></div>`;
   }else{
     const trackB=bi<nav.P.length-1?bearing(nav.P[bi],nav.P[bi+1]):null;
     const moving=pos.coords.speed==null||isNaN(pos.coords.speed)||pos.coords.speed>0.5;
     const wrongWay=heading!=null&&!isNaN(heading)&&trackB!=null&&Math.abs(angDiff(trackB,heading))>110&&moving;
-    const next=nav.turns.find(t=>t[0]>bi);
-    const dist=next?Math.max(0,(nav.cum[next[0]]-nav.cum[bi])*1000):null;
+    const next=nav.turns.find(t=>nav.cum[t[0]]>hereCum+0.012);
+    const dist=next?Math.max(0,(nav.cum[next[0]]-hereCum)*1000):null;
     if(wrongWay)html=`${navArrow("uturn")}<div class="nv-main"><b>Wrong way</b><span>the camino runs ${compass(trackB)} from here, turn around</span></div>`;
     else if(!next||dist>2500)html=`${navArrow("straight")}<div class="nv-main"><b>Straight on</b><span>${next?"next turn in "+(dist/1000).toFixed(1)+" km":"no turns ahead on the track"}</span></div>`;
     else{
@@ -2381,8 +2388,8 @@ function navUpdate(pos){
       html=`${navArrow(k.k)}<div class="nv-main"><b>${k.t}</b><span>in ${m} m${afterTxt}</span></div>`;
     }
   }
-  const gx=store.get("camino-gpx",null);const kmHere=gx&&gx.pairs?trackCumToKm(gx,nav.cum[bi]):null;
-  const kmLeft=Math.max(0,160.5-(kmHere!=null?kmHere:(nav.cum[bi]/nav.cum[nav.cum.length-1])*160.5));
+  const gx=store.get("camino-gpx",null);const kmHere=gx&&gx.pairs?trackCumToKm(gx,hereCum):null;
+  const kmLeft=Math.max(0,160.5-(kmHere!=null?kmHere:(hereCum/nav.cum[nav.cum.length-1])*160.5));
   bar.innerHTML=html+`<span class="nv-mojon">${SHELL_S}<b>K. ${kmLeft.toFixed(1)}</b><i>to Vigo</i></span>`;
   bar.classList.add("show");
 }
@@ -2404,12 +2411,12 @@ function buildPairs(P,cum){
   return out;
 }
 function locateOnTrack(lat,lon,g){
-  let bi=0,bd=1e9;
-  for(let i=0;i<g.P.length;i++){const d=hav(lat,lon,g.P[i][0],g.P[i][1]);if(d<bd){bd=d;bi=i;}}
+  const pj=projectOnLine(lat,lon,g.P,g.cum);const bi=pj.i,bd=pj.d;
   const wp=locateOnWaypoints(lat,lon);
-  const km=g.pairs?trackCumToKm(g,g.cum[bi]):null;
+  const km=g.pairs?trackCumToKm(g,pj.cum):null;
   if(km==null||(wp&&wp.distKm+0.3<bd))return wp;
-  const ele=g.P[bi][2];
+  const e0=g.P[bi][2],e1=g.P[Math.min(bi+1,g.P.length-1)][2];
+  const ele=(e0!=null&&e1!=null)?e0+(e1-e0)*pj.t:(e0!=null?e0:e1);
   const alt=(ele!=null&&!isNaN(ele))?ele:(wp?wp.alt:0);
   return {km,alt,distKm:bd};
 }
@@ -2421,10 +2428,43 @@ function parseGpxText(txt){
     return pts.map(p=>{const ele=p.querySelector("ele");return [+p.getAttribute("lat"),+p.getAttribute("lon"),ele?+ele.textContent:null];});
   }catch(e){return null;}
 }
+/* perpendicular distance (km) of p from segment a-b, in a local flat frame */
+function segDist(p,a,b){
+  const ky=111.32,kx=111.32*Math.cos(a[0]*Math.PI/180);
+  const ax=0,ay=0,bx=(b[1]-a[1])*kx,by=(b[0]-a[0])*ky,px=(p[1]-a[1])*kx,py=(p[0]-a[0])*ky;
+  const L2=bx*bx+by*by;let t=L2>0?((px*bx+py*by)/L2):0;t=Math.max(0,Math.min(1,t));
+  const dx=px-(ax+t*bx),dy=py-(ay+t*by);return {d:Math.sqrt(dx*dx+dy*dy),t};
+}
+function simplifyTrack(pts,tol){
+  if(pts.length<3)return pts.slice();
+  const keep=new Uint8Array(pts.length);keep[0]=1;keep[pts.length-1]=1;
+  const stack=[[0,pts.length-1]];
+  while(stack.length){
+    const [a,b]=stack.pop();if(b-a<2)continue;
+    let mi=-1,md=-1;
+    for(let i=a+1;i<b;i++){const d=segDist(pts[i],pts[a],pts[b]).d;if(d>md){md=d;mi=i;}}
+    if(md>tol){keep[mi]=1;stack.push([a,mi],[mi,b]);}
+  }
+  const out=[];for(let i=0;i<pts.length;i++)if(keep[i])out.push(pts[i]);
+  /* never leave more than 60 m between kept points, so projections stay local */
+  const dense=[];for(let i=0;i<out.length;i++){if(i>0){const d=hav(out[i-1][0],out[i-1][1],out[i][0],out[i][1]);if(d>0.06){const n=Math.ceil(d/0.05);for(let k=1;k<n;k++){const f=k/n;dense.push([out[i-1][0]+(out[i][0]-out[i-1][0])*f,out[i-1][1]+(out[i][1]-out[i-1][1])*f,out[i-1][2]!=null&&out[i][2]!=null?out[i-1][2]+(out[i][2]-out[i-1][2])*f:null]);}}}dense.push(out[i]);}
+  return dense;
+}
+/* nearest point ON the line (segments, not vertices): returns {i, t, d (km), cum (km)} */
+function projectOnLine(lat,lon,P,cum){
+  let best={i:0,t:0,d:1e9,cum:0};
+  let bi=0,bd=1e9;for(let i=0;i<P.length;i++){const d=hav(lat,lon,P[i][0],P[i][1]);if(d<bd){bd=d;bi=i;}}
+  const lo=Math.max(0,bi-40),hi=Math.min(P.length-2,bi+40);
+  for(let i=lo;i<=hi;i++){const r=segDist([lat,lon],P[i],P[i+1]);if(r.d<best.d){best={i,t:r.t,d:r.d,cum:cum[i]+(cum[i+1]-cum[i])*r.t};}}
+  if(best.d>=1e9)best={i:bi,t:0,d:bd,cum:cum[bi]};
+  return best;
+}
 function buildTrack(raw,srcLen){
   if(!raw||raw.length<10)return false;
-  const stride=Math.max(1,Math.floor(raw.length/600));
-  const P=[];for(let i=0;i<raw.length;i+=stride)P.push(raw[i]);
+  /* keep every corner, drop the straight runs: ~4 m tolerance, capped at ~9000 points for storage */
+  let P=simplifyTrack(raw,0.004);
+  if(P.length>9000){const st=Math.ceil(P.length/9000);P=P.filter((_,i)=>i%st===0||i===P.length-1);}
+  P=P.map(p=>[+(+p[0]).toFixed(5),+(+p[1]).toFixed(5),p[2]==null||isNaN(p[2])?null:Math.round(p[2])]);
   const cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+hav(P[i-1][0],P[i-1][1],P[i][0],P[i][1]));
   const anchors={};
   SLEEP_ORDER.forEach(id=>{
@@ -2783,6 +2823,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v59</div>
+<div class="appver">camino-app · v60</div>
 </body>
 </html>
