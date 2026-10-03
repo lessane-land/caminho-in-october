@@ -1885,6 +1885,7 @@ buildPacking();
 let bigN=null,bigWatch=null,bigG=null,bigSel=null;
 function gradeColor(gr){return gr<3?"#4a90b8":gr<6?"#f2c230":"#ef8354";}
 function fmtH(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh>0?hh+"h "+String(mm).padStart(2,"0"):mm+" min";}
+function shortName(n,max){n=n.split(",")[0].split(" (")[0].split(" / ")[0];if(n.length<=max)return n;const w=n.split(" ");let o=w[0];for(let k=1;k<w.length;k++){if((o+" "+w[k]).length>max)break;o+=" "+w[k];}return o;}
 function bigProfileSVG(st,g){
   let W=1200,H=440;
   const holder=document.getElementById("big-svg");
@@ -1937,24 +1938,38 @@ function bigProfileSVG(st,g){
   if(!strip&&det){
     const G=gradeSeries(base,0.15);
     let i=0;
+    const runs=[];
     while(i<base.length-1){
       const d0=Math.abs(G[i]);
       if(d0<4.5){i++;continue;}
       let j=i,sgn=Math.sign(G[i]);
       while(j<base.length-1&&Math.abs(G[j+1])>=3.5&&Math.sign(G[j+1])===sgn)j++;
       const dist=base[j][0]-base[i][0],gain=Math.abs(base[j][1]-base[i][1]);
-      if(dist>=0.3&&gain>=18){
-        let gs=0;for(let q=i;q<=j;q++)gs+=Math.abs(G[q]);const pct=Math.round(Math.min(gain/dist/10,gs/(j-i+1)));let mx=X((base[i][0]+base[j][0])/2);
-        /* keep clear of waypoint dots and their labels: slide the badge 82 px away from a dot closer than 46 px */
-        const dotX=st.seg.map(w=>X(w.km)).filter(x=>Math.abs(x-mx)<46);if(dotX.length){const dx=dotX[0];mx=mx<=dx?dx-82:dx+82;}
-        let top=Math.min(...base.slice(i,j+1).map(p=>Y(p[1])));
-        {let bi2=i,bdx=1e9;for(let q=Math.max(0,i-40);q<Math.min(base.length,j+40);q++){const dx=Math.abs(X(base[q][0])-mx);if(dx<bdx){bdx=dx;bi2=q;}}top=Math.min(top,Y(base[bi2][1]));}
-        const up=sgn>0;
-        let by=null;for(const cand of [top-36,top-58,top-80]){if(cand<8)break;if(!placed.some(b=>Math.abs(mx-b[0])<50&&Math.abs(cand-b[1])<20)){by=cand;break;}}
-        const lift=0;
-        if(by!=null&&mx>=padL&&mx<=W-padR){placed.push([mx,by]);grades+=`<g><rect x="${(mx-21).toFixed(1)}" y="${by.toFixed(1)}" width="42" height="16" rx="8" fill="#ef8354"/><text x="${mx.toFixed(1)}" y="${(by+11.5).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" font-weight="700" fill="#0a111c">${up?"\u25b2":"\u25bc"} ${pct}%</text></g>`;}
-      }
+      if(dist>=0.3&&gain>=18){let gs=0;for(let q=i;q<=j;q++)gs+=Math.abs(G[q]);runs.push({i,j,gain,dist,sgn,pct:Math.round(Math.min(gain/dist/10,gs/(j-i+1)))});}
       i=Math.max(j,i+1);
+    }
+    /* a phone at full-stage zoom only has room for the big ones; zoom in and they all show */
+    let show=runs;const narrow=W<560;
+    if(narrow&&!zoomed)show=[]; /* the colour of the line carries it; pinch in for the numbers */
+    else if(narrow)show=runs.slice().sort((a,b)=>b.gain-a.gain).slice(0,4).sort((a,b)=>a.i-b.i);
+    const dotXY=st.seg.map(w=>[X(w.km),Y(snapAlt(det,w.km,w.alt))]);
+    for(const r of show){
+      const {i,j,sgn,pct}=r;const mx0=X((base[i][0]+base[j][0])/2);
+      const yAt=x=>{let t=1e9;for(let q=0;q<base.length;q++){if(Math.abs(X(base[q][0])-x)<=24)t=Math.min(t,Y(base[q][1]));}return t<1e9?t:Y(base[Math.min(j,base.length-1)][1]);};
+      let spot=null;
+      for(const off of [0,-46,46,-70,70,-96,96]){
+        const mx=mx0+off;if(mx<padL+21||mx>W-padR-21)continue;
+        const top=yAt(mx);
+        for(const cand of (narrow?[top-36,top-58]:[top-36,top-58,top-80])){
+          if(cand<8)break;
+          if(dotXY.some(d=>Math.abs(d[0]-mx)<34&&cand>d[1]-46))continue; /* on top of a dot or its time label */
+          if(!placed.some(b=>Math.abs(mx-b[0])<50&&Math.abs(cand-b[1])<20)){spot=[mx,cand];break;}
+        }
+        if(spot)break;
+      }
+      if(!spot)continue;
+      const [mx,by]=spot;const up=sgn>0;placed.push([mx,by]);
+      grades+=`<g><rect x="${(mx-21).toFixed(1)}" y="${by.toFixed(1)}" width="42" height="16" rx="8" fill="#ef8354"/><text x="${mx.toFixed(1)}" y="${(by+11.5).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" font-weight="700" fill="#0a111c">${up?"\u25b2":"\u25bc"} ${pct}%</text></g>`;
     }
   }
   const hiAlt=Math.max(...st.seg.map(w=>w.alt));
@@ -1979,7 +1994,7 @@ function bigProfileSVG(st,g){
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?12:8}" fill="${on?CH("hi"):hi?"#f2c230":"#4a90b8"}" stroke="${on?"#f2c230":CH("bg")}" stroke-width="${on?4:2}"/>
       <text x="${x.toFixed(1)}" y="${(y-15-lift).toFixed(1)}" text-anchor="middle" font-family="DM Mono, monospace" font-size="10.5" fill="${slim?(on?CH("hi"):CH("eta")):(on?CH("hi"):hi?"#f2c230":CH("dim"))}">${slim?"~"+eta:w.alt}</text>
       ${glyphs}
-      ${strip?"":`<text x="${nx}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${anch}" font-family="DM Mono, monospace" font-size="12" fill="${on?CH("hi"):CH("name")}">${w.name.split(",")[0].split(" (")[0]}${slim?"":`<tspan fill="${on?CH("hi"):CH("eta")}" font-size="10.5"> \u00b7 ~${eta}</tspan>`}</text>`}
+      ${strip?"":`<text x="${nx}" y="${H-padB+rTop+(i%nrows)*rY}" text-anchor="${anch}" font-family="DM Mono, monospace" font-size="12" fill="${on?CH("hi"):CH("name")}">${shortName(w.name,nrows===3?16:40)}${slim?"":`<tspan fill="${on?CH("hi"):CH("eta")}" font-size="10.5"> \u00b7 ~${eta}</tspan>`}</text>`}
     </g>`;
   }).join("");
   let walked="",gps="";
@@ -2877,6 +2892,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v62</div>
+<div class="appver">camino-app · v63</div>
 </body>
 </html>
