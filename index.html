@@ -2530,6 +2530,7 @@ function projectOnLine(lat,lon,P,cum){
   if(best.d>=1e9)best={i:bi,t:0,d:bd,cum:cum[bi]};
   return best;
 }
+function wptSig(){let h=0;const str=WPTS.map(w=>w.km+"|"+w.lat+"|"+w.lon).join(";");for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))|0;return h;}
 function buildTrack(raw,srcLen){
   if(!raw||raw.length<10)return false;
   /* keep every corner, drop the straight runs: ~4 m tolerance, capped at ~9000 points for storage */
@@ -2543,7 +2544,7 @@ function buildTrack(raw,srcLen){
     P.forEach((p,i)=>{const d=hav(w.lat,w.lon,p[0],p[1]);if(d<bd){bd=d;b2=i;}});
     anchors[id]=b2;
   });
-  store.set("camino-gpx",{P,cum,anchors,pairs:buildPairs(P,cum),srcLen:srcLen||0});
+  store.set("camino-gpx",{P,cum,anchors,pairs:buildPairs(P,cum),srcLen:srcLen||0,wsig:wptSig()});
   buildNav(raw);
   setTrackChip();if(MAP)drawRoute();
   return true;
@@ -2574,7 +2575,7 @@ async function autoLoadBundled(){
     if(!texts.length)return;
     const srcLen=texts.reduce((a,t)=>a+t.length,0);
     const cur=store.get("camino-gpx",null);
-    if(cur&&cur.srcLen===srcLen&&cur.pairs&&getNav())return;
+    if(cur&&cur.srcLen===srcLen&&cur.pairs&&cur.wsig===wptSig()&&getNav())return; /* rebuild when the waypoints or their km change, not only the tracks */
     let raw=[];
     texts.forEach(t=>{const p=parseGpxText(t);if(p)raw=raw.concat(p);});
     buildTrack(raw,srcLen);
@@ -2894,6 +2895,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!updReloading){updReloading=true;location.reload();}});
 }
 </script>
-<div class="appver">camino-app · v65</div>
+<div class="appver">camino-app · v66</div>
 </body>
 </html>
